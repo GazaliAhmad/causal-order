@@ -14,6 +14,52 @@ The roadmap is guided by four constraints:
 * streaming claims must be operationally real, not aspirational
 * examples and docs are part of the product, not a cleanup task
 
+## `1.0` Design Principles
+
+The core design challenge is not whether distributed event uncertainty is real.
+It is whether the package can stay understandable while remaining honest.
+
+`causal-order` should aim for an API that is easy to adopt at the surface, but difficult to misuse into false certainty.
+
+Design standards for `1.0`:
+
+* a normal developer should be able to get value in minutes, not after reading the full specification
+* the default API must never silently upgrade weak evidence into strong claims
+* simple usage should stay simple, without forcing every user to learn the full causal model on day one
+* deeper truth must remain available through inspectable confidence, ordering basis, causal evidence, anomalies, and stream finality semantics
+* names should sound operational and clear, not academic for its own sake
+* outputs should help users answer:
+  * what happened?
+  * how sure are we?
+  * why does the library think that?
+  * what should we be careful about?
+* strict mode should be real and useful, not just more annoying
+* uncertainty should lead to action:
+  * inspect a concurrent group
+  * flag a suspicious event
+  * keep a stream window open longer
+  * avoid publishing a false audit timeline
+* determinism is required even when certainty is not
+* streaming finality must remain framed as an operational decision, not a causal truth claim
+
+Release bar for `1.0`:
+
+* the top-level API surface feels small and stable
+* the README teaches the mental model without overwhelming first-time users
+* result objects are easy to inspect and hard to misuse
+* tests and examples cover the common distributed failure modes the package claims to handle
+* there is no major place where the library hides uncertainty behind a clean-looking answer
+* a new user can explain the package simply:
+  * it helps order distributed events honestly and tells me how trustworthy that order is
+
+For new features, the default design test should be:
+
+* does this make first use clearer or harder?
+* does this preserve honesty?
+* does this expose useful depth without forcing it on everyone?
+* would an ordinary backend engineer understand the name?
+* does this create a cleaner mental model, not just a richer one?
+
 ## Platform Baseline
 
 Current intended platform posture:
