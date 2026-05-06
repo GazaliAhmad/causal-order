@@ -11,7 +11,7 @@ It is a library for working with distributed event timelines when wall-clock tim
 
 The project is intended to mature through `0.x` releases before a stable npm release.
 
-Current version: `0.0.3`
+Current version: `0.0.4`
 
 During `0.x`:
 
@@ -243,3 +243,7 @@ If you want the deeper mental model and failure modes, start here:
 * [Causal Inversion](./guides/causal-inversion.md)
 
 Runnable versions of those guides live in [examples/README.md](./examples/README.md).
+
+## License
+
+MIT. See [LICENSE](./LICENSE).

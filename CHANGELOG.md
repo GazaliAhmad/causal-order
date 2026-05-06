@@ -6,6 +6,18 @@ The project is currently in pre-release `0.x` development and has not been publi
 
 ## [Unreleased]
 
+## [0.0.4]
+
+### Added
+
+* top-level `LICENSE` file for the MIT license
+* README license section pointing to `LICENSE`
+
+### Changed
+
+* package version advanced to `0.0.4`
+* GitHub Actions CI now skips the Node `20` and `24` test matrix for docs-only and metadata-only updates
+
 ## [0.0.3]
 
 ### Added
