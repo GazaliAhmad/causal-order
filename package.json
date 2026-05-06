@@ -1,6 +1,6 @@
 {
   "name": "causal-order",
-  "version": "0.1.0",
+  "version": "0.0.3",
   "description": "An event integrity library for ordering and analyzing distributed events without false certainty.",
   "license": "MIT",
   "type": "module",
@@ -19,7 +19,10 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "check": "tsc -p tsconfig.json --noEmit"
+    "check": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node test/run.mjs",
+    "demo": "npm run build && node examples/smoke-demo.mjs",
+    "examples": "npm run build && node examples/index.mjs"
   },
   "devDependencies": {
     "typescript": "^5.9.0"

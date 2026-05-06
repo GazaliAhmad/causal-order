@@ -1,0 +1,13 @@
+import "./unit/clock.test.mjs"
+import "./unit/validation.test.mjs"
+import "./unit/ordering.test.mjs"
+import "./streaming/late-arrival.test.mjs"
+import "./scenarios/replay-corruption.test.mjs"
+import "./scenarios/multi-region-drift.test.mjs"
+import "./scenarios/false-audit-timeline.test.mjs"
+import "./scenarios/offline-sync-anomalies.test.mjs"
+import "./scenarios/causal-inversion.test.mjs"
+
+import { run } from "./helpers/harness.mjs"
+
+await run()

@@ -11,6 +11,8 @@ It is a library for working with distributed event timelines when wall-clock tim
 
 The project is intended to mature through `0.x` releases before a stable npm release.
 
+Current version: `0.0.3`
+
 During `0.x`:
 
 * the API is expected to evolve
@@ -21,6 +23,23 @@ Planned release posture:
 
 * `0.x`: testing, iteration, API refinement
 * `1.0.0`: first stable public npm release
+
+## Try It
+
+The fastest way to see the library working today:
+
+```bash
+npm install
+npm test
+npm run demo
+npm run examples
+```
+
+What those commands do:
+
+* `npm test`: runs the automated unit, streaming, and scenario tests
+* `npm run demo`: runs a small focused causal inversion demo
+* `npm run examples`: runs the guide-aligned distributed failure-mode examples
 
 ## How Developers Use This Library
 
@@ -210,3 +229,17 @@ Naive timestamp sorting produces a clean-looking answer.
 That answer is often false.
 
 `causal-order` exists to make that uncertainty visible instead of hiding it.
+
+## Guides
+
+If you want the deeper mental model and failure modes, start here:
+
+* [Guides Index](./guides/README.md)
+* [Mental Model](./guides/mental-model.md)
+* [Replay Corruption](./guides/replay-corruption.md)
+* [Multi-Region Drift](./guides/multi-region-drift.md)
+* [False Audit Timelines](./guides/false-audit-timeline.md)
+* [Offline Sync Anomalies](./guides/offline-sync-anomalies.md)
+* [Causal Inversion](./guides/causal-inversion.md)
+
+Runnable versions of those guides live in [examples/README.md](./examples/README.md).

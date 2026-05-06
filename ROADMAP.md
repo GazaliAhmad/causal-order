@@ -110,6 +110,8 @@ Focus:
 
 * improve API ergonomics where it helps without weakening rigor
 * add examples directory
+* add a tiny CLI demo for fast hands-on evaluation, for example:
+  * `npx causal-order-demo sample.jsonl`
 * add JSONL adapter
 * improve error messages and anomaly formatting
 * add quick-start samples for:
