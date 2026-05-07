@@ -2,9 +2,56 @@
 
 All notable changes to this project will be documented in this file.
 
-The project is currently in pre-release `0.x` development and has not been published to npm.
+## [0.1.0]
 
-## [Unreleased]
+### Added
+
+* npm release metadata including repository, homepage, bugs, keywords, author, and Node.js engine requirements
+* `release:check` command for a full pre-release verification pass
+* conceptual GitHub wiki pages for the first public `0.1.x` release line
+* explicit validated-value types for clocks and event envelopes after successful validation
+
+### Changed
+
+* package version advanced to `0.1.0`
+* README was rewritten to be npm-facing, with installation, package-level usage, and public documentation links
+* package payload was trimmed to the essentials for npm publishing:
+  * `dist`
+  * `README.md`
+  * `LICENSE`
+* guide and wiki links in the README now resolve cleanly from a public npm package context
+* package builds automatically during `prepack`
+* `validateClock()` and `validateEvent()` now accept raw `unknown` input and promote successful validation results into stronger validated values
+* `orderEventStream()` now surfaces malformed events as anomalies in non-strict mode instead of crashing during watermark handling
+* ordering metadata now restores the intended distinction between `derived`, `fallback`, and `unknown`, including reachable `ingestion_order` and deterministic tie-break outcomes
+
+## [0.0.6]
+
+### Added
+
+* expanded semantic test coverage for ordering regressions, missing dependencies, same-node conflicts, concurrency grouping, invalid-data survival, and publish-surface verification
+* dedicated scale-regression perf guardrails for `10k` and `100k` workload bands
+* benchmark check command for validating broad timing and memory thresholds
+
+### Changed
+
+* package version advanced to `0.0.6`
+* `orderEventStream()` now distinguishes correction flushes from terminal finality in `emit_correction` mode
+* performance tooling now includes explicit guard profiles intended to catch catastrophic regressions
+
+## [0.0.5]
+
+### Added
+
+* performance benchmark harness with named profiles and CSV export support
+* benchmark commands for default, full-profile, and CSV benchmark runs
+* realistic workload model guidance in the README and roadmap
+
+### Changed
+
+* package version advanced to `0.0.5`
+* `orderEvents()` now avoids double-counting duplicate causal edges when building the ordering graph
+* README now documents performance benchmarking entry points
 
 ## [0.0.4]
 

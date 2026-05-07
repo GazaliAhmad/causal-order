@@ -3,7 +3,9 @@ import type {
   EventEnvelope,
   OrderBatch,
   StreamOrderOptions,
+  ValidatedEventEnvelope,
 } from "../types.js"
+import { detectAnomalies } from "../anomalies/detectAnomalies.js"
 import { getEventTime } from "../internal/utils.js"
 import { orderEvents } from "./orderEvents.js"
 import { validateEvent } from "../validate/validateEvent.js"
@@ -11,7 +13,7 @@ import { validateEvent } from "../validate/validateEvent.js"
 function defaultWatermark<T>(
   event: EventEnvelope<T>,
 ): bigint {
-  return event.clock.physicalTimeMs
+  return getEventTime(event) ?? 0n
 }
 
 export async function* orderEventStream<T>(
@@ -23,18 +25,21 @@ export async function* orderEventStream<T>(
   const lateArrivalPolicy = options?.lateArrivalPolicy ?? "flag"
   const getWatermark = options?.watermark ?? defaultWatermark
 
-  const buffer: EventEnvelope<T>[] = []
+  const buffer: ValidatedEventEnvelope<T>[] = []
   let maxSeenPhysicalTime = 0n
   let pendingAnomalies: EventAnomaly<T>[] = []
 
-  const flushReady = (isFinal: boolean): OrderBatch<T> | undefined => {
+  const flushReady = (
+    flushAll: boolean,
+    isTerminal: boolean,
+  ): OrderBatch<T> | undefined => {
     const watermark = maxSeenPhysicalTime - maxLateArrivalMs
-    const ready: EventEnvelope<T>[] = []
-    const remaining: EventEnvelope<T>[] = []
+    const ready: ValidatedEventEnvelope<T>[] = []
+    const remaining: ValidatedEventEnvelope<T>[] = []
 
     for (const event of buffer) {
       const eventTime = getEventTime(event)
-      if (isFinal || (eventTime !== undefined && eventTime <= watermark)) {
+      if (flushAll || (eventTime !== undefined && eventTime <= watermark)) {
         ready.push(event)
       } else {
         remaining.push(event)
@@ -44,7 +49,7 @@ export async function* orderEventStream<T>(
     buffer.length = 0
     buffer.push(...remaining)
 
-    if (ready.length === 0 && pendingAnomalies.length === 0 && !isFinal) {
+    if (ready.length === 0 && pendingAnomalies.length === 0 && !isTerminal) {
       return undefined
     }
 
@@ -56,7 +61,7 @@ export async function* orderEventStream<T>(
       events: result.ordered,
       anomalies,
       watermark,
-      isFinal: isFinal && buffer.length === 0,
+      isFinal: isTerminal && buffer.length === 0,
     }
   }
 
@@ -74,6 +79,10 @@ export async function* orderEventStream<T>(
           .map((error) => error.message)
           .join("; ")}`,
       )
+    }
+
+    if (!validation.valid) {
+      pendingAnomalies.push(...detectAnomalies([event], validationOptions))
     }
 
     const watermarkValue = getWatermark(event)
@@ -100,7 +109,7 @@ export async function* orderEventStream<T>(
       pendingAnomalies.push(anomaly)
 
       if (lateArrivalPolicy === "drop") {
-        const maybeBatch = flushReady(false)
+        const maybeBatch = flushReady(false, false)
         if (maybeBatch !== undefined) {
           yield maybeBatch
         }
@@ -109,23 +118,26 @@ export async function* orderEventStream<T>(
     }
 
     if (validation.valid) {
-      buffer.push(event)
+      buffer.push(validation.value)
     }
 
     if (buffer.length >= batchSize) {
-      const maybeBatch = flushReady(lateArrivalPolicy === "emit_correction" && isLate)
+      const maybeBatch = flushReady(
+        lateArrivalPolicy === "emit_correction" && isLate,
+        false,
+      )
       if (maybeBatch !== undefined) {
         yield maybeBatch
       }
     } else {
-      const maybeBatch = flushReady(false)
+      const maybeBatch = flushReady(false, false)
       if (maybeBatch !== undefined) {
         yield maybeBatch
       }
     }
   }
 
-  const finalBatch = flushReady(true)
+  const finalBatch = flushReady(true, true)
   if (finalBatch !== undefined) {
     yield finalBatch
   }

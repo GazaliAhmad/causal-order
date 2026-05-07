@@ -53,6 +53,13 @@ export function compareDeterministically<T>(
     return logical
   }
 
+  if (tieBreaker !== undefined) {
+    const tieResult = applyTieBreaker(a, b, tieBreaker)
+    if (tieResult !== 0) {
+      return tieResult
+    }
+  }
+
   const node = compareString(a.nodeId, b.nodeId)
   if (node !== 0) {
     return node
@@ -63,5 +70,5 @@ export function compareDeterministically<T>(
     return id
   }
 
-  return applyTieBreaker(a, b, tieBreaker)
+  return 0
 }

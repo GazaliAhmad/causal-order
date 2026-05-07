@@ -42,6 +42,54 @@ test("orderEvents keeps HLC-only ordering as derived", () => {
   assert.equal(result.ordered[0].confidence, "derived")
 })
 
+test("orderEvents marks equal-time independent events as deterministic fallback", () => {
+  const eventA = makeEvent({
+    id: "evt-a",
+    nodeId: "node-a",
+    physicalTimeMs: 5_000n,
+  })
+  const eventB = makeEvent({
+    id: "evt-b",
+    nodeId: "node-b",
+    physicalTimeMs: 5_000n,
+  })
+
+  const result = orderEvents([eventB, eventA])
+
+  assert.deepEqual(
+    result.ordered.map((entry) => entry.event.id),
+    ["evt-a", "evt-b"],
+  )
+  assert.ok(result.ordered.every((entry) => entry.orderBasis === "deterministic_tiebreaker"))
+  assert.ok(result.ordered.every((entry) => entry.confidence === "fallback"))
+})
+
+test("orderEvents can derive equal-time ordering from ingestion metadata when requested", () => {
+  const eventA = makeEvent({
+    id: "evt-a",
+    nodeId: "node-a",
+    physicalTimeMs: 5_000n,
+    ingestedAt: 20n,
+  })
+  const eventB = makeEvent({
+    id: "evt-b",
+    nodeId: "node-b",
+    physicalTimeMs: 5_000n,
+    ingestedAt: 10n,
+  })
+
+  const result = orderEvents([eventA, eventB], {
+    tieBreaker: "ingestion_order",
+  })
+
+  assert.deepEqual(
+    result.ordered.map((entry) => entry.event.id),
+    ["evt-b", "evt-a"],
+  )
+  assert.ok(result.ordered.every((entry) => entry.orderBasis === "ingestion_order"))
+  assert.ok(result.ordered.every((entry) => entry.confidence === "derived"))
+})
+
 test("orderEvents returns structured anomalies by default for invalid input", () => {
   const invalid = {
     id: "evt-invalid",

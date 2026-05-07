@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap describes how `causal-order` should mature from an experimental `0.x` library into a stable `1.0.0` npm package.
+This roadmap describes how `causal-order` should mature from its public `0.1.x` release line into a stable `1.0.0` npm package.
 
 The goal is not to rush publication.
 The goal is to make sure the semantics are trustworthy before the package becomes a long-term contract.
@@ -68,6 +68,61 @@ Current intended platform posture:
 * ESM only
 * core time representation stays primitive: `bigint` epoch milliseconds
 * no `Temporal` requirement in the core package
+
+## Realistic Workload Model
+
+The roadmap should optimize for real operational slices, not vanity-scale numbers.
+
+In most actual use cases, the unit of work is not "all historical events everywhere."
+It is something more bounded:
+
+* a single audit reconstruction
+* a replay batch
+* a tenant or partition slice
+* a device or account history
+* a bounded streaming window
+
+That means the design target should be:
+
+* `10k` events should feel routine
+* `100k` events should feel credible and well-supported
+* `1M+` events should be treated as a deliberate scalability track, not as the baseline promise for every use case
+
+This distinction matters because there is no end to abstract number-chasing.
+If the package says `1M`, someone will ask why not `10M`.
+The better standard is whether the package is strong for the kinds of event sets that teams actually inspect together.
+
+For truly large or unbounded workloads, the roadmap should prefer batching, partitioning, and `orderEventStream()` semantics over pretending one giant in-memory batch is the primary model.
+
+## `1.0` Release Checklist
+
+Before `causal-order` should be considered ready for `1.0.0`, these should all feel true:
+
+* the top-level API names and exported result types feel stable enough to support long-term
+* confidence semantics for `proven`, `derived`, `fallback`, and `unknown` are crisp and no longer expected to change materially
+* `orderBasis`, `causalEvidence`, anomaly types, concurrent groups, and strict-mode behavior feel intentional rather than exploratory
+* the difference between `orderEvents()` and `orderEventStream()` is clear in both code and docs
+* the README describes the real shipped package, not a still-evolving intended shape
+* examples clearly show why this library is safer than naive timestamp sorting
+* performance guidance is honest about routine workloads, heavier batch workloads, and when streaming is the better model
+* large-batch behavior has been benchmarked and pressure-tested enough that major surprises are unlikely in realistic use
+* anomaly and error messages are useful enough to support real debugging and audit work
+* the project is ready to preserve the semantics as a public contract, not just the function names
+
+Current status snapshot:
+
+| Checklist Item | Status | Notes |
+| --- | --- | --- |
+| Top-level API names and exported result types feel stable enough to support long-term | Partial | The surface is getting coherent, but semantics are still being hardened through testing and iteration. |
+| Confidence semantics are crisp and no longer expected to change materially | Partial | The model is strong, but still feels like it is being frozen rather than already frozen. |
+| `orderBasis`, `causalEvidence`, anomaly types, concurrent groups, and strict-mode behavior feel intentional rather than exploratory | Partial | Stronger than before, but concurrency grouping and some stream semantics still feel actively defined. |
+| The difference between `orderEvents()` and `orderEventStream()` is clear in both code and docs | Partial | The boundary is clearer, but can still be made more explicit in the docs. |
+| The README describes the real shipped package, not a still-evolving intended shape | Partial | The README is now npm-facing and package-oriented, but the broader documentation set still needs to feel fully settled as a long-term contract. |
+| Examples clearly show why this library is safer than naive timestamp sorting | Partial | The examples are good and aligned to failure modes, but can still be made more central for `1.0`. |
+| Performance guidance is honest about routine workloads, heavier batch workloads, and when streaming is the better model | Partial | This is much improved and grounded, but still relatively fresh. |
+| Large-batch behavior has been benchmarked and pressure-tested enough that major surprises are unlikely in realistic use | Partial | Benchmarks and guardrails are now in place, but more repeated pressure would strengthen confidence further. |
+| Anomaly and error messages are useful enough to support real debugging and audit work | Partial | Coverage is stronger, but message quality still feels like a polish area rather than a closed one. |
+| The project is ready to preserve the semantics as a public contract, not just the function names | Not Yet | This is the real `1.0` threshold, and the project does not appear to be claiming that yet. |
 
 ## Release Phases
 
@@ -166,6 +221,12 @@ Focus:
   * distributed debugging
   * offline sync inspection
 * add guidance for choosing strict mode and late-arrival policies
+* document stricter-mode guidance more explicitly, including where fail-fast behavior is the safer operational choice:
+  * audit and compliance pipelines
+  * financial or regulated event processing
+  * CI and fixture verification
+  * upstream data-quality enforcement
+  * producer debugging and contract testing
 
 Exit criteria:
 

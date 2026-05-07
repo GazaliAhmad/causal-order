@@ -1,90 +1,126 @@
 # causal-order
 
-`causal-order` is an event integrity library for distributed systems.
+An event integrity library for distributed systems.
 
-It helps developers order what can be ordered, group what is concurrent, flag what is suspicious, and refuse false certainty.
+`causal-order` helps developers reconstruct event timelines without pretending the system knows more than it does.
 
-This is not a general time library.
-It is a library for working with distributed event timelines when wall-clock timestamps are not enough.
+Instead of only sorting by timestamp, it helps you:
 
-## Status
+* order what can be ordered
+* group what is concurrent
+* flag what is suspicious
+* keep the difference between proof, inference, fallback, and unknown
 
-The project is intended to mature through `0.x` releases before a stable npm release.
+## Why This Exists
 
-Current version: `0.0.4`
+Distributed systems produce misleading timelines all the time:
 
-During `0.x`:
+* clocks drift across regions
+* replayed events can look newer than original events
+* offline devices sync late
+* ingestion order differs from creation order
+* some events are truly concurrent
 
-* the API is expected to evolve
-* examples and semantics matter more than surface stability
-* the goal is to prove the model before publishing `1.0.0`
+A naive timestamp sort produces a clean-looking answer.
+That answer is often false.
 
-Planned release posture:
+`causal-order` exists to make that uncertainty visible instead of hiding it.
 
-* `0.x`: testing, iteration, API refinement
-* `1.0.0`: first stable public npm release
+## What You Get
 
-## Try It
+Given a set of distributed events, the library returns more than a sorted list.
 
-The fastest way to see the library working today:
+It returns:
 
-```bash
-npm install
-npm test
-npm run demo
-npm run examples
-```
+* `ordered`: events with `orderIndex`, `orderBasis`, and `confidence`
+* `concurrentGroups`: events that should not be flattened into fake sequence
+* `anomalies`: invalid, suspicious, or operationally important records
+* `stats`: summary counts for the batch
 
-What those commands do:
-
-* `npm test`: runs the automated unit, streaming, and scenario tests
-* `npm run demo`: runs a small focused causal inversion demo
-* `npm run examples`: runs the guide-aligned distributed failure-mode examples
-
-## How Developers Use This Library
-
-Developers use `causal-order` when they have events from multiple services, regions, devices, or workers and do not want to lie to themselves by sorting only on timestamps.
-
-Typical workflow:
-
-1. Generate or ingest event clocks.
-2. Validate each event.
-3. Order events with explicit confidence levels.
-4. Inspect anomalies and concurrent groups instead of forcing fake order.
-
-In practice, this library is useful for:
-
-* audit timeline reconstruction
-* replay pipelines
-* multi-region debugging
-* offline sync inspection
-* late-arrival stream handling
-* distributed incident analysis
-
-What developers get back is not just a sorted list.
-They get a safer interpretation of the timeline:
+Confidence is explicit:
 
 * `proven`: explicit causal evidence exists
-* `derived`: order was inferred from HLC, sequence, or ingestion metadata
-* `fallback`: deterministic tie-breaking was required
-* `unknown`: the library cannot justify a reliable order
+* `derived`: order was inferred from useful but weaker metadata
+* `fallback`: deterministic ordering was imposed for stability
+* `unknown`: the library cannot honestly justify the claim
 
-That means the result can say:
+## Install
 
-* this event is safely before that one
-* these two events are concurrent
-* this record has an invalid clock
-* this stream result is operationally final, not causally certain
+```bash
+npm install causal-order
+```
 
-The value is not "we sorted your events."
-The value is "we stopped your timeline from pretending to know more than it does."
+Platform:
 
-## Quick Start
+* Node.js `20+`
+* ESM only
 
-The examples below describe the intended `0.x` API shape.
-They are designed to show how a developer would use the library once the package surface is available.
+## Quick Example
 
-### 1. Create clocks when producing events
+```ts
+import { orderEvents } from "causal-order"
+
+const events = [
+  {
+    id: "evt-1",
+    nodeId: "orders-api",
+    clock: {
+      physicalTimeMs: 1714971840123n,
+      logicalCounter: 0,
+      nodeId: "orders-api",
+    },
+    sequence: 1n,
+    payload: { type: "order.created" },
+  },
+  {
+    id: "evt-2",
+    nodeId: "payments-worker",
+    clock: {
+      physicalTimeMs: 1714971840125n,
+      logicalCounter: 1,
+      nodeId: "payments-worker",
+    },
+    parentEventId: "evt-1",
+    payload: { type: "payment.captured" },
+  },
+]
+
+const result = orderEvents(events, {
+  strict: false,
+  detectAnomalies: true,
+})
+
+console.log(result.ordered)
+console.log(result.concurrentGroups)
+console.log(result.anomalies)
+```
+
+Example output shape:
+
+```ts
+[
+  {
+    event: events[0],
+    orderIndex: 0n,
+    orderBasis: "sequence",
+    confidence: "derived",
+  },
+  {
+    event: events[1],
+    orderIndex: 1n,
+    orderBasis: "causal",
+    confidence: "proven",
+    causalEvidence: [{ type: "parent_event", parentEventId: "evt-1" }],
+  },
+]
+```
+
+The important part is not just the order.
+It is the explanation of why that order exists and how trustworthy it is.
+
+## Common Workflow
+
+### 1. Create or ingest clocks
 
 ```ts
 import { createHlcClock } from "causal-order"
@@ -97,103 +133,51 @@ const event = {
   id: "evt-1",
   nodeId: "api-sg-1",
   clock: clock.now(),
-  payload: {
-    type: "user_created",
-    userId: "user-123",
-  },
+  payload: { type: "user.created" },
   sequence: 1n,
 }
 ```
 
-This gives each event a Hybrid Logical Clock timestamp that can move forward safely even when wall-clock time is imperfect.
-
-### 2. Validate events before trusting them
+### 2. Validate events
 
 ```ts
 import { validateEvent } from "causal-order"
 
-const result = validateEvent(event)
+const validation = validateEvent(event)
 
-if (!result.valid) {
-  console.error(result.errors)
+if (!validation.valid) {
+  console.error(validation.errors)
 }
 ```
 
-Validation is important because bad metadata should become visible, not silently normalized.
-
-### 3. Order events honestly
+### 3. Order the batch honestly
 
 ```ts
 import { orderEvents } from "causal-order"
 
-const events = [
-  {
-    id: "evt-1",
-    nodeId: "api-sg-1",
-    clock: {
-      physicalTimeMs: 1714971840123n,
-      logicalCounter: 0,
-      nodeId: "api-sg-1",
-    },
-    payload: { type: "user_created" },
-    sequence: 1n,
-  },
-  {
-    id: "evt-2",
-    nodeId: "worker-us-1",
-    clock: {
-      physicalTimeMs: 1714971840125n,
-      logicalCounter: 2,
-      nodeId: "worker-us-1",
-    },
-    payload: { type: "email_sent" },
-  },
-]
-
-const ordered = orderEvents(events, {
+const result = orderEvents(events, {
   strict: false,
   detectAnomalies: true,
 })
 ```
 
-Then inspect the result:
+### 4. Inspect confidence and evidence
 
 ```ts
-console.log(ordered.ordered)
-console.log(ordered.concurrentGroups)
-console.log(ordered.anomalies)
+for (const item of result.ordered) {
+  console.log(item.event.id, item.orderBasis, item.confidence)
+}
 ```
 
-Expected shape:
+## Streaming
 
-```ts
-[
-  {
-    event: events[0],
-    orderIndex: 0n,
-    orderBasis: "sequence",
-    confidence: "proven",
-    causalEvidence: [{ type: "same_node_sequence" }],
-  },
-  {
-    event: events[1],
-    orderIndex: 1n,
-    orderBasis: "hlc",
-    confidence: "derived",
-  },
-]
-```
-
-The important part is the explanation.
-The library tells the developer why an order exists and how trustworthy that order is.
-
-### 4. Use streaming mode for large event flows
+For large or unbounded event flows, use `orderEventStream()` instead of pretending everything belongs in one in-memory batch.
 
 ```ts
 import { orderEventStream } from "causal-order"
 
-for await (const batch of orderEventStream(source, {
-  windowSizeMs: 60_000n,
+for await (const batch of orderEventStream(source(), {
+  batchSize: 100,
   maxLateArrivalMs: 30_000n,
   lateArrivalPolicy: "flag",
   strict: false,
@@ -204,46 +188,143 @@ for await (const batch of orderEventStream(source, {
 }
 ```
 
-This is for large or unbounded streams where the library should use bounded windows instead of pretending it can hold full history forever.
+Important rule:
 
-### 5. Understand what the result means
+* stream finality is operational, not causal certainty
 
-Keep these rules in mind:
+## When To Use It
 
-* HLC ordering alone is `derived`, not `proven`
-* `concurrent` means no known causal relationship exists
-* `unknown` means the metadata is too weak or invalid to justify a claim
-* stream finality is watermark-based operational confidence, not causal certainty
+`causal-order` is a good fit for:
 
-## Why Not Just Sort By Timestamp?
+* audit timeline reconstruction
+* replay analysis
+* multi-region debugging
+* offline sync inspection
+* late-arrival stream handling
+* distributed incident analysis
 
-Because distributed systems produce misleading timelines all the time:
+It is especially useful when:
 
-* clocks drift across regions
-* replayed events can appear newer than original events
-* offline devices sync late
-* ingestion order can differ from event creation order
-* some events are truly concurrent
+* events come from multiple services, devices, or regions
+* timestamps are not enough on their own
+* ordering claims need explanation
+* concurrency matters
+* suspicious metadata should not be silently normalized
 
-Naive timestamp sorting produces a clean-looking answer.
-That answer is often false.
+## Realistic Workloads
 
-`causal-order` exists to make that uncertainty visible instead of hiding it.
+This package is not designed around the idea that every user needs to sort millions of unrelated events in one call.
 
-## Guides
+The more realistic question is:
+how many events need to be interpreted together to answer one operational question honestly?
 
-If you want the deeper mental model and failure modes, start here:
+Typical real-world ranges are more often:
 
-* [Guides Index](./guides/README.md)
-* [Mental Model](./guides/mental-model.md)
-* [Replay Corruption](./guides/replay-corruption.md)
-* [Multi-Region Drift](./guides/multi-region-drift.md)
-* [False Audit Timelines](./guides/false-audit-timeline.md)
-* [Offline Sync Anomalies](./guides/offline-sync-anomalies.md)
-* [Causal Inversion](./guides/causal-inversion.md)
+* `100` to `10,000` events for focused debugging or audit slices
+* `10,000` to `100,000` events for larger replay, sync, or incident workloads
+* `100,000+` events for heavier batch analysis, where benchmarking and batching matter
 
-Runnable versions of those guides live in [examples/README.md](./examples/README.md).
+A practical mental model is:
+
+* `10k` should feel easy
+* `100k` should feel solid
+* million-scale workloads should be treated as an explicit scalability target, not the default assumption
+
+If the workload is naturally unbounded, `orderEventStream()` is the more honest model.
+
+## What The Package Believes
+
+`causal-order` is built around a simple idea:
+
+> Be easy to use at the surface, but hard to misuse into false certainty.
+
+That means:
+
+* `concurrent` is not the same thing as `unknown`
+* HLC ordering alone is useful, but not full proof
+* deterministic output is not the same thing as justified causal order
+* invalid or weak metadata should become visible, not silently repaired
+
+## Why Not Just Use Clock Libraries?
+
+There are already npm packages for pieces of this problem:
+
+* vector clocks
+* version vectors
+* hybrid logical clocks
+* infrastructure-specific causal ordering primitives
+
+Those packages are useful, but they usually stop at the clock or ordering primitive itself.
+
+`causal-order` is trying to solve a different package-level problem:
+
+* validate distributed event records
+* order batches of events
+* surface concurrency explicitly
+* detect anomalies
+* return confidence and evidence with the result
+
+So the goal is not to replace clock libraries.
+It is to provide a higher-level event interpretation layer for developers who need an honest timeline, not just a timestamp primitive.
+
+## Documentation
+
+Conceptual docs:
+
+* [Wiki Home](https://github.com/GazaliAhmad/causal-order/wiki)
+* [What This Library Is](https://github.com/GazaliAhmad/causal-order/wiki/What-This-Library-Is)
+* [The Problem With Distributed Timelines](https://github.com/GazaliAhmad/causal-order/wiki/The-Problem-With-Distributed-Timelines)
+* [Confidence Levels](https://github.com/GazaliAhmad/causal-order/wiki/Confidence-Levels)
+* [Concurrent vs Unknown](https://github.com/GazaliAhmad/causal-order/wiki/Concurrent-vs-Unknown)
+* [Streaming Finality](https://github.com/GazaliAhmad/causal-order/wiki/Streaming-Finality)
+
+Repository guides:
+
+* [Guides Index](https://github.com/GazaliAhmad/causal-order/blob/main/guides/README.md)
+* [Mental Model](https://github.com/GazaliAhmad/causal-order/blob/main/guides/mental-model.md)
+* [Replay Corruption](https://github.com/GazaliAhmad/causal-order/blob/main/guides/replay-corruption.md)
+* [Multi-Region Drift](https://github.com/GazaliAhmad/causal-order/blob/main/guides/multi-region-drift.md)
+* [False Audit Timelines](https://github.com/GazaliAhmad/causal-order/blob/main/guides/false-audit-timeline.md)
+* [Offline Sync Anomalies](https://github.com/GazaliAhmad/causal-order/blob/main/guides/offline-sync-anomalies.md)
+* [Causal Inversion](https://github.com/GazaliAhmad/causal-order/blob/main/guides/causal-inversion.md)
+
+Runnable repository examples:
+
+* [Examples Index](https://github.com/GazaliAhmad/causal-order/blob/main/examples/README.md)
+
+## Status
+
+`causal-order` is currently in the public `0.1.x` release line.
+
+That means:
+
+* the package is usable today
+* the API is expected to evolve
+* semantics matter more than surface churn at this stage
+* `1.0.0` is the point where the semantic contract should feel stable enough to preserve long-term
+
+## Repository Development
+
+If you are working in the repository itself:
+
+```bash
+npm install
+npm run check
+npm test
+npm run bench:check
+```
+
+Useful local commands:
+
+* `npm run demo`
+* `npm run examples`
+* `npm run bench`
+* `npm run bench:all`
+* `npm run bench:csv`
+
+The perf guard is intentionally a broad safety rail, not a machine-independent promise.
+It is meant to catch obvious regressions in realistic workload bands.
 
 ## License
 
-MIT. See [LICENSE](./LICENSE).
+MIT. See [LICENSE](https://github.com/GazaliAhmad/causal-order/blob/main/LICENSE).

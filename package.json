@@ -1,8 +1,31 @@
 {
   "name": "causal-order",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "An event integrity library for ordering and analyzing distributed events without false certainty.",
+  "keywords": [
+    "distributed-systems",
+    "event-ordering",
+    "event-integrity",
+    "hybrid-logical-clock",
+    "hlc",
+    "audit",
+    "concurrency",
+    "event-streams"
+  ],
+  "author": "Gazali Ahmad",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GazaliAhmad/causal-order.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GazaliAhmad/causal-order/issues"
+  },
+  "homepage": "https://github.com/GazaliAhmad/causal-order#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "sideEffects": false,
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -15,14 +38,20 @@
   "files": [
     "dist",
     "README.md",
-    "CHANGELOG.md"
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node test/run.mjs",
+    "release:check": "npm run check && npm test && npm run bench:check",
     "demo": "npm run build && node examples/smoke-demo.mjs",
-    "examples": "npm run build && node examples/index.mjs"
+    "examples": "npm run build && node examples/index.mjs",
+    "bench": "npm run build && node perf/run.mjs --profile baseline-100k-shuffled",
+    "bench:all": "npm run build && node perf/run.mjs --all",
+    "bench:csv": "npm run build && node perf/run.mjs --all --out perf/results/latest.csv",
+    "bench:check": "npm run build && node perf/check.mjs",
+    "prepack": "npm run build"
   },
   "devDependencies": {
     "typescript": "^5.9.0"

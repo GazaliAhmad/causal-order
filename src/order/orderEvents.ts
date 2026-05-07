@@ -5,16 +5,17 @@ import type {
   OrderOptions,
   OrderResult,
   OrderedEvent,
+  ValidatedEventEnvelope,
 } from "../types.js"
 import { compareByCausality } from "../compare/causalCompare.js"
 import { compareByHlc } from "../compare/hlcCompare.js"
 import { compareDeterministically } from "../compare/deterministicCompare.js"
 import { detectAnomalies } from "../anomalies/detectAnomalies.js"
-import { dedupeEvidence } from "../internal/utils.js"
+import { dedupeEvidence, getEventTime } from "../internal/utils.js"
 import { validateEvent } from "../validate/validateEvent.js"
 
 type GraphNode<T> = {
-  event: EventEnvelope<T>
+  event: ValidatedEventEnvelope<T>
   index: number
   outgoing: number[]
   indegree: number
@@ -24,18 +25,36 @@ type GraphNode<T> = {
 function pushUniqueEdge<T>(
   from: GraphNode<T>,
   toIndex: number,
-): void {
+): boolean {
   if (!from.outgoing.includes(toIndex)) {
     from.outgoing.push(toIndex)
+    return true
   }
+
+  return false
 }
 
 function buildOrderedMetadata<T>(
-  event: EventEnvelope<T>,
+  event: ValidatedEventEnvelope<T>,
   orderIndex: bigint,
   evidence: CausalEvidence[],
+  options: {
+    tieBreaker?: OrderOptions<T>["tieBreaker"]
+    unresolvedEventIds: Set<string>
+    sameTimeEventCounts: Map<string, number>
+    sameTimeIngestionTies: Set<string>
+  },
 ): OrderedEvent<T> {
   const causalEvidence = dedupeEvidence(evidence)
+
+  if (options.unresolvedEventIds.has(event.id)) {
+    return {
+      event,
+      orderIndex,
+      orderBasis: "deterministic_tiebreaker",
+      confidence: "unknown",
+    }
+  }
 
   if (causalEvidence.length > 0) {
     const hasSequenceEvidence = causalEvidence.some(
@@ -59,21 +78,37 @@ function buildOrderedMetadata<T>(
     }
   }
 
-  const hlcOrder = compareByHlc(event.clock, event.clock)
-  if (hlcOrder !== "unknown") {
-    return {
-      event,
-      orderIndex,
-      orderBasis: "hlc",
-      confidence: "derived",
-    }
-  }
+  const eventTime = getEventTime(event)
+  const sameTimeCount = eventTime === undefined
+    ? 0
+    : (options.sameTimeEventCounts.get(eventTime.toString()) ?? 0)
 
-  if (event.ingestedAt !== undefined) {
+  if (
+    options.tieBreaker === "ingestion_order" &&
+    options.sameTimeIngestionTies.has(event.id)
+  ) {
     return {
       event,
       orderIndex,
       orderBasis: "ingestion_order",
+      confidence: "derived",
+    }
+  }
+
+  if (sameTimeCount > 1) {
+    return {
+      event,
+      orderIndex,
+      orderBasis: "deterministic_tiebreaker",
+      confidence: "fallback",
+    }
+  }
+
+  if (compareByHlc(event.clock, event.clock) !== "unknown") {
+    return {
+      event,
+      orderIndex,
+      orderBasis: "hlc",
       confidence: "derived",
     }
   }
@@ -131,7 +166,7 @@ export function orderEvents<T>(
     ? []
     : detectAnomalies(events, validationOptions)
 
-  const validEvents: EventEnvelope<T>[] = []
+  const validEvents: ValidatedEventEnvelope<T>[] = []
   for (const event of events) {
     const validation = validateEvent(event, validationOptions)
     if (!validation.valid) {
@@ -154,7 +189,7 @@ export function orderEvents<T>(
       continue
     }
 
-    validEvents.push(event)
+    validEvents.push(validation.value)
   }
 
   const nodes = validEvents.map<GraphNode<T>>((event, index) => ({
@@ -181,9 +216,10 @@ export function orderEvents<T>(
       if (parentIndex !== undefined) {
         const parentNode = nodes[parentIndex]
         if (parentNode !== undefined) {
-          pushUniqueEdge(parentNode, node.index)
+          if (pushUniqueEdge(parentNode, node.index)) {
+            node.indegree += 1
+          }
         }
-        node.indegree += 1
         node.evidence.push({ type: "parent_event", parentEventId })
       }
     }
@@ -193,9 +229,10 @@ export function orderEvents<T>(
       if (dependencyIndex !== undefined) {
         const dependencyNode = nodes[dependencyIndex]
         if (dependencyNode !== undefined) {
-          pushUniqueEdge(dependencyNode, node.index)
+          if (pushUniqueEdge(dependencyNode, node.index)) {
+            node.indegree += 1
+          }
         }
-        node.indegree += 1
         node.evidence.push({
           type: "causal_dependency",
           dependsOnEventId: dependencyEventId,
@@ -217,8 +254,9 @@ export function orderEvents<T>(
         current?.event.sequence !== undefined &&
         previous.event.sequence < current.event.sequence
       ) {
-        pushUniqueEdge(previous, current.index)
-        current.indegree += 1
+        if (pushUniqueEdge(previous, current.index)) {
+          current.indegree += 1
+        }
         current.evidence.push({ type: "same_node_sequence" })
       }
     }
@@ -254,7 +292,11 @@ export function orderEvents<T>(
     throw new Error("Unable to produce a complete ordering from the provided events")
   }
 
-  for (const node of nodes) {
+  const unresolvedNodes = nodes
+    .filter((node) => !orderedNodes.includes(node))
+    .sort((a, b) => compareDeterministically(a.event, b.event, options?.tieBreaker))
+
+  for (const node of unresolvedNodes) {
     if (!orderedNodes.includes(node)) {
       anomalies.push({
         type: "unknown_order",
@@ -266,8 +308,53 @@ export function orderEvents<T>(
     }
   }
 
+  const unresolvedEventIds = new Set(unresolvedNodes.map((node) => node.event.id))
+  const sameTimeEventCounts = new Map<string, number>()
+  const sameTimeIngestionTies = new Set<string>()
+  const eventsByTime = new Map<string, ValidatedEventEnvelope<T>[]>()
+
+  for (const event of validEvents) {
+    const eventTime = getEventTime(event)
+    if (eventTime === undefined) {
+      continue
+    }
+
+    const timeKey = eventTime.toString()
+    sameTimeEventCounts.set(timeKey, (sameTimeEventCounts.get(timeKey) ?? 0) + 1)
+    const cohort = eventsByTime.get(timeKey) ?? []
+    cohort.push(event)
+    eventsByTime.set(timeKey, cohort)
+  }
+
+  if (options?.tieBreaker === "ingestion_order") {
+    for (const cohort of eventsByTime.values()) {
+      if (cohort.length < 2) {
+        continue
+      }
+
+      const ingestionValues = new Set(
+        cohort
+          .map((event) => event.ingestedAt?.toString())
+          .filter((value): value is string => value !== undefined),
+      )
+
+      if (ingestionValues.size > 1) {
+        for (const event of cohort) {
+          if (event.ingestedAt !== undefined) {
+            sameTimeIngestionTies.add(event.id)
+          }
+        }
+      }
+    }
+  }
+
   const ordered = orderedNodes.map((node, index) =>
-    buildOrderedMetadata(node.event, BigInt(index), node.evidence))
+    buildOrderedMetadata(node.event, BigInt(index), node.evidence, {
+      tieBreaker: options?.tieBreaker,
+      unresolvedEventIds,
+      sameTimeEventCounts,
+      sameTimeIngestionTies,
+    }))
   const concurrentGroups = collectConcurrentGroups(ordered.map((item) => item.event))
 
   return {

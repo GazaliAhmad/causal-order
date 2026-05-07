@@ -1,15 +1,32 @@
-import type { EventEnvelope, ValidationResult } from "../types.js"
+import type {
+  EventEnvelope,
+  ValidationError,
+  ValidationResult,
+  ValidationWarning,
+  ValidatedEventEnvelope,
+} from "../types.js"
 import { isBigInt, isNonEmptyString } from "../internal/utils.js"
 import { validateClock } from "./validateClock.js"
 
 export function validateEvent<T>(
   event: EventEnvelope<T>,
   options?: { maxClockDriftMs?: bigint; now?: () => bigint },
-): ValidationResult {
-  const errors: ValidationResult["errors"] = []
-  const warnings: ValidationResult["warnings"] = []
+): ValidationResult<ValidatedEventEnvelope<T>>
+export function validateEvent(
+  event: unknown,
+  options?: { maxClockDriftMs?: bigint; now?: () => bigint },
+): ValidationResult<ValidatedEventEnvelope<unknown>>
+export function validateEvent<T>(
+  event: unknown,
+  options?: { maxClockDriftMs?: bigint; now?: () => bigint },
+): ValidationResult<ValidatedEventEnvelope<T>> {
+  const errors: ValidationError[] = []
+  const warnings: ValidationWarning[] = []
+  const candidate = typeof event === "object" && event !== null
+    ? event as Partial<EventEnvelope<T>>
+    : undefined
 
-  if (!isNonEmptyString(event?.id)) {
+  if (!isNonEmptyString(candidate?.id)) {
     errors.push({
       code: "missing_event_id",
       message: "event.id must be a non-empty string",
@@ -17,7 +34,7 @@ export function validateEvent<T>(
     })
   }
 
-  if (!isNonEmptyString(event?.nodeId)) {
+  if (!isNonEmptyString(candidate?.nodeId)) {
     errors.push({
       code: "missing_node_id",
       message: "event.nodeId must be a non-empty string",
@@ -33,11 +50,14 @@ export function validateEvent<T>(
     clockOptions.now = options.now
   }
 
-  const clockValidation = validateClock(event.clock, clockOptions)
+  const clockValidation = validateClock(candidate?.clock, clockOptions)
   errors.push(...clockValidation.errors)
   warnings.push(...clockValidation.warnings)
 
-  if (event.sequence !== undefined && (!isBigInt(event.sequence) || event.sequence < 0n)) {
+  if (
+    candidate?.sequence !== undefined &&
+    (!isBigInt(candidate.sequence) || candidate.sequence < 0n)
+  ) {
     errors.push({
       code: "invalid_sequence",
       message: "event.sequence must be a non-negative bigint when provided",
@@ -45,7 +65,7 @@ export function validateEvent<T>(
     })
   }
 
-  if (event.sequence === undefined) {
+  if (candidate?.sequence === undefined) {
     warnings.push({
       code: "missing_sequence",
       message: "event.sequence is not present",
@@ -53,9 +73,18 @@ export function validateEvent<T>(
     })
   }
 
+  if (errors.length > 0) {
+    return {
+      valid: false,
+      errors,
+      warnings,
+    }
+  }
+
   return {
-    valid: errors.length === 0,
-    errors,
+    valid: true,
+    errors: [],
     warnings,
+    value: candidate as ValidatedEventEnvelope<T>,
   }
 }

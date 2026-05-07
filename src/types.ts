@@ -7,6 +7,11 @@ export type HlcTimestamp = {
   nodeId: NodeId
 }
 
+declare const validatedHlcTimestampBrand: unique symbol
+export type ValidatedHlcTimestamp = HlcTimestamp & {
+  readonly [validatedHlcTimestampBrand]: true
+}
+
 export type CausalOrdering =
   | "before"
   | "after"
@@ -35,6 +40,11 @@ export type EventEnvelope<T = unknown> = {
   ingestedAt?: bigint
 }
 
+declare const validatedEventEnvelopeBrand: unique symbol
+export type ValidatedEventEnvelope<T = unknown> = EventEnvelope<T> & {
+  readonly [validatedEventEnvelopeBrand]: true
+}
+
 export type ValidationErrorCode =
   | "missing_node_id"
   | "missing_event_id"
@@ -60,11 +70,23 @@ export type ValidationWarning = {
   path?: string
 }
 
-export type ValidationResult = {
-  valid: boolean
+export type ValidationSuccess<TValue> = {
+  valid: true
+  errors: []
+  warnings: ValidationWarning[]
+  value: TValue
+}
+
+export type ValidationFailure = {
+  valid: false
   errors: ValidationError[]
   warnings: ValidationWarning[]
+  value?: never
 }
+
+export type ValidationResult<TValue = never> =
+  | ValidationSuccess<TValue>
+  | ValidationFailure
 
 export type AnomalyType =
   | "clock_regression"

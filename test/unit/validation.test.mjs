@@ -2,6 +2,7 @@ import assert from "node:assert/strict"
 
 import {
   compareByCausality,
+  validateClock,
   validateEvent,
 } from "../../dist/index.js"
 import { makeEvent } from "../helpers/events.mjs"
@@ -24,6 +25,40 @@ test("validateEvent reports invalid clocks and missing sequence warnings", () =>
   assert.ok(result.errors.some((error) => error.code === "invalid_logical_counter"))
   assert.ok(result.errors.some((error) => error.code === "missing_node_id"))
   assert.ok(result.warnings.some((warning) => warning.code === "missing_sequence"))
+})
+
+test("validateEvent accepts raw unknown input and returns a validated value on success", () => {
+  const raw = {
+    id: "evt-valid",
+    nodeId: "node-a",
+    clock: {
+      physicalTimeMs: 1_000n,
+      logicalCounter: 0,
+      nodeId: "node-a",
+    },
+    payload: { type: "test" },
+    sequence: 1n,
+  }
+
+  const result = validateEvent(raw)
+
+  assert.equal(result.valid, true)
+  assert.equal(result.value.id, "evt-valid")
+  assert.equal(result.value.clock.nodeId, "node-a")
+})
+
+test("validateClock accepts raw unknown input and returns a validated value on success", () => {
+  const raw = {
+    physicalTimeMs: 1_000n,
+    logicalCounter: 0,
+    nodeId: "node-a",
+  }
+
+  const result = validateClock(raw)
+
+  assert.equal(result.valid, true)
+  assert.equal(result.value.physicalTimeMs, 1_000n)
+  assert.equal(result.value.nodeId, "node-a")
 })
 
 test("compareByCausality returns concurrent for valid independent cross-node events", () => {

@@ -1,12 +1,26 @@
-import type { HlcTimestamp, ValidationResult } from "../types.js"
+import type {
+  HlcTimestamp,
+  ValidationError,
+  ValidationResult,
+  ValidationWarning,
+  ValidatedHlcTimestamp,
+} from "../types.js"
 import { isBigInt, isNonEmptyString, isSafeInteger } from "../internal/utils.js"
 
 export function validateClock(
   clock: HlcTimestamp,
   options?: { maxDriftMs?: bigint; now?: () => bigint },
-): ValidationResult {
-  const errors: ValidationResult["errors"] = []
-  const warnings: ValidationResult["warnings"] = []
+): ValidationResult<ValidatedHlcTimestamp>
+export function validateClock(
+  clock: unknown,
+  options?: { maxDriftMs?: bigint; now?: () => bigint },
+): ValidationResult<ValidatedHlcTimestamp>
+export function validateClock(
+  clock: unknown,
+  options?: { maxDriftMs?: bigint; now?: () => bigint },
+): ValidationResult<ValidatedHlcTimestamp> {
+  const errors: ValidationError[] = []
+  const warnings: ValidationWarning[] = []
 
   if (typeof clock !== "object" || clock === null) {
     errors.push({
@@ -17,7 +31,9 @@ export function validateClock(
     return { valid: false, errors, warnings }
   }
 
-  if (!isBigInt(clock.physicalTimeMs) || clock.physicalTimeMs < 0n) {
+  const candidate = clock as Partial<HlcTimestamp>
+
+  if (!isBigInt(candidate.physicalTimeMs) || candidate.physicalTimeMs < 0n) {
     errors.push({
       code: "invalid_physical_time",
       message: "clock.physicalTimeMs must be a non-negative bigint",
@@ -25,7 +41,7 @@ export function validateClock(
     })
   }
 
-  if (!isSafeInteger(clock.logicalCounter) || clock.logicalCounter < 0) {
+  if (!isSafeInteger(candidate.logicalCounter) || candidate.logicalCounter < 0) {
     errors.push({
       code: "invalid_logical_counter",
       message: "clock.logicalCounter must be a non-negative safe integer",
@@ -33,7 +49,7 @@ export function validateClock(
     })
   }
 
-  if (!isNonEmptyString(clock.nodeId)) {
+  if (!isNonEmptyString(candidate.nodeId)) {
     errors.push({
       code: "missing_node_id",
       message: "clock.nodeId must be a non-empty string",
@@ -45,8 +61,8 @@ export function validateClock(
   if (
     now !== undefined &&
     options?.maxDriftMs !== undefined &&
-    isBigInt(clock.physicalTimeMs) &&
-    clock.physicalTimeMs > now() + options.maxDriftMs
+    isBigInt(candidate.physicalTimeMs) &&
+    candidate.physicalTimeMs > now() + options.maxDriftMs
   ) {
     errors.push({
       code: "clock_drift_exceeded",
@@ -57,8 +73,8 @@ export function validateClock(
 
   if (
     now !== undefined &&
-    isBigInt(clock.physicalTimeMs) &&
-    clock.physicalTimeMs > now()
+    isBigInt(candidate.physicalTimeMs) &&
+    candidate.physicalTimeMs > now()
   ) {
     warnings.push({
       code: "future_timestamp",
@@ -67,9 +83,18 @@ export function validateClock(
     })
   }
 
+  if (errors.length > 0) {
+    return {
+      valid: false,
+      errors,
+      warnings,
+    }
+  }
+
   return {
-    valid: errors.length === 0,
-    errors,
+    valid: true,
+    errors: [],
     warnings,
+    value: candidate as ValidatedHlcTimestamp,
   }
 }

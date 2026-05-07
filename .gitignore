@@ -1,5 +1,7 @@
 node_modules/
 dist/
+.npm-cache/
+.npm-cache-release/
 
 *.log
 npm-debug.log*
@@ -12,3 +14,4 @@ Thumbs.db
 
 .idea/
 .vscode/
+perf/results/
