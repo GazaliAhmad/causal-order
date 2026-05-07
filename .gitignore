@@ -1,7 +1,6 @@
 node_modules/
 dist/
-.npm-cache/
-.npm-cache-release/
+.npm-cache*/
 
 *.log
 npm-debug.log*

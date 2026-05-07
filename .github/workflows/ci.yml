@@ -28,16 +28,13 @@ jobs:
           predicate-quantifier: every
           filters: |
             code:
-              - '**'
-              - '!**/*.md'
-              - '!docs/**'
-              - '!guides/**'
-              - '!.github/ISSUE_TEMPLATE/**'
-              - '!.github/PULL_REQUEST_TEMPLATE*'
-              - '!.github/CODEOWNERS'
-              - '!.gitignore'
-              - '!.npmignore'
-              - '!LICENSE'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'tsconfig.json'
+              - 'src/**'
+              - 'test/**'
+              - 'perf/**'
+              - 'examples/**/*.mjs'
 
   test:
     needs: changes

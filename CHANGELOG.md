@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 * npm publishing automation now uses npm trusted publishing via GitHub Actions OIDC instead of a long-lived npm token
+* CI workflow now runs only for code-facing changes instead of docs, wiki, or workflow-only edits
+* `.gitignore` now ignores all local `.npm-cache*` directories created during npm publish and dry-run checks
 
 ## [0.1.0]
 
