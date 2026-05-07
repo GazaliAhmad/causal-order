@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+* GitHub Actions release workflow for publishing to npm when a GitHub release is published
+
+### Changed
+
+* npm publishing automation now uses npm trusted publishing via GitHub Actions OIDC instead of a long-lived npm token
+
 ## [0.1.0]
 
 ### Added
