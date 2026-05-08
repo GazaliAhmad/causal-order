@@ -294,6 +294,38 @@ Exit criteria:
 * “why not just sort by timestamp?” has strong concrete answers
 * tricky event sets no longer expose major semantic ambiguity
 
+### Likely `0.2.1` Follow-Up: Corrupted Dataset Stress Hardening
+
+This should not block `0.2.0`.
+It is a natural follow-up once `0.2.0` has had time to settle and the semantics feel stable in the field.
+
+Focus:
+
+* add explicit `100k`-scale stress benchmarks for anomaly-heavy and corruption-heavy datasets
+* benchmark large synthetic expansions of:
+  * multi-region drift
+  * replay corruption
+  * offline sync anomalies
+  * "unknown" case-study style cross-node ambiguity
+* distinguish clearly between:
+  * routine `100k` batch behavior
+  * anomaly-heavy `100k` stress behavior
+* identify whether replay-heavy and offline-sync-heavy workloads need targeted performance work
+* document the difference between semantic correctness under stress and performance comfort under stress
+
+Why this belongs after `0.2.0`:
+
+* `0.2.0` is primarily a semantics and API cleanup release
+* the corrupted-dataset stress work is better treated as stabilization and pressure-testing
+* this keeps the semantic release crisp while preserving a clear next step for hardening
+
+Success criteria:
+
+* the repo has named benchmark coverage for these corruption-heavy patterns
+* maintainers can compare normal large-batch profiles against anomaly-heavy stress profiles
+* any serious stress-path regressions are visible before later release lines
+* follow-up performance work, if needed, can be scoped from real benchmark evidence rather than intuition
+
 ## `0.3.x` Streaming Reality
 
 Goal:

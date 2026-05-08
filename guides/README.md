@@ -5,6 +5,7 @@ These guides explain how to think about `causal-order` and why a distributed tim
 Start here:
 
 * [Mental Model](./mental-model.md)
+* [Case Studies](./case-studies.md)
 
 Failure-mode guides:
 

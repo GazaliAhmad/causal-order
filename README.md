@@ -304,6 +304,7 @@ Repository guides:
 
 * [Guides Index](https://github.com/GazaliAhmad/causal-order/blob/main/guides/README.md)
 * [Mental Model](https://github.com/GazaliAhmad/causal-order/blob/main/guides/mental-model.md)
+* [Case Studies](https://github.com/GazaliAhmad/causal-order/blob/main/guides/case-studies.md)
 * [Replay Corruption](https://github.com/GazaliAhmad/causal-order/blob/main/guides/replay-corruption.md)
 * [Multi-Region Drift](https://github.com/GazaliAhmad/causal-order/blob/main/guides/multi-region-drift.md)
 * [False Audit Timelines](https://github.com/GazaliAhmad/causal-order/blob/main/guides/false-audit-timeline.md)
