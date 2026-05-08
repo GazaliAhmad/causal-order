@@ -33,7 +33,7 @@ Given a set of distributed events, the library returns more than a sorted list.
 It returns:
 
 * `ordered`: events with `orderIndex`, `orderBasis`, and `confidence`
-* `concurrentGroups`: events the library can positively justify as concurrent instead of flattening into fake sequence
+* `concurrentGroups`: events the library can positively justify as concurrent instead of flattening into fake sequence; under the current supported model this is currently empty
 * `anomalies`: invalid, suspicious, or operationally important records
 * `stats`: summary counts for the batch
 
@@ -51,7 +51,7 @@ Current semantic posture:
   * `parentEventId`
   * `dependencyEventIds`
   * same-node monotonic `sequence`
-* `concurrentGroups` may often be empty unless the library can positively justify concurrency
+* `concurrentGroups` are currently empty unless the library gains stronger future evidence for justified concurrency
 * shared `traceId` or `partition` metadata does not, by itself, imply causality
 
 ## Install
@@ -140,7 +140,7 @@ That means:
 * explicit parent and dependency links can produce `proven` causal ordering
 * same-node monotonic sequence can produce strong ordering evidence
 * HLC, ingestion order, shared `traceId`, or shared `partition` metadata can still be useful without becoming causal proof
-* `concurrentGroups` are available, but the current supported model intentionally prefers `unknown` over speculative concurrency
+* `concurrentGroups` remain part of the result shape, but current releases leave them empty because the supported model intentionally prefers `unknown` over speculative concurrency
 
 ## Common Workflow
 

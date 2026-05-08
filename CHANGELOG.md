@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 * roadmap guidance now makes `0.2.0` semantics explicit for `concurrent` vs `unknown`, and clarifies that `traceId` and `partition` remain non-causal metadata in that release line
 * exported causal evidence and ordering option types now match the currently supported runtime semantics more closely, removing unsupported evidence variants and the unused `getPartition` option
 * ordering hot paths now avoid repeated validated-event comparison overhead and reduce same-time bookkeeping allocation churn, substantially improving the `100k` shuffled benchmark profile
+* `orderEventStream()` now precomputes buffered event times and compacts stream windows in place, significantly reducing large-stream flush overhead, and `orderEvents()` no longer spends time collecting currently unreachable `concurrentGroups`
 
 ## [0.1.0]
 

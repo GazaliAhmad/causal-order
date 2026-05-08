@@ -16,7 +16,6 @@ export type CausalOrdering =
   | "before"
   | "after"
   | "equal"
-  | "concurrent"
   | "unknown"
 
 export type CausalEvidence =
@@ -157,7 +156,6 @@ export type LateArrivalPolicy =
 
 export type StreamOrderOptions<T> = OrderOptions<T> & {
   batchSize?: number
-  windowSizeMs?: bigint
   maxLateArrivalMs?: bigint
   lateArrivalPolicy?: LateArrivalPolicy
   watermark?: (event: EventEnvelope<T>) => bigint

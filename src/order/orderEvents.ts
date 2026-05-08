@@ -7,15 +7,12 @@ import type {
   OrderedEvent,
   ValidatedEventEnvelope,
 } from "../types.js"
-import { compareValidatedByCausality } from "../compare/causalCompare.js"
 import {
-  compareDeterministically,
   compareValidatedDeterministically,
 } from "../compare/deterministicCompare.js"
 import { detectAnomalies } from "../anomalies/detectAnomalies.js"
 import {
   dedupeEvidence,
-  getEventTime,
   getValidatedEventTime,
 } from "../internal/utils.js"
 import { validateEvent } from "../validate/validateEvent.js"
@@ -84,10 +81,8 @@ function buildOrderedMetadata<T>(
     }
   }
 
-  const eventTime = getEventTime(event)
-  const sameTimeCount = eventTime === undefined
-    ? 0
-    : (options.sameTimeEventCounts.get(eventTime) ?? 0)
+  const eventTime = getValidatedEventTime(event)
+  const sameTimeCount = options.sameTimeEventCounts.get(eventTime) ?? 0
 
   if (
     options.tieBreaker === "ingestion_order" &&
@@ -116,37 +111,6 @@ function buildOrderedMetadata<T>(
     orderBasis: "hlc",
     confidence: "derived",
   }
-}
-
-function collectConcurrentGroups<T>(
-  orderedEvents: ValidatedEventEnvelope<T>[],
-): ValidatedEventEnvelope<T>[][] {
-  const groups: ValidatedEventEnvelope<T>[][] = []
-  let currentGroup: ValidatedEventEnvelope<T>[] = []
-
-  for (const event of orderedEvents) {
-    const previous = currentGroup[currentGroup.length - 1]
-    if (previous === undefined) {
-      currentGroup.push(event)
-      continue
-    }
-
-    if (compareValidatedByCausality(previous, event) === "concurrent") {
-      currentGroup.push(event)
-      continue
-    }
-
-    if (currentGroup.length > 1) {
-      groups.push(currentGroup)
-    }
-    currentGroup = [event]
-  }
-
-  if (currentGroup.length > 1) {
-    groups.push(currentGroup)
-  }
-
-  return groups
 }
 
 export function orderEvents<T>(
@@ -364,7 +328,7 @@ export function orderEvents<T>(
       sameTimeEventCounts,
       sameTimeIngestionTies,
     }))
-  const concurrentGroups = collectConcurrentGroups(orderedNodes.map((node) => node.event))
+  const concurrentGroups: ValidatedEventEnvelope<T>[][] = []
 
   return {
     ordered,
