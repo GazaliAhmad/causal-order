@@ -17,7 +17,6 @@ Two events may genuinely happen independently.
 
 In current releases, this result is intentionally rare.
 The runtime prefers `unknown` over speculative concurrency when the supported evidence is too weak, especially across nodes.
-In practice, that also means `concurrentGroups` are currently empty in current releases.
 
 ## `unknown`
 

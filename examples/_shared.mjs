@@ -62,15 +62,6 @@ export function printOrderResult(result) {
     )
   }
 
-  console.log("Concurrent groups:")
-  console.log(
-    JSON.stringify(
-      result.concurrentGroups.map((group) => group.map((event) => event.id)),
-      null,
-      2,
-    ),
-  )
-
   console.log("Anomalies:")
   console.log(
     JSON.stringify(

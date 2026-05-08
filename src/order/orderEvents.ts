@@ -328,18 +328,15 @@ export function orderEvents<T>(
       sameTimeEventCounts,
       sameTimeIngestionTies,
     }))
-  const concurrentGroups: ValidatedEventEnvelope<T>[][] = []
 
   return {
     ordered,
-    concurrentGroups,
     anomalies,
     stats: {
       totalEvents: events.length,
       validEvents: validEvents.length,
       invalidEvents: events.length - validEvents.length,
       orderedEvents: ordered.length,
-      concurrentGroupCount: concurrentGroups.length,
       anomalyCount: anomalies.length,
     },
   }

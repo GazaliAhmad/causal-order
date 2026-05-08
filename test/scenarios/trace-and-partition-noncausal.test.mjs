@@ -22,6 +22,4 @@ test("trace and partition fixture keeps shared metadata non-causal while honorin
   assert.deepEqual(paymentCaptured.causalEvidence, [
     { type: "parent_event", parentEventId: "request-accepted" },
   ])
-
-  assert.deepEqual(result.concurrentGroups, [])
 })

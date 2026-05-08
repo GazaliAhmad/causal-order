@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap describes how `causal-order` should mature from its public `0.1.x` release line into a stable `1.0.0` npm package.
+This roadmap describes how `causal-order` should mature from its current public `0.2.x` release line into a stable `1.0.0` npm package.
 
 The goal is not to rush publication.
 The goal is to make sure the semantics are trustworthy before the package becomes a long-term contract.

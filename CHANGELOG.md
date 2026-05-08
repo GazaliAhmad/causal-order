@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.1.1]
+## [0.2.0]
 
 ### Added
 
@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-* package version advanced to `0.1.1`
+* package version advanced to `0.2.0`
 * npm publishing automation now uses npm trusted publishing via GitHub Actions OIDC instead of a long-lived npm token
 * CI workflow now runs only for code-facing changes instead of docs, wiki, or workflow-only edits
 * `.gitignore` now ignores all local `.npm-cache*` directories created during npm publish and dry-run checks
@@ -20,7 +20,8 @@ All notable changes to this project will be documented in this file.
 * roadmap guidance now makes `0.2.0` semantics explicit for `concurrent` vs `unknown`, and clarifies that `traceId` and `partition` remain non-causal metadata in that release line
 * exported causal evidence and ordering option types now match the currently supported runtime semantics more closely, removing unsupported evidence variants and the unused `getPartition` option
 * ordering hot paths now avoid repeated validated-event comparison overhead and reduce same-time bookkeeping allocation churn, substantially improving the `100k` shuffled benchmark profile
-* `orderEventStream()` now precomputes buffered event times and compacts stream windows in place, significantly reducing large-stream flush overhead, and `orderEvents()` no longer spends time collecting currently unreachable `concurrentGroups`
+* `orderEventStream()` now precomputes buffered event times and compacts stream windows in place, significantly reducing large-stream flush overhead
+* `concurrentGroups` has been removed from the current runtime API until the library can justify concurrency with stronger future evidence
 
 ## [0.1.0]
 

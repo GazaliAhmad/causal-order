@@ -40,6 +40,7 @@ test("orderEvents keeps HLC-only ordering as derived", () => {
 
   assert.equal(result.ordered[0].orderBasis, "hlc")
   assert.equal(result.ordered[0].confidence, "derived")
+  assert.equal("concurrentGroups" in result, false)
 })
 
 test("orderEvents marks equal-time independent events as deterministic fallback", () => {

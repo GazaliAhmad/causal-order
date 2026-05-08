@@ -245,7 +245,6 @@ test("orderEvents does not treat shared traceId as causal evidence on its own", 
     detectAnomalies: true,
   })
 
-  assert.deepEqual(result.concurrentGroups, [])
   assert.ok(result.ordered.every((entry) => entry.confidence !== "proven"))
   assert.ok(result.ordered.every((entry) => entry.causalEvidence === undefined))
 })
@@ -270,7 +269,6 @@ test("orderEvents does not treat shared partition as causal evidence on its own"
     detectAnomalies: true,
   })
 
-  assert.deepEqual(result.concurrentGroups, [])
   assert.ok(result.ordered.every((entry) => entry.confidence !== "proven"))
   assert.ok(result.ordered.every((entry) => entry.causalEvidence === undefined))
 })

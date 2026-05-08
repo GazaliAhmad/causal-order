@@ -226,7 +226,6 @@ export function runBenchmarkCase(inputProfile) {
       orderingMs,
       heapDeltaBytes: memoryAfter - memoryBefore,
       orderedEvents: result.ordered.length,
-      concurrentGroupCount: result.concurrentGroups.length,
       anomalyCount: result.anomalies.length,
       anomalyBreakdown: summarizeAnomalies(result),
       confidenceCounts: summarizeConfidence(result),
@@ -249,7 +248,6 @@ export function printBenchmarkSummary(run) {
   console.log(`Ordering: ${formatMs(metrics.orderingMs)}`)
   console.log(`Heap delta: ${formatMemory(metrics.heapDeltaBytes)}`)
   console.log(`Ordered events: ${metrics.orderedEvents.toLocaleString()}`)
-  console.log(`Concurrent groups: ${metrics.concurrentGroupCount.toLocaleString()}`)
   console.log(`Anomalies: ${metrics.anomalyCount.toLocaleString()}`)
   if (metrics.anomalyCount > 0) {
     console.log(`Anomaly breakdown: ${JSON.stringify(metrics.anomalyBreakdown)}`)
@@ -283,7 +281,6 @@ export function toCsv(runs) {
       "ordering_ms",
       "heap_delta_bytes",
       "ordered_events",
-      "concurrent_group_count",
       "anomaly_count",
       "anomaly_breakdown",
       "confidence_counts",
@@ -304,7 +301,6 @@ export function toCsv(runs) {
       run.metrics.orderingMs.toFixed(2),
       run.metrics.heapDeltaBytes,
       run.metrics.orderedEvents,
-      run.metrics.concurrentGroupCount,
       run.metrics.anomalyCount,
       JSON.stringify(run.metrics.anomalyBreakdown),
       JSON.stringify(run.metrics.confidenceCounts),

@@ -33,7 +33,6 @@ Given a set of distributed events, the library returns more than a sorted list.
 It returns:
 
 * `ordered`: events with `orderIndex`, `orderBasis`, and `confidence`
-* `concurrentGroups`: events the library can positively justify as concurrent instead of flattening into fake sequence; under the current supported model this is currently empty
 * `anomalies`: invalid, suspicious, or operationally important records
 * `stats`: summary counts for the batch
 
@@ -51,7 +50,6 @@ Current semantic posture:
   * `parentEventId`
   * `dependencyEventIds`
   * same-node monotonic `sequence`
-* `concurrentGroups` are currently empty unless the library gains stronger future evidence for justified concurrency
 * shared `traceId` or `partition` metadata does not, by itself, imply causality
 
 ## Install
@@ -101,7 +99,6 @@ const result = orderEvents(events, {
 })
 
 console.log(result.ordered)
-console.log(result.concurrentGroups)
 console.log(result.anomalies)
 ```
 
@@ -140,7 +137,6 @@ That means:
 * explicit parent and dependency links can produce `proven` causal ordering
 * same-node monotonic sequence can produce strong ordering evidence
 * HLC, ingestion order, shared `traceId`, or shared `partition` metadata can still be useful without becoming causal proof
-* `concurrentGroups` remain part of the result shape, but current releases leave them empty because the supported model intentionally prefers `unknown` over speculative concurrency
 
 ## Common Workflow
 
@@ -320,10 +316,10 @@ Runnable repository examples:
 
 ## Status
 
-`causal-order` is currently in the public `0.1.x` release line.
+`causal-order` is currently in the public `0.2.x` release line.
 
-The repository is currently prepared as `0.1.1`, while npm publication still depends on the GitHub release workflow.
-Some `0.2`-facing semantic hardening has already started in late `0.1.x` preparation so the eventual `1.0` contract can be tighter and more settled.
+The repository is currently prepared as `0.2.0`, while npm publication still depends on the GitHub release workflow.
+This release reflects the semantics hardening that began during late `0.1.x` preparation so the eventual `1.0` contract can be tighter and more settled.
 
 That means:
 

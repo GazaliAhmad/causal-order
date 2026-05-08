@@ -8,6 +8,5 @@ test("multi-region drift fixture keeps independent cross-node events as unknown 
   const fixture = multiRegionDriftFixture()
   const result = orderEvents(fixture.events)
 
-  assert.equal(result.concurrentGroups.length, 0)
   assert.ok(result.ordered.every((entry) => entry.confidence === "derived"))
 })

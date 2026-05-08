@@ -122,13 +122,11 @@ export type OrderStats = {
   validEvents: number
   invalidEvents: number
   orderedEvents: number
-  concurrentGroupCount: number
   anomalyCount: number
 }
 
 export type OrderResult<T = unknown> = {
   ordered: OrderedEvent<T>[]
-  concurrentGroups: EventEnvelope<T>[][]
   anomalies: EventAnomaly<T>[]
   stats: OrderStats
 }
