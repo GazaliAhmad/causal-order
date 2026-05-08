@@ -4,7 +4,7 @@ import { orderEvents } from "../../dist/index.js"
 import { makeEvent } from "../helpers/events.mjs"
 import { test } from "../helpers/harness.mjs"
 
-test("orderEvents can merge consecutive independent cross-node events into one stable concurrent group", () => {
+test("orderEvents does not label independent cross-node runs as concurrent without explicit evidence", () => {
   const events = [
     makeEvent({
       id: "evt-a1",
@@ -49,15 +49,10 @@ test("orderEvents can merge consecutive independent cross-node events into one s
     detectAnomalies: true,
   })
 
-  assert.deepEqual(
-    result.concurrentGroups.map((group) => group.map((event) => event.id)),
-    [
-      ["evt-a1", "evt-b1", "evt-c1", "evt-a2", "evt-b2", "evt-c2"],
-    ],
-  )
+  assert.deepEqual(result.concurrentGroups, [])
 })
 
-test("orderEvents splits concurrent groups when sequence or explicit causality breaks adjacency-based independence", () => {
+test("orderEvents keeps groups empty when adjacency alone is the only cross-node signal", () => {
   const events = [
     makeEvent({
       id: "evt-a1",
@@ -91,17 +86,14 @@ test("orderEvents splits concurrent groups when sequence or explicit causality b
     detectAnomalies: true,
   })
 
-  assert.deepEqual(
-    result.concurrentGroups.map((group) => group.map((event) => event.id)),
-    [["evt-b2", "evt-c1"]],
-  )
+  assert.deepEqual(result.concurrentGroups, [])
   assert.deepEqual(
     result.ordered.map((entry) => entry.event.id),
     ["evt-a1", "evt-b1", "evt-b2", "evt-c1"],
   )
 })
 
-test("orderEvents can exclude a causally constrained event from an otherwise concurrent tail", () => {
+test("orderEvents keeps causally constrained tails out of concurrent groups when the remainder is still unknown", () => {
   const events = [
     makeEvent({
       id: "evt-a1",
@@ -129,10 +121,7 @@ test("orderEvents can exclude a causally constrained event from an otherwise con
     detectAnomalies: true,
   })
 
-  assert.deepEqual(
-    result.concurrentGroups.map((group) => group.map((event) => event.id)),
-    [["evt-b1", "evt-c1"]],
-  )
+  assert.deepEqual(result.concurrentGroups, [])
   assert.deepEqual(
     result.ordered.map((entry) => entry.event.id),
     ["evt-a1", "evt-b1", "evt-c1"],

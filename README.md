@@ -33,7 +33,7 @@ Given a set of distributed events, the library returns more than a sorted list.
 It returns:
 
 * `ordered`: events with `orderIndex`, `orderBasis`, and `confidence`
-* `concurrentGroups`: events that should not be flattened into fake sequence
+* `concurrentGroups`: events the library can positively justify as concurrent instead of flattening into fake sequence
 * `anomalies`: invalid, suspicious, or operationally important records
 * `stats`: summary counts for the batch
 
@@ -242,6 +242,7 @@ That means:
 
 * `concurrent` is not the same thing as `unknown`
 * HLC ordering alone is useful, but not full proof
+* shared `traceId` or `partition` metadata does not, by itself, prove causality
 * deterministic output is not the same thing as justified causal order
 * invalid or weak metadata should become visible, not silently repaired
 

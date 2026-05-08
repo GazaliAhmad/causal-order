@@ -61,11 +61,19 @@ test("validateClock accepts raw unknown input and returns a validated value on s
   assert.equal(result.value.nodeId, "node-a")
 })
 
-test("compareByCausality returns concurrent for valid independent cross-node events", () => {
+test("compareByCausality returns unknown for valid independent cross-node events without explicit evidence", () => {
   const a = makeEvent({ id: "evt-a", nodeId: "node-a" })
   const b = makeEvent({ id: "evt-b", nodeId: "node-b", physicalTimeMs: 1_001n })
 
-  assert.equal(compareByCausality(a, b), "concurrent")
+  assert.equal(compareByCausality(a, b), "unknown")
+})
+
+test("compareByCausality still orders same-node events by monotonic sequence", () => {
+  const a = makeEvent({ id: "evt-a", nodeId: "node-a", sequence: 1n })
+  const b = makeEvent({ id: "evt-b", nodeId: "node-a", sequence: 2n, physicalTimeMs: 1_001n })
+
+  assert.equal(compareByCausality(a, b), "before")
+  assert.equal(compareByCausality(b, a), "after")
 })
 
 test("compareByCausality returns unknown when metadata is invalid", () => {

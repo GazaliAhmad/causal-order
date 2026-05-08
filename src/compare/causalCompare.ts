@@ -42,9 +42,5 @@ export function compareByCausality<T>(
     return "unknown"
   }
 
-  if (a.nodeId !== b.nodeId) {
-    return "concurrent"
-  }
-
   return "unknown"
 }

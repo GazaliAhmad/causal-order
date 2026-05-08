@@ -13,6 +13,7 @@ import "./scenarios/multi-region-drift.test.mjs"
 import "./scenarios/false-audit-timeline.test.mjs"
 import "./scenarios/offline-sync-anomalies.test.mjs"
 import "./scenarios/causal-inversion.test.mjs"
+import "./scenarios/trace-and-partition-noncausal.test.mjs"
 
 import { run } from "./helpers/harness.mjs"
 
