@@ -25,7 +25,6 @@ jobs:
         uses: dorny/paths-filter@v4
         with:
           base: ${{ github.ref }}
-          predicate-quantifier: every
           filters: |
             code:
               - 'package.json'
