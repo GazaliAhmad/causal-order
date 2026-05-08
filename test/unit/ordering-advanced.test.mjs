@@ -268,7 +268,6 @@ test("orderEvents does not treat shared partition as causal evidence on its own"
   const result = orderEvents([eventB, eventA], {
     strict: false,
     detectAnomalies: true,
-    getPartition: (event) => event.partition,
   })
 
   assert.deepEqual(result.concurrentGroups, [])

@@ -88,6 +88,12 @@ That means the design target should be:
 * `100k` events should feel credible and well-supported
 * `1M+` events should be treated as a deliberate scalability track, not as the baseline promise for every use case
 
+Current benchmarking posture:
+
+* `100k` remains the main enforced large-batch guardrail
+* `150k` benchmark profiles are useful stretch visibility, but should not yet be treated as the formal baseline promise for CI enforcement
+* if `150k` becomes a required guard later, the docs and performance policy should be updated together rather than drifting separately
+
 This distinction matters because there is no end to abstract number-chasing.
 If the package says `1M`, someone will ask why not `10M`.
 The better standard is whether the package is strong for the kinds of event sets that teams actually inspect together.
@@ -159,6 +165,10 @@ Exit criteria:
 
 Goal:
 Pressure-test the meaning of the library, not just the syntax.
+
+This work is not starting from zero.
+Late `0.1.x` preparation has already tightened some semantics, especially around preferring `unknown` over speculative concurrency.
+The purpose of `0.2.x` is to finish and extend that hardening rather than introducing the idea for the first time.
 
 Focus:
 

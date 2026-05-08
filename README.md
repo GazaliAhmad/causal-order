@@ -7,7 +7,7 @@ An event integrity library for distributed systems.
 Instead of only sorting by timestamp, it helps you:
 
 * order what can be ordered
-* group what is concurrent
+* preserve concurrency only when it can be justified honestly
 * flag what is suspicious
 * keep the difference between proof, inference, fallback, and unknown
 
@@ -43,6 +43,16 @@ Confidence is explicit:
 * `derived`: order was inferred from useful but weaker metadata
 * `fallback`: deterministic ordering was imposed for stability
 * `unknown`: the library cannot honestly justify the claim
+
+Current semantic posture:
+
+* cross-node events without explicit supported causal evidence should usually remain `unknown`
+* supported causal evidence today is intentionally narrow:
+  * `parentEventId`
+  * `dependencyEventIds`
+  * same-node monotonic `sequence`
+* `concurrentGroups` may often be empty unless the library can positively justify concurrency
+* shared `traceId` or `partition` metadata does not, by itself, imply causality
 
 ## Install
 
@@ -117,6 +127,20 @@ Example output shape:
 
 The important part is not just the order.
 It is the explanation of why that order exists and how trustworthy it is.
+
+## Semantic Notes
+
+Two rules matter especially for current releases:
+
+* `concurrent` is not a polite word for "I don't know"
+* lack of a visible causal edge should usually stay `unknown`, especially across nodes
+
+That means:
+
+* explicit parent and dependency links can produce `proven` causal ordering
+* same-node monotonic sequence can produce strong ordering evidence
+* HLC, ingestion order, shared `traceId`, or shared `partition` metadata can still be useful without becoming causal proof
+* `concurrentGroups` are available, but the current supported model intentionally prefers `unknown` over speculative concurrency
 
 ## Common Workflow
 
@@ -228,6 +252,7 @@ A practical mental model is:
 
 * `10k` should feel easy
 * `100k` should feel solid
+* `150k` benchmark profiles are useful stretch visibility, but not yet the enforced baseline promise
 * million-scale workloads should be treated as an explicit scalability target, not the default assumption
 
 If the workload is naturally unbounded, `orderEventStream()` is the more honest model.
@@ -297,6 +322,9 @@ Runnable repository examples:
 
 `causal-order` is currently in the public `0.1.x` release line.
 
+The repository is currently prepared as `0.1.1`, while npm publication still depends on the GitHub release workflow.
+Some `0.2`-facing semantic hardening has already started in late `0.1.x` preparation so the eventual `1.0` contract can be tighter and more settled.
+
 That means:
 
 * the package is usable today
@@ -325,6 +353,11 @@ Useful local commands:
 
 The perf guard is intentionally a broad safety rail, not a machine-independent promise.
 It is meant to catch obvious regressions in realistic workload bands.
+
+Current benchmark posture:
+
+* `10k` and `100k` are the main enforced guardrail bands
+* `150k` profiles are available for stretch visibility, but are not currently enforced in `npm run bench:check`
 
 ## License
 

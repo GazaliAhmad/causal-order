@@ -2,11 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.1.1]
 
 ### Added
 
 * GitHub Actions release workflow for publishing to npm when a GitHub release is published
+* dedicated fixture and scenario coverage showing that shared `traceId` and `partition` metadata do not, by themselves, imply causality
+* `150k` benchmark profiles for stretch visibility beyond the current `100k` baseline, including an optional no-anomalies guard profile that is not yet enforced in `perf/check`
 
 ### Changed
 
@@ -14,6 +16,10 @@ All notable changes to this project will be documented in this file.
 * npm publishing automation now uses npm trusted publishing via GitHub Actions OIDC instead of a long-lived npm token
 * CI workflow now runs only for code-facing changes instead of docs, wiki, or workflow-only edits
 * `.gitignore` now ignores all local `.npm-cache*` directories created during npm publish and dry-run checks
+* cross-node events without explicit supported causal evidence now remain `unknown` instead of being grouped as `concurrent`
+* roadmap guidance now makes `0.2.0` semantics explicit for `concurrent` vs `unknown`, and clarifies that `traceId` and `partition` remain non-causal metadata in that release line
+* exported causal evidence and ordering option types now match the currently supported runtime semantics more closely, removing unsupported evidence variants and the unused `getPartition` option
+* ordering hot paths now avoid repeated validated-event comparison overhead and reduce same-time bookkeeping allocation churn, substantially improving the `100k` shuffled benchmark profile
 
 ## [0.1.0]
 

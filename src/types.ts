@@ -21,10 +21,7 @@ export type CausalOrdering =
 
 export type CausalEvidence =
   | { type: "parent_event"; parentEventId: EventId }
-  | { type: "trace_parent_child"; traceId: string }
   | { type: "causal_dependency"; dependsOnEventId: EventId }
-  | { type: "message_receive"; relatedEventId?: EventId }
-  | { type: "vector_dominance" }
   | { type: "same_node_sequence" }
 
 export type EventEnvelope<T = unknown> = {
@@ -150,7 +147,6 @@ export type OrderOptions<T> = {
   detectAnomalies?: boolean
   allowUnknownOrder?: boolean
   maxClockDriftMs?: bigint
-  getPartition?: (event: EventEnvelope<T>) => string | undefined
 }
 
 export type LateArrivalPolicy =

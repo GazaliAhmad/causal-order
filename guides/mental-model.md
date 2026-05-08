@@ -21,7 +21,7 @@ For any pair or set of events, the library tries to separate four different case
 
 * `proven`: explicit causal evidence exists
 * `derived`: order can be inferred, but causality is not proven
-* `concurrent`: valid metadata shows no known causal relationship
+* `concurrent`: the library can positively justify that no supported causal order exists
 * `unknown`: the metadata is insufficient or invalid
 
 That distinction matters because these are not interchangeable.
@@ -32,9 +32,10 @@ Examples of explicit causal evidence:
 
 * `parentEventId`
 * explicit dependency lists
-* message send and receive linkage
-* vector dominance
 * same-node monotonic sequence
+
+In current releases, this supported evidence set is intentionally narrow.
+Shared `traceId`, shared `partition`, HLC order, and ingestion order can still be useful without becoming causal proof.
 
 When that evidence exists, the library can say more than "A happened earlier."
 It can say:
@@ -63,13 +64,14 @@ That is why HLC-only ordering is `derived`, not `proven`.
 
 `concurrent` does not mean "we gave up."
 
-It means the metadata is valid enough to evaluate causal order, and the answer is:
+It means the library can positively justify that, within the currently supported causal model, the answer is:
 
 ```txt
 neither event is known to causally precede the other
 ```
 
 That is a real result, not a weak one.
+But the current runtime intentionally prefers `unknown` over speculative concurrency, especially across nodes without explicit supported evidence.
 
 ## What Unknown Means
 
@@ -101,6 +103,6 @@ A good outcome is often:
 ```txt
 these events are provably ordered
 these are only inferred
-these are concurrent
+these might be concurrent, but remain unknown under the current supported model
 these are too broken to trust
 ```

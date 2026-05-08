@@ -6,9 +6,7 @@ import { test } from "../helpers/harness.mjs"
 
 test("trace and partition fixture keeps shared metadata non-causal while honoring explicit parent edges", () => {
   const fixture = traceAndPartitionNoncausalFixture()
-  const result = orderEvents(fixture.events, {
-    getPartition: (event) => event.partition,
-  })
+  const result = orderEvents(fixture.events)
 
   const inventoryChecked = result.ordered.find((entry) => entry.event.id === "inventory-checked")
   const paymentCaptured = result.ordered.find((entry) => entry.event.id === "payment-captured")
