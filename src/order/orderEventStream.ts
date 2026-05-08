@@ -6,9 +6,14 @@ import type {
   ValidatedEventEnvelope,
 } from "../types.js"
 import { detectAnomalies } from "../anomalies/detectAnomalies.js"
-import { getEventTime } from "../internal/utils.js"
+import { getEventTime, getValidatedEventTime } from "../internal/utils.js"
 import { orderEvents } from "./orderEvents.js"
 import { validateEvent } from "../validate/validateEvent.js"
+
+type BufferedEvent<T> = {
+  event: ValidatedEventEnvelope<T>
+  eventTime: bigint
+}
 
 function defaultWatermark<T>(
   event: EventEnvelope<T>,
@@ -25,7 +30,7 @@ export async function* orderEventStream<T>(
   const lateArrivalPolicy = options?.lateArrivalPolicy ?? "flag"
   const getWatermark = options?.watermark ?? defaultWatermark
 
-  const buffer: ValidatedEventEnvelope<T>[] = []
+  const buffer: BufferedEvent<T>[] = []
   let maxSeenPhysicalTime = 0n
   let pendingAnomalies: EventAnomaly<T>[] = []
 
@@ -35,26 +40,38 @@ export async function* orderEventStream<T>(
   ): OrderBatch<T> | undefined => {
     const watermark = maxSeenPhysicalTime - maxLateArrivalMs
     const ready: ValidatedEventEnvelope<T>[] = []
-    const remaining: ValidatedEventEnvelope<T>[] = []
+    let writeIndex = 0
 
-    for (const event of buffer) {
-      const eventTime = getEventTime(event)
-      if (flushAll || (eventTime !== undefined && eventTime <= watermark)) {
-        ready.push(event)
-      } else {
-        remaining.push(event)
+    for (let readIndex = 0; readIndex < buffer.length; readIndex += 1) {
+      const entry = buffer[readIndex]
+      if (entry === undefined) {
+        continue
       }
+
+      if (flushAll || entry.eventTime <= watermark) {
+        ready.push(entry.event)
+        continue
+      }
+
+      buffer[writeIndex] = entry
+      writeIndex += 1
     }
 
-    buffer.length = 0
-    buffer.push(...remaining)
+    buffer.length = writeIndex
 
     if (ready.length === 0 && pendingAnomalies.length === 0 && !isTerminal) {
       return undefined
     }
 
-    const result = orderEvents(ready, options)
-    const anomalies = [...result.anomalies, ...pendingAnomalies]
+    const result = ready.length > 0
+      ? orderEvents(ready, options)
+      : {
+          ordered: [],
+          anomalies: [],
+        }
+    const anomalies = result.anomalies.length > 0
+      ? [...result.anomalies, ...pendingAnomalies]
+      : pendingAnomalies
     pendingAnomalies = []
 
     return {
@@ -91,7 +108,10 @@ export async function* orderEventStream<T>(
     }
 
     const currentWatermark = maxSeenPhysicalTime - maxLateArrivalMs
-    const eventTime = getEventTime(event)
+    const validatedEventTime = validation.valid
+      ? getValidatedEventTime(validation.value)
+      : undefined
+    const eventTime = validatedEventTime ?? getEventTime(event)
     const isLate = eventTime !== undefined && eventTime < currentWatermark
 
     if (isLate) {
@@ -118,7 +138,10 @@ export async function* orderEventStream<T>(
     }
 
     if (validation.valid) {
-      buffer.push(validation.value)
+      buffer.push({
+        event: validation.value,
+        eventTime: getValidatedEventTime(validation.value),
+      })
     }
 
     if (buffer.length >= batchSize) {

@@ -16,15 +16,11 @@ export type CausalOrdering =
   | "before"
   | "after"
   | "equal"
-  | "concurrent"
   | "unknown"
 
 export type CausalEvidence =
   | { type: "parent_event"; parentEventId: EventId }
-  | { type: "trace_parent_child"; traceId: string }
   | { type: "causal_dependency"; dependsOnEventId: EventId }
-  | { type: "message_receive"; relatedEventId?: EventId }
-  | { type: "vector_dominance" }
   | { type: "same_node_sequence" }
 
 export type EventEnvelope<T = unknown> = {
@@ -126,13 +122,11 @@ export type OrderStats = {
   validEvents: number
   invalidEvents: number
   orderedEvents: number
-  concurrentGroupCount: number
   anomalyCount: number
 }
 
 export type OrderResult<T = unknown> = {
   ordered: OrderedEvent<T>[]
-  concurrentGroups: EventEnvelope<T>[][]
   anomalies: EventAnomaly<T>[]
   stats: OrderStats
 }
@@ -150,7 +144,6 @@ export type OrderOptions<T> = {
   detectAnomalies?: boolean
   allowUnknownOrder?: boolean
   maxClockDriftMs?: bigint
-  getPartition?: (event: EventEnvelope<T>) => string | undefined
 }
 
 export type LateArrivalPolicy =
@@ -161,7 +154,6 @@ export type LateArrivalPolicy =
 
 export type StreamOrderOptions<T> = OrderOptions<T> & {
   batchSize?: number
-  windowSizeMs?: bigint
   maxLateArrivalMs?: bigint
   lateArrivalPolicy?: LateArrivalPolicy
   watermark?: (event: EventEnvelope<T>) => bigint

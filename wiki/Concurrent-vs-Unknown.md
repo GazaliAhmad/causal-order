@@ -6,14 +6,17 @@ They are not the same thing.
 
 ## `concurrent`
 
-`concurrent` means there is no known causal relationship between the events.
+`concurrent` means the library can positively justify that there is no supported causal relationship between the events.
 
 This is a meaningful statement.
 It does not mean the library failed.
-It means the available metadata does not show one event causing or preceding the other.
+It means the available metadata is strong enough to rule out any supported causal precedence claim.
 
 In many distributed systems, concurrency is real.
 Two events may genuinely happen independently.
+
+In current releases, this result is intentionally rare.
+The runtime prefers `unknown` over speculative concurrency when the supported evidence is too weak, especially across nodes.
 
 ## `unknown`
 
@@ -23,7 +26,7 @@ This is different from concurrency.
 
 Concurrency says:
 
-* these events appear independent
+* the library can justify independence within the supported model
 
 Unknown says:
 

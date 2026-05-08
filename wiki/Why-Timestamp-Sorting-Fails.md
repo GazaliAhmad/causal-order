@@ -41,5 +41,5 @@ But it is a safer answer.
 ## The Philosophy
 
 If the system only has weak evidence, the output should say so.
-If there is no known causal relationship, the output should allow concurrency.
+If the library can positively justify no supported causal relationship, the output should allow concurrency.
 If the metadata is not strong enough, the output should leave room for unknowns.

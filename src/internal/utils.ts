@@ -1,4 +1,5 @@
 import type { EventEnvelope, EventId, HlcTimestamp, NodeId } from "../types.js"
+import type { ValidatedEventEnvelope } from "../types.js"
 
 export function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0
@@ -79,6 +80,12 @@ export function getEventTime<T>(event: EventEnvelope<T>): bigint | undefined {
   } catch {
     return event.ingestedAt
   }
+}
+
+export function getValidatedEventTime<T>(
+  event: ValidatedEventEnvelope<T>,
+): bigint {
+  return event.clock.physicalTimeMs
 }
 
 export function dedupeEvidence<T extends { type: string }>(items: T[]): T[] {

@@ -7,7 +7,7 @@ An event integrity library for distributed systems.
 Instead of only sorting by timestamp, it helps you:
 
 * order what can be ordered
-* group what is concurrent
+* preserve concurrency only when it can be justified honestly
 * flag what is suspicious
 * keep the difference between proof, inference, fallback, and unknown
 
@@ -33,7 +33,6 @@ Given a set of distributed events, the library returns more than a sorted list.
 It returns:
 
 * `ordered`: events with `orderIndex`, `orderBasis`, and `confidence`
-* `concurrentGroups`: events that should not be flattened into fake sequence
 * `anomalies`: invalid, suspicious, or operationally important records
 * `stats`: summary counts for the batch
 
@@ -43,6 +42,15 @@ Confidence is explicit:
 * `derived`: order was inferred from useful but weaker metadata
 * `fallback`: deterministic ordering was imposed for stability
 * `unknown`: the library cannot honestly justify the claim
+
+Current semantic posture:
+
+* cross-node events without explicit supported causal evidence should usually remain `unknown`
+* supported causal evidence today is intentionally narrow:
+  * `parentEventId`
+  * `dependencyEventIds`
+  * same-node monotonic `sequence`
+* shared `traceId` or `partition` metadata does not, by itself, imply causality
 
 ## Install
 
@@ -91,7 +99,6 @@ const result = orderEvents(events, {
 })
 
 console.log(result.ordered)
-console.log(result.concurrentGroups)
 console.log(result.anomalies)
 ```
 
@@ -117,6 +124,19 @@ Example output shape:
 
 The important part is not just the order.
 It is the explanation of why that order exists and how trustworthy it is.
+
+## Semantic Notes
+
+Two rules matter especially for current releases:
+
+* `concurrent` is not a polite word for "I don't know"
+* lack of a visible causal edge should usually stay `unknown`, especially across nodes
+
+That means:
+
+* explicit parent and dependency links can produce `proven` causal ordering
+* same-node monotonic sequence can produce strong ordering evidence
+* HLC, ingestion order, shared `traceId`, or shared `partition` metadata can still be useful without becoming causal proof
 
 ## Common Workflow
 
@@ -228,6 +248,7 @@ A practical mental model is:
 
 * `10k` should feel easy
 * `100k` should feel solid
+* `150k` benchmark profiles are useful stretch visibility, but not yet the enforced baseline promise
 * million-scale workloads should be treated as an explicit scalability target, not the default assumption
 
 If the workload is naturally unbounded, `orderEventStream()` is the more honest model.
@@ -242,6 +263,7 @@ That means:
 
 * `concurrent` is not the same thing as `unknown`
 * HLC ordering alone is useful, but not full proof
+* shared `traceId` or `partition` metadata does not, by itself, prove causality
 * deterministic output is not the same thing as justified causal order
 * invalid or weak metadata should become visible, not silently repaired
 
@@ -282,6 +304,7 @@ Repository guides:
 
 * [Guides Index](https://github.com/GazaliAhmad/causal-order/blob/main/guides/README.md)
 * [Mental Model](https://github.com/GazaliAhmad/causal-order/blob/main/guides/mental-model.md)
+* [Case Studies](https://github.com/GazaliAhmad/causal-order/blob/main/guides/case-studies.md)
 * [Replay Corruption](https://github.com/GazaliAhmad/causal-order/blob/main/guides/replay-corruption.md)
 * [Multi-Region Drift](https://github.com/GazaliAhmad/causal-order/blob/main/guides/multi-region-drift.md)
 * [False Audit Timelines](https://github.com/GazaliAhmad/causal-order/blob/main/guides/false-audit-timeline.md)
@@ -294,7 +317,10 @@ Runnable repository examples:
 
 ## Status
 
-`causal-order` is currently in the public `0.1.x` release line.
+`causal-order` is currently in the public `0.2.x` release line.
+
+The repository is currently prepared as `0.2.0`, while npm publication still depends on the GitHub release workflow.
+This release reflects the semantics hardening that began during late `0.1.x` preparation so the eventual `1.0` contract can be tighter and more settled.
 
 That means:
 
@@ -324,6 +350,11 @@ Useful local commands:
 
 The perf guard is intentionally a broad safety rail, not a machine-independent promise.
 It is meant to catch obvious regressions in realistic workload bands.
+
+Current benchmark posture:
+
+* `10k` and `100k` are the main enforced guardrail bands
+* `150k` profiles are available for stretch visibility, but are not currently enforced in `npm run bench:check`
 
 ## License
 
