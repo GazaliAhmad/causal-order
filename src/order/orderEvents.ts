@@ -7,11 +7,14 @@ import type {
   OrderedEvent,
   ValidatedEventEnvelope,
 } from "../types.js"
-import { compareByCausality } from "../compare/causalCompare.js"
-import { compareByHlc } from "../compare/hlcCompare.js"
-import { compareDeterministically } from "../compare/deterministicCompare.js"
+import {
+  compareValidatedDeterministically,
+} from "../compare/deterministicCompare.js"
 import { detectAnomalies } from "../anomalies/detectAnomalies.js"
-import { dedupeEvidence, getEventTime } from "../internal/utils.js"
+import {
+  dedupeEvidence,
+  getValidatedEventTime,
+} from "../internal/utils.js"
 import { validateEvent } from "../validate/validateEvent.js"
 
 type GraphNode<T> = {
@@ -41,7 +44,7 @@ function buildOrderedMetadata<T>(
   options: {
     tieBreaker?: OrderOptions<T>["tieBreaker"]
     unresolvedEventIds: Set<string>
-    sameTimeEventCounts: Map<string, number>
+    sameTimeEventCounts: Map<bigint, number>
     sameTimeIngestionTies: Set<string>
   },
 ): OrderedEvent<T> {
@@ -78,10 +81,8 @@ function buildOrderedMetadata<T>(
     }
   }
 
-  const eventTime = getEventTime(event)
-  const sameTimeCount = eventTime === undefined
-    ? 0
-    : (options.sameTimeEventCounts.get(eventTime.toString()) ?? 0)
+  const eventTime = getValidatedEventTime(event)
+  const sameTimeCount = options.sameTimeEventCounts.get(eventTime) ?? 0
 
   if (
     options.tieBreaker === "ingestion_order" &&
@@ -104,52 +105,12 @@ function buildOrderedMetadata<T>(
     }
   }
 
-  if (compareByHlc(event.clock, event.clock) !== "unknown") {
-    return {
-      event,
-      orderIndex,
-      orderBasis: "hlc",
-      confidence: "derived",
-    }
-  }
-
   return {
     event,
     orderIndex,
-    orderBasis: "deterministic_tiebreaker",
-    confidence: "fallback",
+    orderBasis: "hlc",
+    confidence: "derived",
   }
-}
-
-function collectConcurrentGroups<T>(
-  orderedEvents: EventEnvelope<T>[],
-): EventEnvelope<T>[][] {
-  const groups: EventEnvelope<T>[][] = []
-  let currentGroup: EventEnvelope<T>[] = []
-
-  for (const event of orderedEvents) {
-    const previous = currentGroup[currentGroup.length - 1]
-    if (previous === undefined) {
-      currentGroup.push(event)
-      continue
-    }
-
-    if (compareByCausality(previous, event) === "concurrent") {
-      currentGroup.push(event)
-      continue
-    }
-
-    if (currentGroup.length > 1) {
-      groups.push(currentGroup)
-    }
-    currentGroup = [event]
-  }
-
-  if (currentGroup.length > 1) {
-    groups.push(currentGroup)
-  }
-
-  return groups
 }
 
 export function orderEvents<T>(
@@ -244,7 +205,7 @@ export function orderEvents<T>(
   for (const [, sameNodeEvents] of nodesByNodeId) {
     const withSequence = sameNodeEvents
       .filter((node) => node.event.sequence !== undefined)
-      .sort((a, b) => compareDeterministically(a.event, b.event, "sequence"))
+      .sort((a, b) => compareValidatedDeterministically(a.event, b.event, "sequence"))
 
     for (let index = 1; index < withSequence.length; index += 1) {
       const previous = withSequence[index - 1]
@@ -264,9 +225,10 @@ export function orderEvents<T>(
 
   const queue = nodes
     .filter((node) => node.indegree === 0)
-    .sort((a, b) => compareDeterministically(a.event, b.event, options?.tieBreaker))
+    .sort((a, b) => compareValidatedDeterministically(a.event, b.event, options?.tieBreaker))
 
   const orderedNodes: GraphNode<T>[] = []
+  const isOrdered = new Array<boolean>(nodes.length).fill(false)
   while (queue.length > 0) {
     const current = queue.shift()
     if (current === undefined) {
@@ -274,6 +236,7 @@ export function orderEvents<T>(
     }
 
     orderedNodes.push(current)
+    isOrdered[current.index] = true
 
     for (const outgoingIndex of current.outgoing) {
       const target = nodes[outgoingIndex]
@@ -283,7 +246,8 @@ export function orderEvents<T>(
       target.indegree -= 1
       if (target.indegree === 0) {
         queue.push(target)
-        queue.sort((a, b) => compareDeterministically(a.event, b.event, options?.tieBreaker))
+        queue.sort((a, b) =>
+          compareValidatedDeterministically(a.event, b.event, options?.tieBreaker))
       }
     }
   }
@@ -293,11 +257,11 @@ export function orderEvents<T>(
   }
 
   const unresolvedNodes = nodes
-    .filter((node) => !orderedNodes.includes(node))
-    .sort((a, b) => compareDeterministically(a.event, b.event, options?.tieBreaker))
+    .filter((node) => !isOrdered[node.index])
+    .sort((a, b) => compareValidatedDeterministically(a.event, b.event, options?.tieBreaker))
 
   for (const node of unresolvedNodes) {
-    if (!orderedNodes.includes(node)) {
+    if (!isOrdered[node.index]) {
       anomalies.push({
         type: "unknown_order",
         severity: options?.allowUnknownOrder === false ? "error" : "warning",
@@ -305,21 +269,17 @@ export function orderEvents<T>(
         message: "Event could not be fully placed by causal ordering and was appended deterministically",
       })
       orderedNodes.push(node)
+      isOrdered[node.index] = true
     }
   }
 
   const unresolvedEventIds = new Set(unresolvedNodes.map((node) => node.event.id))
-  const sameTimeEventCounts = new Map<string, number>()
+  const sameTimeEventCounts = new Map<bigint, number>()
   const sameTimeIngestionTies = new Set<string>()
-  const eventsByTime = new Map<string, ValidatedEventEnvelope<T>[]>()
+  const eventsByTime = new Map<bigint, ValidatedEventEnvelope<T>[]>()
 
   for (const event of validEvents) {
-    const eventTime = getEventTime(event)
-    if (eventTime === undefined) {
-      continue
-    }
-
-    const timeKey = eventTime.toString()
+    const timeKey = getValidatedEventTime(event)
     sameTimeEventCounts.set(timeKey, (sameTimeEventCounts.get(timeKey) ?? 0) + 1)
     const cohort = eventsByTime.get(timeKey) ?? []
     cohort.push(event)
@@ -332,13 +292,26 @@ export function orderEvents<T>(
         continue
       }
 
-      const ingestionValues = new Set(
-        cohort
-          .map((event) => event.ingestedAt?.toString())
-          .filter((value): value is string => value !== undefined),
-      )
+      let firstIngestedAt: bigint | undefined
+      let hasDistinctIngestionOrder = false
 
-      if (ingestionValues.size > 1) {
+      for (const event of cohort) {
+        if (event.ingestedAt === undefined) {
+          continue
+        }
+
+        if (firstIngestedAt === undefined) {
+          firstIngestedAt = event.ingestedAt
+          continue
+        }
+
+        if (event.ingestedAt !== firstIngestedAt) {
+          hasDistinctIngestionOrder = true
+          break
+        }
+      }
+
+      if (hasDistinctIngestionOrder) {
         for (const event of cohort) {
           if (event.ingestedAt !== undefined) {
             sameTimeIngestionTies.add(event.id)
@@ -355,18 +328,15 @@ export function orderEvents<T>(
       sameTimeEventCounts,
       sameTimeIngestionTies,
     }))
-  const concurrentGroups = collectConcurrentGroups(ordered.map((item) => item.event))
 
   return {
     ordered,
-    concurrentGroups,
     anomalies,
     stats: {
       totalEvents: events.length,
       validEvents: validEvents.length,
       invalidEvents: events.length - validEvents.length,
       orderedEvents: ordered.length,
-      concurrentGroupCount: concurrentGroups.length,
       anomalyCount: anomalies.length,
     },
   }

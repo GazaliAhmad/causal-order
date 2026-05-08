@@ -224,3 +224,51 @@ test("orderEvents preserves explicit causal and same-node sequence invariants ac
     }
   }
 })
+
+test("orderEvents does not treat shared traceId as causal evidence on its own", () => {
+  const traceId = "trace-checkout-1"
+  const eventA = makeEvent({
+    id: "evt-a",
+    nodeId: "api-a",
+    physicalTimeMs: 1_000n,
+    traceId,
+  })
+  const eventB = makeEvent({
+    id: "evt-b",
+    nodeId: "worker-b",
+    physicalTimeMs: 1_001n,
+    traceId,
+  })
+
+  const result = orderEvents([eventB, eventA], {
+    strict: false,
+    detectAnomalies: true,
+  })
+
+  assert.ok(result.ordered.every((entry) => entry.confidence !== "proven"))
+  assert.ok(result.ordered.every((entry) => entry.causalEvidence === undefined))
+})
+
+test("orderEvents does not treat shared partition as causal evidence on its own", () => {
+  const partition = "tenant-42"
+  const eventA = makeEvent({
+    id: "evt-a",
+    nodeId: "api-a",
+    physicalTimeMs: 1_000n,
+    partition,
+  })
+  const eventB = makeEvent({
+    id: "evt-b",
+    nodeId: "worker-b",
+    physicalTimeMs: 1_001n,
+    partition,
+  })
+
+  const result = orderEvents([eventB, eventA], {
+    strict: false,
+    detectAnomalies: true,
+  })
+
+  assert.ok(result.ordered.every((entry) => entry.confidence !== "proven"))
+  assert.ok(result.ordered.every((entry) => entry.causalEvidence === undefined))
+})

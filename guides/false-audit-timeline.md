@@ -23,7 +23,7 @@ In audit mode, the library should help teams say:
 
 * this relationship is `proven`
 * this one is only `derived`
-* these two records are `concurrent`
+* this relationship should remain `unknown` rather than being flattened into false certainty
 * this part of the evidence is `unknown`
 
 That is a stronger audit posture than emitting a single false total order.

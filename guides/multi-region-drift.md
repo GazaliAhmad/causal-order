@@ -34,7 +34,7 @@ In a case like this, the library should distinguish between:
 
 * HLC or timestamp-based ordering that is only `derived`
 * explicit dependencies that make some relationships `proven`
-* cross-node events that may actually be `concurrent`
+* cross-node events that may need to remain `unknown` unless stronger evidence exists
 
 This is especially important when a user expects a total order simply because every record has a timestamp.
 

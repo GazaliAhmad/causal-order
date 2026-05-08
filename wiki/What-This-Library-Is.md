@@ -10,7 +10,7 @@ At a high level, the library helps a developer:
 
 * validate event metadata
 * order what can be ordered
-* group what is concurrent
+* preserve concurrency only when it can be justified honestly
 * flag anomalies and suspicious records
 * preserve the difference between strong evidence and weak inference
 

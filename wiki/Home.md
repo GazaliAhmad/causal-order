@@ -33,7 +33,7 @@ If you are new to the project, read these pages first:
 The library does not try to make distributed event order magically certain.
 It tries to answer a more honest question:
 
-> What can be ordered safely, what is only inferred, what is concurrent, and what should remain unknown?
+> What can be ordered safely, what is only inferred, what can be justified as concurrent, and what should remain unknown?
 
 That means the value of the library is not just:
 

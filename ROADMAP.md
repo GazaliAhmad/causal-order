@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap describes how `causal-order` should mature from its public `0.1.x` release line into a stable `1.0.0` npm package.
+This roadmap describes how `causal-order` should mature from its current public `0.2.x` release line into a stable `1.0.0` npm package.
 
 The goal is not to rush publication.
 The goal is to make sure the semantics are trustworthy before the package becomes a long-term contract.
@@ -88,6 +88,12 @@ That means the design target should be:
 * `100k` events should feel credible and well-supported
 * `1M+` events should be treated as a deliberate scalability track, not as the baseline promise for every use case
 
+Current benchmarking posture:
+
+* `100k` remains the main enforced large-batch guardrail
+* `150k` benchmark profiles are useful stretch visibility, but should not yet be treated as the formal baseline promise for CI enforcement
+* if `150k` becomes a required guard later, the docs and performance policy should be updated together rather than drifting separately
+
 This distinction matters because there is no end to abstract number-chasing.
 If the package says `1M`, someone will ask why not `10M`.
 The better standard is whether the package is strong for the kinds of event sets that teams actually inspect together.
@@ -160,6 +166,10 @@ Exit criteria:
 Goal:
 Pressure-test the meaning of the library, not just the syntax.
 
+This work is not starting from zero.
+Late `0.1.x` preparation has already tightened some semantics, especially around preferring `unknown` over speculative concurrency.
+The purpose of `0.2.x` is to finish and extend that hardening rather than introducing the idea for the first time.
+
 Focus:
 
 * add tests for edge cases and regressions
@@ -171,11 +181,150 @@ Focus:
 * make anomaly messages more useful for debugging
 * clarify what counts as proven causality in difficult cases
 
+### `0.2.0` Semantic Decision: `concurrent` vs `unknown`
+
+A key `0.2.0` goal is to make the library stricter and more honest about unresolved relationships.
+
+`concurrent` and `unknown` should not mean the same thing.
+
+For this release line:
+
+* `concurrent` is a positive claim
+* `unknown` is the absence of a defensible claim
+
+### Intended Meaning
+
+* `before`: the library can justify that `A` happened before `B` within the supported causal model
+* `after`: the library can justify that `A` happened after `B` within the supported causal model
+* `equal`: both references identify the same event
+* `concurrent`: the library can positively justify that neither event is known to come before the other within the supported causal model
+* `unknown`: the library cannot honestly justify ordering or concurrency
+
+### Supported Causal Signals For `0.2.0`
+
+For `0.2.0`, only these should count as causality-bearing signals:
+
+* `parentEventId`
+* `dependencyEventIds`
+* same-node monotonic `sequence`
+
+The following may support deterministic or operational ordering, but should not by themselves prove causality:
+
+* HLC comparison
+* raw timestamps
+* ingestion order
+* shared `traceId`
+* shared `partition`
+
+### Pairwise Comparison Rule
+
+The intended comparison rule for `0.2.0` is:
+
+1. return `equal` when both references identify the same event
+2. return `unknown` if either event is invalid
+3. return `before` if `B` explicitly names `A` as a parent or dependency
+4. return `after` if `A` explicitly names `B` as a parent or dependency
+5. for same-node events with valid, distinct `sequence` values:
+   * lower sequence means `before`
+   * higher sequence means `after`
+6. for same-node events with missing, equal, or unusable sequence evidence, return `unknown` unless another supported causal signal applies
+7. for cross-node events with no explicit supported causal edge, return `unknown`
+8. do not infer `concurrent` from missing evidence alone
+
+### Practical Consequence
+
+This means `0.2.0` should prefer honest ambiguity over confident-looking grouping.
+
+Examples:
+
+* two cross-node events with no dependency relationship should usually be `unknown`
+* two same-node events with usable sequence metadata can still be ordered
+* HLC-only ordering remains useful, but should stay `derived` rather than causally `proven`
+
+### Consequence For `concurrentGroups`
+
+`concurrentGroups` should only contain events that are truly concurrent under the supported model.
+
+That means:
+
+* some current groups may shrink
+* some current groups may disappear
+* this is acceptable if it removes false certainty
+
+### Release Intent
+
+This is a semantics-hardening change, not just an implementation cleanup.
+
+The purpose of `0.2.0` is to make sure the library does not label lack of evidence as concurrency, and does not hide uncertainty behind a clean-looking result.
+
+### `0.2.0` Scope Decision: `traceId` and `partition`
+
+For `0.2.0`, `traceId` and `partition` should remain metadata, not causality-bearing signals.
+
+That means:
+
+* shared `traceId` should be treated as correlation metadata only
+* shared `partition` should be treated as scoping metadata only
+* neither field should, by itself, change `before`, `after`, `concurrent`, or `unknown`
+* neither field should, by itself, upgrade confidence to `proven`
+
+This keeps the release honest and avoids turning weak correlation into false causal certainty.
+
+### Future Path
+
+Possible future extensions should require stronger structure rather than looser inference.
+
+For trace-derived causality:
+
+* add explicit span-level structure such as `spanId`
+* add explicit parent-child span structure such as `parentSpanId`
+* define whether trace parent-child relationships count as `proven` or only `derived`
+* define behavior for retries, fan-out, async hops, and partial traces
+
+For partition-aware ordering:
+
+* add explicit monotonic partition position metadata such as `partitionOffset`
+* define what guarantee that position carries in the source system
+* treat partition-local ordering as a candidate for `derived` ordering, not automatic causal proof
+* define behavior for replay, compaction, rebalancing, and duplicate delivery
+
 Exit criteria:
 
 * users can understand why outputs are labeled the way they are
 * “why not just sort by timestamp?” has strong concrete answers
 * tricky event sets no longer expose major semantic ambiguity
+
+### Likely `0.2.1` Follow-Up: Corrupted Dataset Stress Hardening
+
+This should not block `0.2.0`.
+It is a natural follow-up once `0.2.0` has had time to settle and the semantics feel stable in the field.
+
+Focus:
+
+* add explicit `100k`-scale stress benchmarks for anomaly-heavy and corruption-heavy datasets
+* benchmark large synthetic expansions of:
+  * multi-region drift
+  * replay corruption
+  * offline sync anomalies
+  * "unknown" case-study style cross-node ambiguity
+* distinguish clearly between:
+  * routine `100k` batch behavior
+  * anomaly-heavy `100k` stress behavior
+* identify whether replay-heavy and offline-sync-heavy workloads need targeted performance work
+* document the difference between semantic correctness under stress and performance comfort under stress
+
+Why this belongs after `0.2.0`:
+
+* `0.2.0` is primarily a semantics and API cleanup release
+* the corrupted-dataset stress work is better treated as stabilization and pressure-testing
+* this keeps the semantic release crisp while preserving a clear next step for hardening
+
+Success criteria:
+
+* the repo has named benchmark coverage for these corruption-heavy patterns
+* maintainers can compare normal large-batch profiles against anomaly-heavy stress profiles
+* any serious stress-path regressions are visible before later release lines
+* follow-up performance work, if needed, can be scoped from real benchmark evidence rather than intuition
 
 ## `0.3.x` Streaming Reality
 
