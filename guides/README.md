@@ -7,6 +7,7 @@ Start here:
 * [Mental Model](./mental-model.md)
 * [Case Studies](./case-studies.md)
 * [Stress Hardening](./stress-hardening.md)
+* [After-Hours Batch Processing](./after-hours-batch-processing.md)
 
 Failure-mode guides:
 
