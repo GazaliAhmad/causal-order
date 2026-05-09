@@ -29,6 +29,10 @@ export async function* orderEventStream<T>(
   const maxLateArrivalMs = options?.maxLateArrivalMs ?? 30_000n
   const lateArrivalPolicy = options?.lateArrivalPolicy ?? "flag"
   const getWatermark = options?.watermark ?? defaultWatermark
+  const validationOptions: { maxClockDriftMs?: bigint } = {}
+  if (options?.maxClockDriftMs !== undefined) {
+    validationOptions.maxClockDriftMs = options.maxClockDriftMs
+  }
 
   const buffer: BufferedEvent<T>[] = []
   let maxSeenPhysicalTime = 0n
@@ -83,11 +87,6 @@ export async function* orderEventStream<T>(
   }
 
   for await (const event of source) {
-    const validationOptions: { maxClockDriftMs?: bigint } = {}
-    if (options?.maxClockDriftMs !== undefined) {
-      validationOptions.maxClockDriftMs = options.maxClockDriftMs
-    }
-
     const validation = validateEvent(event, validationOptions)
 
     if (!validation.valid && (options?.strict ?? false)) {
@@ -99,7 +98,10 @@ export async function* orderEventStream<T>(
     }
 
     if (!validation.valid) {
-      pendingAnomalies.push(...detectAnomalies([event], validationOptions))
+      pendingAnomalies.push(...detectAnomalies([event], {
+        ...validationOptions,
+        validations: [{ event, validation }],
+      }))
     }
 
     const watermarkValue = getWatermark(event)

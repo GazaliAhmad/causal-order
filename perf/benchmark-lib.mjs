@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises"
 import { dirname } from "node:path"
 import { performance } from "node:perf_hooks"
 import { orderEvents } from "../dist/index.js"
+import { stressBenchmarkProfiles } from "./stress-profiles.mjs"
 
 function createGenerator({
   nodeCount,
@@ -67,6 +68,16 @@ function shuffleInPlace(items) {
   }
 }
 
+function createDefaultEvents(profile) {
+  const generateEvent = createGenerator(profile)
+  const events = Array.from({ length: profile.totalEvents }, (_, index) => generateEvent(index))
+  if (profile.shuffle) {
+    shuffleInPlace(events)
+  }
+
+  return events
+}
+
 function formatMs(value) {
   return `${value.toFixed(2)} ms`
 }
@@ -85,6 +96,22 @@ function summarizeConfidence(result) {
 
   for (const item of result.ordered) {
     counts[item.confidence] += 1
+  }
+
+  return counts
+}
+
+function summarizeOrderBasis(result) {
+  const counts = {
+    causal: 0,
+    hlc: 0,
+    sequence: 0,
+    deterministic_tiebreaker: 0,
+    ingestion_order: 0,
+  }
+
+  for (const item of result.ordered) {
+    counts[item.orderBasis] += 1
   }
 
   return counts
@@ -175,6 +202,7 @@ export const benchmarkProfiles = {
     crossDependencyEvery: 5,
     dependencyFanIn: 2,
   },
+  ...stressBenchmarkProfiles,
 }
 
 export function listProfileNames() {
@@ -195,13 +223,11 @@ export function getProfile(name) {
 
 export function runBenchmarkCase(inputProfile) {
   const profile = typeof inputProfile === "string" ? getProfile(inputProfile) : inputProfile
-  const generateEvent = createGenerator(profile)
 
   const generationStart = performance.now()
-  const events = Array.from({ length: profile.totalEvents }, (_, index) => generateEvent(index))
-  if (profile.shuffle) {
-    shuffleInPlace(events)
-  }
+  const events = profile.createEvents !== undefined
+    ? profile.createEvents(profile)
+    : createDefaultEvents(profile)
   const generationMs = performance.now() - generationStart
 
   const memoryBefore = process.memoryUsage().heapUsed
@@ -225,10 +251,13 @@ export function runBenchmarkCase(inputProfile) {
       generationMs,
       orderingMs,
       heapDeltaBytes: memoryAfter - memoryBefore,
+      validEvents: result.stats.validEvents,
+      invalidEvents: result.stats.invalidEvents,
       orderedEvents: result.ordered.length,
       anomalyCount: result.anomalies.length,
       anomalyBreakdown: summarizeAnomalies(result),
       confidenceCounts: summarizeConfidence(result),
+      orderBasisCounts: summarizeOrderBasis(result),
     },
     sample: result.ordered.slice(0, 5).map((item) => ({
       id: item.event.id,
@@ -247,12 +276,15 @@ export function printBenchmarkSummary(run) {
   console.log(`Generation + shuffle: ${formatMs(metrics.generationMs)}`)
   console.log(`Ordering: ${formatMs(metrics.orderingMs)}`)
   console.log(`Heap delta: ${formatMemory(metrics.heapDeltaBytes)}`)
+  console.log(`Valid events: ${metrics.validEvents.toLocaleString()}`)
+  console.log(`Invalid events: ${metrics.invalidEvents.toLocaleString()}`)
   console.log(`Ordered events: ${metrics.orderedEvents.toLocaleString()}`)
   console.log(`Anomalies: ${metrics.anomalyCount.toLocaleString()}`)
   if (metrics.anomalyCount > 0) {
     console.log(`Anomaly breakdown: ${JSON.stringify(metrics.anomalyBreakdown)}`)
   }
   console.log(`Confidence counts: ${JSON.stringify(metrics.confidenceCounts)}`)
+  console.log(`Order basis counts: ${JSON.stringify(metrics.orderBasisCounts)}`)
   console.log("First 5 ordered events:")
   console.log(JSON.stringify(sample, null, 2))
 }
@@ -280,10 +312,13 @@ export function toCsv(runs) {
       "generation_ms",
       "ordering_ms",
       "heap_delta_bytes",
+      "valid_events",
+      "invalid_events",
       "ordered_events",
       "anomaly_count",
       "anomaly_breakdown",
       "confidence_counts",
+      "order_basis_counts",
     ],
   ]
 
@@ -300,10 +335,13 @@ export function toCsv(runs) {
       run.metrics.generationMs.toFixed(2),
       run.metrics.orderingMs.toFixed(2),
       run.metrics.heapDeltaBytes,
+      run.metrics.validEvents,
+      run.metrics.invalidEvents,
       run.metrics.orderedEvents,
       run.metrics.anomalyCount,
       JSON.stringify(run.metrics.anomalyBreakdown),
       JSON.stringify(run.metrics.confidenceCounts),
+      JSON.stringify(run.metrics.orderBasisCounts),
     ])
   }
 

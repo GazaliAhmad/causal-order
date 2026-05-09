@@ -32,10 +32,15 @@ For this project, a useful mental model is:
 
 * `10k` should feel easy
 * `100k` should feel solid
+* `150k` is a valuable corrupted-dataset stress band for hardening and visibility
 * `1M+` should be treated as an explicit scalability target, not a default assumption
 
 This is not about lowering ambition.
 It is about staying anchored to the workloads teams actually inspect together.
+
+The important distinction is that `100k` is still the routine credible batch story, while `150k` is used to pressure-test anomaly-heavy and corruption-heavy workloads.
+
+For more on that distinction, see [Stress Hardening](Stress-Hardening).
 
 ## Why Streaming Exists
 

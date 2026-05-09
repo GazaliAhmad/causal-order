@@ -248,7 +248,7 @@ A practical mental model is:
 
 * `10k` should feel easy
 * `100k` should feel solid
-* `150k` benchmark profiles are useful stretch visibility, but not yet the enforced baseline promise
+* `150k` corrupted-dataset profiles are useful stress visibility for hardening work, but not yet the enforced baseline promise
 * million-scale workloads should be treated as an explicit scalability target, not the default assumption
 
 If the workload is naturally unbounded, `orderEventStream()` is the more honest model.
@@ -305,6 +305,7 @@ Repository guides:
 * [Guides Index](https://github.com/GazaliAhmad/causal-order/blob/main/guides/README.md)
 * [Mental Model](https://github.com/GazaliAhmad/causal-order/blob/main/guides/mental-model.md)
 * [Case Studies](https://github.com/GazaliAhmad/causal-order/blob/main/guides/case-studies.md)
+* [Stress Hardening](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stress-hardening.md)
 * [Replay Corruption](https://github.com/GazaliAhmad/causal-order/blob/main/guides/replay-corruption.md)
 * [Multi-Region Drift](https://github.com/GazaliAhmad/causal-order/blob/main/guides/multi-region-drift.md)
 * [False Audit Timelines](https://github.com/GazaliAhmad/causal-order/blob/main/guides/false-audit-timeline.md)
@@ -317,16 +318,16 @@ Runnable repository examples:
 
 ## Status
 
-`causal-order` is currently in the public `0.2.x` release line.
+`causal-order` is currently in the public `0.2.x` release line, with `0.2.1` as the earlier published state, `0.2.2` as the stress-hardening release line, and `0.3.0` as the next planned streaming milestone.
 
-The repository is currently prepared as `0.2.0`, while npm publication still depends on the GitHub release workflow.
-This release reflects the semantics hardening that began during late `0.1.x` preparation so the eventual `1.0` contract can be tighter and more settled.
+The recent `0.2.x` work reflects the semantics hardening that began during late `0.1.x` preparation, continued through the earlier published `0.2.1` state, and was followed by corrupted-dataset stress hardening in `0.2.2`, so the eventual `1.0` contract can be tighter and more settled.
 
 That means:
 
 * the package is usable today
 * the API is expected to evolve
 * semantics matter more than surface churn at this stage
+* the next major area of hardening after `0.2.2` is streaming behavior, which is the current `0.3.0` direction
 * `1.0.0` is the point where the semantic contract should feel stable enough to preserve long-term
 
 ## Repository Development
@@ -347,6 +348,7 @@ Useful local commands:
 * `npm run bench`
 * `npm run bench:all`
 * `npm run bench:csv`
+* `npm run bench:profile`
 
 The perf guard is intentionally a broad safety rail, not a machine-independent promise.
 It is meant to catch obvious regressions in realistic workload bands.
@@ -354,7 +356,8 @@ It is meant to catch obvious regressions in realistic workload bands.
 Current benchmark posture:
 
 * `10k` and `100k` are the main enforced guardrail bands
-* `150k` profiles are available for stretch visibility, but are not currently enforced in `npm run bench:check`
+* `150k` corrupted-dataset profiles are available for stress visibility, but are not currently enforced in `npm run bench:check`
+* `npm run bench:profile` is available when you need CPU profiles for the slowest stress cases
 
 ## License
 

@@ -1,6 +1,6 @@
 {
   "name": "causal-order",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "An event integrity library for ordering and analyzing distributed events without false certainty.",
   "keywords": [
     "distributed-systems",
@@ -50,6 +50,7 @@
     "bench": "npm run build && node perf/run.mjs --profile baseline-100k-shuffled",
     "bench:all": "npm run build && node perf/run.mjs --all",
     "bench:csv": "npm run build && node perf/run.mjs --all --out perf/results/latest.csv",
+    "bench:profile": "npm run build && node perf/profile.mjs",
     "bench:check": "npm run build && node perf/check.mjs",
     "prepack": "npm run build"
   },
