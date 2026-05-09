@@ -6,6 +6,7 @@ Start here:
 
 * [Mental Model](./mental-model.md)
 * [Case Studies](./case-studies.md)
+* [Stress Hardening](./stress-hardening.md)
 
 Failure-mode guides:
 

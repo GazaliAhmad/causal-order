@@ -89,11 +89,20 @@ export function getValidatedEventTime<T>(
 }
 
 export function dedupeEvidence<T extends { type: string }>(items: T[]): T[] {
+  if (items.length < 2) {
+    return items
+  }
+
   const seen = new Set<string>()
   const result: T[] = []
 
   for (const item of items) {
-    const key = JSON.stringify(item)
+    let key = item.type
+    if ("parentEventId" in item) {
+      key = `${item.type}:${item.parentEventId}`
+    } else if ("dependsOnEventId" in item) {
+      key = `${item.type}:${item.dependsOnEventId}`
+    }
     if (seen.has(key)) {
       continue
     }
