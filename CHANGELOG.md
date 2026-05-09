@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.3]
+
+### Notes
+
+* internal repo follow-up after the published `0.2.2` release
+* not intended as a separate npm publication
+
+### Added
+
+* after-hours batch processing guide covering scheduled replay, HLC-backed batch ordering, recommended DB table patterns, and how batch mode relates to the later streaming story
+
+### Changed
+
+* corrected the `0.2.x` publish history wording so the docs now distinguish:
+  * published `0.2.0` baseline
+  * internal `0.2.1` repo step
+  * published `0.2.2` stress-hardening follow-up
+* clarified the `0.3.0` roadmap to distinguish:
+  * `0.2.2` batch recovery using HLC plus event metadata
+  * `0.3.0` streaming recovery using the same event model with watermark, lateness, correction, and bounded-memory behavior
+* improved docs cross-linking between case studies, stress hardening, and the new after-hours batch processing guide
+
 ## [0.2.2]
 
 ### Added

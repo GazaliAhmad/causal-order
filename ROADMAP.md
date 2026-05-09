@@ -370,6 +370,9 @@ Current outcome snapshot:
 * the stress work found and fixed a major ready-queue performance bottleneck in `orderEvents()`
 * follow-up optimization work also reduced duplicate validation and some anomaly-path allocation churn
 * the result is much stronger evidence that the library remains usable under corrupted large-batch pressure, not just under human-sized semantic fixtures
+* this also clarifies the current operational posture:
+  * `0.2.2` is the batch recovery story
+  * HLC, same-node `sequence`, and explicit dependency metadata are used to reconstruct a delayed replay batch honestly after outage recovery
 
 Success criteria:
 
@@ -398,11 +401,20 @@ Focus:
 * test bounded-memory assumptions
 * add backpressure guidance and implementation behavior
 * document memory strategy with concrete examples
+* make outage and offline-sync recovery a first-class streaming use case:
+  * local queue to central replay flow
+  * delayed reconnect batches
+  * correction behavior during resync
+  * storing ordered stream output back into DB tables as derived operational state
+* explain the relationship between the two operational modes clearly:
+  * batch recovery uses HLC plus event metadata to order a finite replayed backlog after the DB comes back
+  * streaming recovery uses the same event model, but adds watermark, lateness, correction, and bounded-memory behavior for continuous resync
 
 Why this is the next public milestone:
 
 * `0.2.x` has now done the main semantics and corrupted-dataset stress hardening work it needed to do
 * the most important remaining credibility questions are now on the streaming path, not the large-batch path
+* outage and offline-sync recovery now belong here because the remaining challenge is operational continuous reconciliation, not core ordering meaning
 * promoting this to `0.3.0` keeps the version story honest:
   * `0.2.0` was the published semantics-hardening baseline
   * `0.2.1` was an internal intermediate repo step

@@ -232,3 +232,5 @@ That keeps the relationship clean:
 
 * case studies explain the semantics in human-sized examples
 * stress benchmarks pressure-test those same semantics at `150k` scale under corrupted-dataset conditions
+
+If you want the operational scheduled-replay pattern that builds on those same semantics, see [After-Hours Batch Processing](./after-hours-batch-processing.md).
