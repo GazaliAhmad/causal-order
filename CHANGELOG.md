@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Planned
+
+* `0.3.0` is the next intended public milestone
+* the next release line is focused on streaming reality work:
+  * `orderEventStream()` hardening
+  * `flushReady()` optimization
+  * watermark and late-arrival behavior clarity
+  * bounded-memory and backpressure credibility
+
+## [0.2.2]
+
+### Added
+
+* completed the `150k` corrupted-dataset stress benchmark matrix and its smaller verification coverage
+* added CPU profiling workflow and `.cpuprofile` capture for investigating the slowest stress cases
+
+### Changed
+
+* found and fixed the major ready-queue bottleneck in `orderEvents()`
+* reduced duplicate validation work and trimmed anomaly-path and metadata-path overhead
+* improved graph edge deduping in denser dependency cases
+* aligned the README, roadmap, examples, guides, and wiki to the completed `0.2.2` stress-hardening story
+* explicitly parked the next meaningful streaming optimization work under `0.3.0` instead of extending the `0.2.x` line further
+
+## [0.2.1]
+
+### Changed
+
+* published earlier `0.2.x` semantics-hardening state before the dedicated corrupted-dataset stress-testing work that was later tracked as `0.2.2`
+
 ## [0.2.0]
 
 ### Added
