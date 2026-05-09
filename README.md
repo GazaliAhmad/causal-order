@@ -318,9 +318,9 @@ Runnable repository examples:
 
 ## Status
 
-`causal-order` is currently in the public `0.2.x` release line, with `0.2.1` as the earlier published state, `0.2.2` as the stress-hardening release line, and `0.3.0` as the next planned streaming milestone.
+`causal-order` is currently in the public `0.2.x` release line. `0.2.2` is the stress-hardening follow-up in that line, and `0.3.0` is the next planned streaming milestone.
 
-The recent `0.2.x` work reflects the semantics hardening that began during late `0.1.x` preparation, continued through the earlier published `0.2.1` state, and was followed by corrupted-dataset stress hardening in `0.2.2`, so the eventual `1.0` contract can be tighter and more settled.
+The recent `0.2.x` work reflects the semantics hardening that began during late `0.1.x` preparation, continued through the `0.2.0` public baseline, passed through an internal `0.2.1` repo step, and was followed by corrupted-dataset stress hardening in `0.2.2`, so the eventual `1.0` contract can be tighter and more settled.
 
 That means:
 

@@ -296,7 +296,8 @@ Exit criteria:
 
 ### `0.2.2` Completed: Corrupted Dataset Stress Hardening
 
-`0.2.1` was the earlier published semantics-hardening state.
+`0.2.0` was the published semantics-hardening baseline.
+`0.2.1` was an internal intermediate repo step.
 `0.2.2` is the release where that work was followed through into explicit corrupted-dataset stress testing and the resulting large-batch performance hardening.
 
 Focus:
@@ -403,7 +404,8 @@ Why this is the next public milestone:
 * `0.2.x` has now done the main semantics and corrupted-dataset stress hardening work it needed to do
 * the most important remaining credibility questions are now on the streaming path, not the large-batch path
 * promoting this to `0.3.0` keeps the version story honest:
-  * `0.2.1` was the earlier published semantics-hardening state
+  * `0.2.0` was the published semantics-hardening baseline
+  * `0.2.1` was an internal intermediate repo step
   * `0.2.2` was the stress-hardening release
   * `0.3.0` is the next meaningful behavioral milestone
 
