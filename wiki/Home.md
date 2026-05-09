@@ -25,6 +25,7 @@ If you are new to the project, read these pages first:
 * [Concurrent vs Unknown](Concurrent-vs-Unknown)
 * [Streaming Finality](Streaming-Finality)
 * [Realistic Workloads](Realistic-Workloads)
+* [Stress Hardening](Stress-Hardening)
 * [Design Philosophy](Design-Philosophy)
 * [When to Use causal-order](When-to-Use-causal-order)
 

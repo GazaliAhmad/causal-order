@@ -294,22 +294,31 @@ Exit criteria:
 * “why not just sort by timestamp?” has strong concrete answers
 * tricky event sets no longer expose major semantic ambiguity
 
-### Likely `0.2.1` Follow-Up: Corrupted Dataset Stress Hardening
+### `0.2.2` Completed: Corrupted Dataset Stress Hardening
 
-This should not block `0.2.0`.
-It is a natural follow-up once `0.2.0` has had time to settle and the semantics feel stable in the field.
+`0.2.1` was the earlier published semantics-hardening state.
+`0.2.2` is the release where that work was followed through into explicit corrupted-dataset stress testing and the resulting large-batch performance hardening.
 
 Focus:
 
-* add explicit `100k`-scale stress benchmarks for anomaly-heavy and corruption-heavy datasets
+* add explicit `150k`-scale stress benchmarks for anomaly-heavy and corruption-heavy datasets
 * benchmark large synthetic expansions of:
   * multi-region drift
   * replay corruption
   * offline sync anomalies
   * "unknown" case-study style cross-node ambiguity
+* add explicit corrupted-dataset stress coverage for:
+  * duplicate explosion density
+  * inversion chain density
+  * malformed-event ratios
+  * sparse-causality graphs
+  * massive same-timestamp clusters
+  * replay storms
+  * cyclic dependency attempts
+  * sequence conflicts
 * distinguish clearly between:
   * routine `100k` batch behavior
-  * anomaly-heavy `100k` stress behavior
+  * anomaly-heavy `150k` stress behavior
 * identify whether replay-heavy and offline-sync-heavy workloads need targeted performance work
 * document the difference between semantic correctness under stress and performance comfort under stress
 
@@ -319,14 +328,57 @@ Why this belongs after `0.2.0`:
 * the corrupted-dataset stress work is better treated as stabilization and pressure-testing
 * this keeps the semantic release crisp while preserving a clear next step for hardening
 
+Current take after implementation:
+
+* this was worth doing because it pressure-tested the shipped semantics under ugly but realistic data shapes instead of only under small scenario fixtures
+* the stress suite confirmed that the semantic model still holds under `150k` corrupted-dataset pressure
+* the work exposed a real performance cliff in the ordering queue path that would have been easy to underestimate from small tests alone
+* the right product story remains:
+  * `100k` is the routine credible batch band
+  * `150k` is the corrupted-dataset stress band for hardening and visibility
+* this should not turn into open-ended number chasing:
+  * the value came from targeted corruption shapes, not from chasing arbitrary larger counts
+
+Initial benchmark matrix:
+
+| Priority | Stress Profile | Scale Target | Main Question |
+| --- | --- | --- | --- |
+| 1 | duplicate explosion density | `150k` | Does repeated duplicate pressure stay visible without causing pathological graph or anomaly overhead? |
+| 2 | malformed-event ratios | `150k` | Does invalid-data survival remain stable when malformed records are no longer rare edge cases? |
+| 3 | sequence conflicts | `150k` | Do same-node ordering conflicts stay honest and performant under heavy contradiction? |
+| 4 | cyclic dependency attempts | `150k` | Can dependency-cycle detection remain robust without turning stress input into runaway work? |
+| 5 | replay storms | `150k` | Does replay-heavy input expose regression risk in duplicate handling, anomaly volume, or ordering cost? |
+| 6 | massive same-timestamp clusters | `150k` | Do large tie clusters preserve deterministic behavior without excessive bookkeeping churn? |
+| 7 | sparse-causality graphs | `150k` | Does the library stay efficient when many events carry weak evidence and cannot be richly connected? |
+| 8 | inversion chain density | `150k` | Do long contradictory causal-looking chains surface cleanly without hidden semantic drift? |
+
+Implementation posture for the matrix:
+
+* treat `100k` routine behavior as the baseline comparison band
+* treat `150k` corrupted-dataset profiles as the main `0.2.2` stress band
+* prefer named synthetic profiles over one giant mixed-chaos profile so regressions stay attributable
+* start by enforcing correctness and survivability, then decide later which stress profiles deserve timing or memory thresholds
+* keep `250k+` experiments as optional visibility work unless real usage evidence justifies expanding the milestone
+* prioritize real operational questions over vanity-scale claims:
+  * can the library stay honest under replay, duplication, inversion, malformed data, sparse evidence, and conflict-heavy input?
+
+Current outcome snapshot:
+
+* the repo now has named `150k` corrupted-dataset stress profiles for the planned matrix
+* the normal test suite now includes smaller verification coverage for those stress generators
+* the stress work found and fixed a major ready-queue performance bottleneck in `orderEvents()`
+* follow-up optimization work also reduced duplicate validation and some anomaly-path allocation churn
+* the result is much stronger evidence that the library remains usable under corrupted large-batch pressure, not just under human-sized semantic fixtures
+
 Success criteria:
 
 * the repo has named benchmark coverage for these corruption-heavy patterns
+* the repo has explicit stress profiles or fixtures covering duplicate pressure, inversion pressure, malformed ratios, sparse causality, timestamp clustering, replay storms, dependency cycles, and sequence conflicts
 * maintainers can compare normal large-batch profiles against anomaly-heavy stress profiles
 * any serious stress-path regressions are visible before later release lines
 * follow-up performance work, if needed, can be scoped from real benchmark evidence rather than intuition
 
-## `0.3.x` Streaming Reality
+## `0.3.0` Next Milestone: Streaming Reality
 
 Goal:
 Make streaming claims believable.
@@ -334,6 +386,7 @@ Make streaming claims believable.
 Focus:
 
 * improve `orderEventStream()`
+* optimize the `flushReady()` path so repeated buffer scans and compaction do not become the next streaming performance cliff
 * harden watermark behavior
 * harden late-arrival policies:
   * `flag`
@@ -344,6 +397,15 @@ Focus:
 * test bounded-memory assumptions
 * add backpressure guidance and implementation behavior
 * document memory strategy with concrete examples
+
+Why this is the next public milestone:
+
+* `0.2.x` has now done the main semantics and corrupted-dataset stress hardening work it needed to do
+* the most important remaining credibility questions are now on the streaming path, not the large-batch path
+* promoting this to `0.3.0` keeps the version story honest:
+  * `0.2.1` was the earlier published semantics-hardening state
+  * `0.2.2` was the stress-hardening release
+  * `0.3.0` is the next meaningful behavioral milestone
 
 Exit criteria:
 
