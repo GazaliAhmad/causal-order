@@ -2,17 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
-
-### Planned
-
-* `0.3.0` is the next intended public milestone
-* the next release line is focused on streaming reality work:
-  * `orderEventStream()` hardening
-  * `flushReady()` optimization
-  * watermark and late-arrival behavior clarity
-  * bounded-memory and backpressure credibility
-
 ## [0.2.2]
 
 ### Added
@@ -32,7 +21,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-* published earlier `0.2.x` semantics-hardening state before the dedicated corrupted-dataset stress-testing work that was later tracked as `0.2.2`
+* internal intermediate `0.2.x` repo step between the published `0.2.0` baseline and the dedicated corrupted-dataset stress-testing work later tracked as `0.2.2`
 
 ## [0.2.0]
 
