@@ -211,6 +211,8 @@ for await (const batch of orderEventStream(source(), {
 Important rule:
 
 * stream finality is operational, not causal certainty
+* `maxLateArrivalMs` is an operational lateness window, not a statement about whether causality is proven
+* an event may still be causally older with `proven` evidence, but be operationally too late for the current stream window and therefore handled through the configured late-arrival policy rather than as normal in-window output
 
 ## When To Use It
 
@@ -319,7 +321,7 @@ Runnable repository examples:
 
 ## Status
 
-`causal-order` is currently in the public `0.2.x` release line. `0.2.2` is the stress-hardening follow-up in that line, and `0.3.0` is the next planned streaming milestone.
+`causal-order` is currently in the public `0.2.x` release line. `0.2.2` is the stress-hardening follow-up in that line, `0.3.0` is the next planned core streaming milestone, `0.3.1` is the intended streaming semantic-tightening follow-up, and `0.3.2` is the intended streaming hardening follow-up.
 
 The recent `0.2.x` work reflects the semantics hardening that began during late `0.1.x` preparation, continued through the `0.2.0` public baseline, passed through an internal `0.2.1` repo step, and was followed by corrupted-dataset stress hardening in `0.2.2`, so the eventual `1.0` contract can be tighter and more settled.
 
@@ -328,7 +330,7 @@ That means:
 * the package is usable today
 * the API is expected to evolve
 * semantics matter more than surface churn at this stage
-* the next major area of hardening after `0.2.2` is streaming behavior, which is the current `0.3.0` direction
+* the next major area after `0.2.2` is streaming behavior, split into a scoped `0.3.0` baseline streaming contract, a `0.3.1` edge-case semantic-tightening pass, and a `0.3.2` pressure-testing follow-up
 * `1.0.0` is the point where the semantic contract should feel stable enough to preserve long-term
 
 ## Repository Development
