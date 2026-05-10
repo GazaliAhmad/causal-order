@@ -371,7 +371,7 @@ Current outcome snapshot:
 * follow-up optimization work also reduced duplicate validation and some anomaly-path allocation churn
 * the result is much stronger evidence that the library remains usable under corrupted large-batch pressure, not just under human-sized semantic fixtures
 * this also clarifies the current operational posture:
-  * `0.2.2` is the batch recovery story
+  * `0.2.2` is the batch recovery and scheduled reconciliation story
   * HLC, same-node `sequence`, and explicit dependency metadata are used to reconstruct a delayed replay batch honestly after outage recovery
 
 Success criteria:
@@ -385,30 +385,45 @@ Success criteria:
 ## `0.3.0` Next Milestone: Streaming Reality
 
 Goal:
-Make streaming claims believable.
+Ship the core streaming contract cleanly.
 
 Focus:
 
 * improve `orderEventStream()`
-* optimize the `flushReady()` path so repeated buffer scans and compaction do not become the next streaming performance cliff
-* harden watermark behavior
-* harden late-arrival policies:
+* make the semantic role of `flushReady()` explicit:
+  * `0.3.0` owns correctness of when events become ready, when corrections are emitted, and when batches are final
+  * `0.3.1` owns the remaining semantic edge-case cleanup once the baseline contract is documented
+  * `0.3.2` owns optimization and pressure behavior once those semantics are settled
+* lock the first intentional stream-facing option surface around the current parameters:
+  * `batchSize`
+  * `maxLateArrivalMs`
+  * `lateArrivalPolicy`
+  * `watermark`
+* provide the best middle ground for watermark configuration:
+  * keep the default watermark behavior conservative and event-driven
+  * do not silently advance stream progress from system time by default
+  * provide built-in opt-in watermark strategy helpers so users do not need to invent common operational policies from scratch
+* establish baseline watermark correctness:
+  * default watermark progression is documented and consistent
+  * baseline non-late vs late handling is correct for ordinary stream flows
+  * idle-source behavior is explicit enough that one silent producer does not accidentally stall the whole ordering pipeline without that being an intentional design choice
+* define silent-producer and idle-source handling explicitly:
+  * if watermark progress depends only on observed event arrival, an idle producer or stalled source can pin stream progress indefinitely
+  * document how users can advance watermark progress or handle idle sources, whether through heartbeats, `maxIdleMs`, an external watermark strategy, or a clearly documented upstream responsibility
+* establish baseline late-arrival policy correctness:
   * `flag`
   * `drop`
   * `emit_correction`
   * `fail`
 * define batch correction behavior more clearly
-* test bounded-memory assumptions
-* add backpressure guidance and implementation behavior
-* document memory strategy with concrete examples
 * make outage and offline-sync recovery a first-class streaming use case:
   * local queue to central replay flow
   * delayed reconnect batches
   * correction behavior during resync
   * storing ordered stream output back into DB tables as derived operational state
 * explain the relationship between the two operational modes clearly:
-  * batch recovery uses HLC plus event metadata to order a finite replayed backlog after the DB comes back
-  * streaming recovery uses the same event model, but adds watermark, lateness, correction, and bounded-memory behavior for continuous resync
+  * batch mode uses HLC plus event metadata to order a finite replayed or scheduled backlog before writing derived results back into central storage
+  * streaming recovery uses the same event model, but adds watermark, lateness, and correction behavior for continuous resync
 
 Why this is the next public milestone:
 
@@ -425,7 +440,86 @@ Exit criteria:
 
 * streaming behavior matches the documented policy
 * late events are never hidden by accident
+* baseline watermark and late-arrival behavior are correct for the intended first contract
+* the stream-facing parameters and policies feel intentional rather than provisional
+* watermark configuration has a conservative default plus explicit built-in opt-in strategies for teams that want different liveness tradeoffs
+* the continuous recovery story is documented clearly enough that `0.3.1` can focus on semantic tightening rather than basic framing
+
+## `0.3.1` Streaming Semantic Tightening
+
+Goal:
+Tighten the edge cases in the `0.3.0` baseline streaming contract before heavier pressure work.
+
+Focus:
+
+* clarify custom `watermark` callback semantics so callers know whether they are supplying an event timestamp, a candidate watermark, or another stream-progress signal
+* define how invalid events interact with watermark advancement in non-strict mode
+* make the relationship between operational lateness and causal confidence explicit:
+  * `maxLateArrivalMs` and watermark progress control stream handling, not whether causal evidence is `proven`
+  * an event may be causally older with explicit evidence and still be operationally too late for the active stream window
+* align the boundary semantics for:
+  * when an event is considered late
+  * when an event is considered ready to flush
+* define the cross-window anomaly contract more explicitly:
+  * what stream-local history is retained
+  * which anomaly types can still be detected after earlier windows have been emitted
+* define correction behavior more precisely for delayed reconnect and resync cases before stress-testing those flows
+* define the legal correction scope:
+  * how far back in already-emitted stream history a correction is allowed to reach
+  * whether that lookback limit is watermark-based, window-based, or policy-based
+  * what the library guarantees once emitted output is older than the supported correction horizon
+* define the correction contract explicitly:
+  * `lateArrivalPolicy: "emit_correction"` implies a correction-capable downstream model
+  * clarify whether the library provides correction logic, correction signals, or only operational notice that previously emitted output may need reconciliation
+  * make the distinction between `ready` output and `final` output explicit enough for users writing to non-transactional or append-only stores
+* add direct semantic coverage for under-tested stream options and behaviors:
+  * `lateArrivalPolicy: "drop"`
+  * custom `watermark`
+  * invalid option inputs
+  * non-trivial `batchSize` cases
+* keep this release focused on edge-case semantic tightening rather than throughput or memory optimization
+
+Exit criteria:
+
+* custom watermark behavior is documented and testable rather than implicit
+* invalid events cannot accidentally distort stream progress without that behavior being explicitly chosen
+* the relationship between HLC/causal confidence and `maxLateArrivalMs` is clear enough that users do not confuse operational lateness with causal uncertainty
+* late-arrival and ready-to-flush boundaries are consistent
+* correction lookback limits are explicit enough that consumers know when previously emitted output can still change
+* the distinction between `ready` output and `final` output is clear enough that downstream consumers can choose a safe storage pattern
+* the cross-window anomaly contract is stated clearly enough that `0.3.2` can harden it without reopening semantic questions
+
+## `0.3.2` Streaming Hardening And Pressure
+
+Goal:
+Make the `0.3.1` streaming contract operationally credible under pressure.
+
+Focus:
+
+* optimize the `flushReady()` path so repeated buffer scans and compaction do not become the next streaming performance cliff
+* treat `flushReady()` performance as a hardening concern rather than part of the initial semantic contract
+* test pathological late-arrival behavior beyond tiny fixtures
+* pressure-test correction-window behavior during resync and delayed reconnect flows
+* test watermark pressure explicitly
+* test bounded-memory assumptions
+* define memory-ceiling versus backpressure behavior explicitly:
+  * what happens when the internal buffer is full but the watermark has not advanced enough to flush safely
+  * whether the default policy is to block ingestion, fail explicitly, or force an explicitly downgraded flush
+  * how backpressure is surfaced when the buffer cannot grow safely and how bounded-memory claims remain honest under large out-of-order bursts
+* explicitly test heap-pressure behavior when `batchSize` is reached but the watermark is still lagging
+* add backpressure guidance and implementation behavior
+* document memory strategy with concrete examples
+* add targeted streaming stress coverage so the new semantics are not only described but exercised under load
+
+Exit criteria:
+
+* pathological late arrivals are covered by explicit streaming tests or stress profiles
+* correction-window behavior is demonstrated under pressure rather than only described conceptually
+* watermark pressure has dedicated coverage
+* memory-ceiling versus backpressure behavior is explicit rather than accidental
+* `batchSize` pressure with a lagging watermark has dedicated coverage
 * bounded-memory operation is demonstrated, not implied
+* maintainers have concrete guidance for backpressure and memory strategy
 
 ## `0.4.x` Developer Experience
 

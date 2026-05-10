@@ -43,3 +43,18 @@ It means the system has made a bounded operational decision.
 * operational finality
 
 That separation protects users from accidentally treating a streaming watermark as if it were proof of real-world event order.
+
+## Lateness Is Operational Too
+
+`maxLateArrivalMs` belongs to the same operational layer.
+
+It tells the stream how long to wait before treating output as stable enough to emit.
+It does not decide whether an ordering relationship is causally `proven`.
+
+That means an event can still be:
+
+* causally older because it carries explicit parent, dependency, or same-node sequence evidence
+* operationally too late for the current stream window
+
+When that happens, the stream should handle the event through the configured late-arrival policy.
+It should not silently downgrade causal proof into mere uncertainty.

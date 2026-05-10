@@ -184,7 +184,17 @@ This guide describes the batch recovery and scheduled reconciliation story.
 That means:
 
 * batch mode uses HLC plus event metadata to order a finite replayed backlog
-* streaming mode will use the same event model, but add watermark, lateness, correction, and bounded-memory behavior
+* `0.3.0` streaming mode will use the same event model, but add watermark, lateness, correction, and the current stream-facing parameters
+* `0.3.1` is where the remaining stream semantic edge cases should be tightened:
+  * watermark callback semantics
+  * invalid-event interaction with watermark advancement
+  * boundary rules for lateness vs readiness
+  * cross-window anomaly behavior
+* `0.3.2` is where the additional streaming pressure work should land:
+  * pathological late arrivals
+  * correction-window hardening
+  * watermark pressure
+  * bounded-memory demonstration and backpressure guidance
 
 So this guide is not being replaced by `0.3.0`.
 It is the simpler operational sibling of the streaming story.
