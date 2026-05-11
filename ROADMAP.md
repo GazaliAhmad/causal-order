@@ -106,7 +106,7 @@ Before `causal-order` should be considered ready for `1.0.0`, these should all f
 
 * the top-level API names and exported result types feel stable enough to support long-term
 * confidence semantics for `proven`, `derived`, `fallback`, and `unknown` are crisp and no longer expected to change materially
-* `orderBasis`, `causalEvidence`, anomaly types, concurrent groups, and strict-mode behavior feel intentional rather than exploratory
+* `orderBasis`, `causalEvidence`, anomaly types, and strict-mode behavior feel intentional rather than exploratory
 * the difference between `orderEvents()` and `orderEventStream()` is clear in both code and docs
 * the README describes the real shipped package, not a still-evolving intended shape
 * examples clearly show why this library is safer than naive timestamp sorting
@@ -121,7 +121,7 @@ Current status snapshot:
 | --- | --- | --- |
 | Top-level API names and exported result types feel stable enough to support long-term | Partial | The surface is getting coherent, but semantics are still being hardened through testing and iteration. |
 | Confidence semantics are crisp and no longer expected to change materially | Partial | The model is strong, but still feels like it is being frozen rather than already frozen. |
-| `orderBasis`, `causalEvidence`, anomaly types, concurrent groups, and strict-mode behavior feel intentional rather than exploratory | Partial | Stronger than before, but concurrency grouping and some stream semantics still feel actively defined. |
+| `orderBasis`, `causalEvidence`, anomaly types, and strict-mode behavior feel intentional rather than exploratory | Partial | Stronger than before, but some stream semantics and a few public-contract decisions still feel actively defined. |
 | The difference between `orderEvents()` and `orderEventStream()` is clear in both code and docs | Partial | The boundary is clearer, but can still be made more explicit in the docs. |
 | The README describes the real shipped package, not a still-evolving intended shape | Partial | The README is now npm-facing and package-oriented, but the broader documentation set still needs to feel fully settled as a long-term contract. |
 | Examples clearly show why this library is safer than naive timestamp sorting | Partial | The examples are good and aligned to failure modes, but can still be made more central for `1.0`. |
@@ -241,15 +241,15 @@ Examples:
 * two same-node events with usable sequence metadata can still be ordered
 * HLC-only ordering remains useful, but should stay `derived` rather than causally `proven`
 
-### Consequence For `concurrentGroups`
+### Consequence For Concurrency Claims
 
-`concurrentGroups` should only contain events that are truly concurrent under the supported model.
+Any future concurrency-oriented output should only contain events that are truly concurrent under the supported model.
 
 That means:
 
-* some current groups may shrink
-* some current groups may disappear
-* this is acceptable if it removes false certainty
+* the current runtime should prefer `unknown` over speculative concurrency
+* any future grouping or concurrency-focused output must justify its claims more strongly than missing evidence alone
+* removing or withholding concurrency-shaped output is acceptable if it removes false certainty
 
 ### Release Intent
 
@@ -393,7 +393,7 @@ Focus:
 * make the semantic role of `flushReady()` explicit:
   * `0.3.0` owns correctness of when events become ready, when corrections are emitted, and when batches are final
   * `0.3.1` owns the remaining semantic edge-case cleanup once the baseline contract is documented
-  * `0.3.2` owns optimization and pressure behavior once those semantics are settled
+  * `0.3.2` owns the remaining pressure behavior, bounded-memory hardening, and any follow-up optimization still needed once those semantics are settled
 * lock the first intentional stream-facing option surface around the current parameters:
   * `batchSize`
   * `maxLateArrivalMs`
@@ -453,6 +453,8 @@ Completed in the current repo state:
 * `flag`, `drop`, `emit_correction`, and `fail` all have direct streaming coverage
 * steady-state streaming plus delayed reconnect and continuous recovery behavior are documented with a dedicated streaming recovery and resync guide plus runnable example
 * correction-capable downstream handling is documented as provisional derived-state reconciliation rather than hidden finality
+* the initial `flushReady()` path has already received baseline overhead reduction work so repeated rescans are no longer entirely unbounded by default behavior
+* the perf harness now includes a dedicated streaming benchmark profile for direct watermark-driven flush measurement
 
 ## `0.3.1` Streaming Semantic Tightening
 
@@ -501,8 +503,8 @@ Make the `0.3.1` streaming contract operationally credible under pressure.
 
 Focus:
 
-* optimize the `flushReady()` path so repeated buffer scans and compaction do not become the next streaming performance cliff
-* treat `flushReady()` performance as a hardening concern rather than part of the initial semantic contract
+* continue optimizing the `flushReady()` path so remaining repeated scans, compaction, and pressure behavior do not become the next streaming performance cliff
+* treat remaining `flushReady()` performance work as a hardening concern rather than part of the initial semantic contract
 * test pathological late-arrival behavior beyond tiny fixtures
 * pressure-test correction-window behavior during resync and delayed reconnect flows
 * test watermark pressure explicitly
@@ -514,7 +516,7 @@ Focus:
 * explicitly test heap-pressure behavior when `batchSize` is reached but the watermark is still lagging
 * add backpressure guidance and implementation behavior
 * document memory strategy with concrete examples
-* add targeted streaming stress coverage so the new semantics are not only described but exercised under load
+* expand targeted streaming stress coverage beyond the baseline benchmark so the new semantics are not only described but exercised under load
 
 Exit criteria:
 

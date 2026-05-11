@@ -1,12 +1,12 @@
 import type {
   EventAnomaly,
   EventEnvelope,
+  HlcTimestamp,
   OrderOptions,
   ValidationResult,
   ValidatedEventEnvelope,
 } from "../types.js"
 import { compareBigInt } from "../internal/utils.js"
-import { compareByHlc } from "../compare/hlcCompare.js"
 import { validateEvent } from "../validate/validateEvent.js"
 
 type EventValidationRecord<T> = {
@@ -24,6 +24,21 @@ const CAUSAL_INVERSION_MESSAGE = "Parent event appears after child by HLC order"
 type FirstSeenEventRecord<T> = {
   event: EventEnvelope<T>
   validation: ValidationResult<ValidatedEventEnvelope<T>>
+}
+
+function isClockAfter(
+  a: HlcTimestamp,
+  b: HlcTimestamp,
+): boolean {
+  if (a.physicalTimeMs !== b.physicalTimeMs) {
+    return a.physicalTimeMs > b.physicalTimeMs
+  }
+
+  if (a.logicalCounter !== b.logicalCounter) {
+    return a.logicalCounter > b.logicalCounter
+  }
+
+  return a.nodeId > b.nodeId
 }
 
 export function detectAnomalies<T>(
@@ -54,7 +69,7 @@ export function detectAnomalies<T>(
       return
     }
 
-    if (compareByHlc(parentRecord.event.clock, childRecord.event.clock) === "after") {
+    if (isClockAfter(parentRecord.event.clock, childRecord.event.clock)) {
       anomalies.push({
         type: "causal_inversion",
         severity: "warning",

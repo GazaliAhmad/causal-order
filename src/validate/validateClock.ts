@@ -32,8 +32,10 @@ export function validateClock(
   }
 
   const candidate = clock as Partial<HlcTimestamp>
+  const physicalTimeMs = candidate.physicalTimeMs
+  const currentTime = options?.now?.()
 
-  if (!isBigInt(candidate.physicalTimeMs) || candidate.physicalTimeMs < 0n) {
+  if (!isBigInt(physicalTimeMs) || physicalTimeMs < 0n) {
     errors.push({
       code: "invalid_physical_time",
       message: "clock.physicalTimeMs must be a non-negative bigint",
@@ -57,12 +59,11 @@ export function validateClock(
     })
   }
 
-  const now = options?.now
   if (
-    now !== undefined &&
+    currentTime !== undefined &&
     options?.maxDriftMs !== undefined &&
-    isBigInt(candidate.physicalTimeMs) &&
-    candidate.physicalTimeMs > now() + options.maxDriftMs
+    isBigInt(physicalTimeMs) &&
+    physicalTimeMs > currentTime + options.maxDriftMs
   ) {
     errors.push({
       code: "clock_drift_exceeded",
@@ -72,9 +73,9 @@ export function validateClock(
   }
 
   if (
-    now !== undefined &&
-    isBigInt(candidate.physicalTimeMs) &&
-    candidate.physicalTimeMs > now()
+    currentTime !== undefined &&
+    isBigInt(physicalTimeMs) &&
+    physicalTimeMs > currentTime
   ) {
     warnings.push({
       code: "future_timestamp",
