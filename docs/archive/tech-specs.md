@@ -222,7 +222,7 @@ Meaning:
 A and B are both valid, but no causal order exists.
 ```
 
-Do not use `concurrent` as a polite word for "I don't know".
+Do not use `concurrent` as a polite word for "we don't know".
 
 Return `unknown` when the evidence is insufficient or untrustworthy.
 
@@ -561,6 +561,14 @@ This watermark represents processing confidence, not causal certainty.
 
 It is a statement about how long the engine waited before treating output as stable enough to emit.
 It is not proof that no earlier causal event exists.
+
+`maxLateArrivalMs` should be understood the same way.
+
+It defines the operational lateness window for stream handling.
+It does not define whether explicit causal evidence is still `proven`.
+
+So an event may still be causally older with explicit evidence and yet be treated as operationally late for the active stream window.
+That distinction must stay visible to consumers.
 
 ### Memory Strategy
 

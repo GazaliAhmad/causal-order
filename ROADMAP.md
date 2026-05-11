@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap describes how `causal-order` should mature from its current public `0.2.x` release line into a stable `1.0.0` npm package.
+This roadmap describes how `causal-order` should mature from its current public `0.3.x` release line into a stable `1.0.0` npm package.
 
 The goal is not to rush publication.
 The goal is to make sure the semantics are trustworthy before the package becomes a long-term contract.
@@ -106,7 +106,7 @@ Before `causal-order` should be considered ready for `1.0.0`, these should all f
 
 * the top-level API names and exported result types feel stable enough to support long-term
 * confidence semantics for `proven`, `derived`, `fallback`, and `unknown` are crisp and no longer expected to change materially
-* `orderBasis`, `causalEvidence`, anomaly types, concurrent groups, and strict-mode behavior feel intentional rather than exploratory
+* `orderBasis`, `causalEvidence`, anomaly types, and strict-mode behavior feel intentional rather than exploratory
 * the difference between `orderEvents()` and `orderEventStream()` is clear in both code and docs
 * the README describes the real shipped package, not a still-evolving intended shape
 * examples clearly show why this library is safer than naive timestamp sorting
@@ -121,7 +121,7 @@ Current status snapshot:
 | --- | --- | --- |
 | Top-level API names and exported result types feel stable enough to support long-term | Partial | The surface is getting coherent, but semantics are still being hardened through testing and iteration. |
 | Confidence semantics are crisp and no longer expected to change materially | Partial | The model is strong, but still feels like it is being frozen rather than already frozen. |
-| `orderBasis`, `causalEvidence`, anomaly types, concurrent groups, and strict-mode behavior feel intentional rather than exploratory | Partial | Stronger than before, but concurrency grouping and some stream semantics still feel actively defined. |
+| `orderBasis`, `causalEvidence`, anomaly types, and strict-mode behavior feel intentional rather than exploratory | Partial | Stronger than before, but some stream semantics and a few public-contract decisions still feel actively defined. |
 | The difference between `orderEvents()` and `orderEventStream()` is clear in both code and docs | Partial | The boundary is clearer, but can still be made more explicit in the docs. |
 | The README describes the real shipped package, not a still-evolving intended shape | Partial | The README is now npm-facing and package-oriented, but the broader documentation set still needs to feel fully settled as a long-term contract. |
 | Examples clearly show why this library is safer than naive timestamp sorting | Partial | The examples are good and aligned to failure modes, but can still be made more central for `1.0`. |
@@ -241,15 +241,15 @@ Examples:
 * two same-node events with usable sequence metadata can still be ordered
 * HLC-only ordering remains useful, but should stay `derived` rather than causally `proven`
 
-### Consequence For `concurrentGroups`
+### Consequence For Concurrency Claims
 
-`concurrentGroups` should only contain events that are truly concurrent under the supported model.
+Any future concurrency-oriented output should only contain events that are truly concurrent under the supported model.
 
 That means:
 
-* some current groups may shrink
-* some current groups may disappear
-* this is acceptable if it removes false certainty
+* the current runtime should prefer `unknown` over speculative concurrency
+* any future grouping or concurrency-focused output must justify its claims more strongly than missing evidence alone
+* removing or withholding concurrency-shaped output is acceptable if it removes false certainty
 
 ### Release Intent
 
@@ -371,7 +371,7 @@ Current outcome snapshot:
 * follow-up optimization work also reduced duplicate validation and some anomaly-path allocation churn
 * the result is much stronger evidence that the library remains usable under corrupted large-batch pressure, not just under human-sized semantic fixtures
 * this also clarifies the current operational posture:
-  * `0.2.2` is the batch recovery story
+  * `0.2.2` is the batch recovery and scheduled reconciliation story
   * HLC, same-node `sequence`, and explicit dependency metadata are used to reconstruct a delayed replay batch honestly after outage recovery
 
 Success criteria:
@@ -382,39 +382,55 @@ Success criteria:
 * any serious stress-path regressions are visible before later release lines
 * follow-up performance work, if needed, can be scoped from real benchmark evidence rather than intuition
 
-## `0.3.0` Next Milestone: Streaming Reality
+## `0.3.0` Completed Milestone: Streaming Reality
 
 Goal:
-Make streaming claims believable.
+Ship the core streaming contract cleanly.
 
 Focus:
 
 * improve `orderEventStream()`
-* optimize the `flushReady()` path so repeated buffer scans and compaction do not become the next streaming performance cliff
-* harden watermark behavior
-* harden late-arrival policies:
+* make the semantic role of `flushReady()` explicit:
+  * `0.3.0` owns correctness of when events become ready, when corrections are emitted, and when batches are final
+  * `0.3.1` owns the remaining semantic edge-case cleanup once the baseline contract is documented
+  * `0.3.2` owns the remaining pressure behavior, bounded-memory hardening, and any follow-up optimization still needed once those semantics are settled
+* lock the first intentional stream-facing option surface around the current parameters:
+  * `batchSize`
+  * `maxLateArrivalMs`
+  * `lateArrivalPolicy`
+  * `watermark`
+* provide the best middle ground for watermark configuration:
+  * keep the default watermark behavior conservative and event-driven
+  * do not silently advance stream progress from system time by default
+  * provide built-in opt-in watermark strategy helpers so users do not need to invent common operational policies from scratch
+* establish baseline watermark correctness:
+  * default watermark progression is documented and consistent
+  * baseline non-late vs late handling is correct for ordinary stream flows
+  * idle-source behavior is explicit enough that one silent producer does not accidentally stall the whole ordering pipeline without that being an intentional design choice
+* define silent-producer and idle-source handling explicitly:
+  * if watermark progress depends only on observed event arrival, an idle producer or stalled source can pin stream progress indefinitely
+  * document how users can advance watermark progress or handle idle sources, whether through heartbeats, `maxIdleMs`, an external watermark strategy, or a clearly documented upstream responsibility
+* establish baseline late-arrival policy correctness:
   * `flag`
   * `drop`
   * `emit_correction`
   * `fail`
 * define batch correction behavior more clearly
-* test bounded-memory assumptions
-* add backpressure guidance and implementation behavior
-* document memory strategy with concrete examples
-* make outage and offline-sync recovery a first-class streaming use case:
+* make routine continuous operations, outage recovery, and offline-sync recovery all first-class streaming use cases:
+  * ordinary day-to-day stream ingestion where output must keep moving
   * local queue to central replay flow
   * delayed reconnect batches
   * correction behavior during resync
   * storing ordered stream output back into DB tables as derived operational state
 * explain the relationship between the two operational modes clearly:
-  * batch recovery uses HLC plus event metadata to order a finite replayed backlog after the DB comes back
-  * streaming recovery uses the same event model, but adds watermark, lateness, correction, and bounded-memory behavior for continuous resync
+  * batch mode uses HLC plus event metadata to order a finite replayed or scheduled backlog before writing derived results back into central storage
+  * streaming mode uses the same event model, but adds watermark, lateness, and correction behavior for both steady-state continuous operations and continuous resync
 
-Why this is the next public milestone:
+Why this was the right public milestone:
 
 * `0.2.x` has now done the main semantics and corrupted-dataset stress hardening work it needed to do
 * the most important remaining credibility questions are now on the streaming path, not the large-batch path
-* outage and offline-sync recovery now belong here because the remaining challenge is operational continuous reconciliation, not core ordering meaning
+* steady-state streaming, outage recovery, and offline-sync recovery now belong here because the remaining challenge is operational continuous reconciliation, not core ordering meaning
 * promoting this to `0.3.0` keeps the version story honest:
   * `0.2.0` was the published semantics-hardening baseline
   * `0.2.1` was an internal intermediate repo step
@@ -425,7 +441,92 @@ Exit criteria:
 
 * streaming behavior matches the documented policy
 * late events are never hidden by accident
+* baseline watermark and late-arrival behavior are correct for the intended first contract
+* the stream-facing parameters and policies feel intentional rather than provisional
+* watermark configuration has a conservative default plus explicit built-in opt-in strategies for teams that want different liveness tradeoffs
+* the continuous operations and recovery story is documented clearly enough that `0.3.1` can focus on semantic tightening rather than basic framing
+
+Completed in the current repo state:
+
+* the stream-facing option surface is implemented and tested around `batchSize`, `maxLateArrivalMs`, `lateArrivalPolicy`, and `watermark`
+* default watermark progression is conservative and event-driven, with opt-in helpers for `ingestedAt` and processing-time strategies
+* `flag`, `drop`, `emit_correction`, and `fail` all have direct streaming coverage
+* steady-state streaming plus delayed reconnect and continuous recovery behavior are documented with a dedicated streaming recovery and resync guide plus runnable example
+* correction-capable downstream handling is documented as provisional derived-state reconciliation rather than hidden finality
+* the initial `flushReady()` path has already received baseline overhead reduction work so repeated rescans are no longer entirely unbounded by default behavior
+* the perf harness now includes a dedicated streaming benchmark profile for direct watermark-driven flush measurement
+
+## `0.3.1` Streaming Semantic Tightening
+
+Goal:
+Tighten the edge cases in the `0.3.0` baseline streaming contract before heavier pressure work.
+
+Focus:
+
+* clarify custom `watermark` callback semantics so callers know whether they are supplying an event timestamp, a candidate watermark, or another stream-progress signal
+* make the relationship between operational lateness and causal confidence explicit:
+  * `maxLateArrivalMs` and watermark progress control stream handling, not whether causal evidence is `proven`
+  * an event may be causally older with explicit evidence and still be operationally too late for the active stream window
+* align the boundary semantics for:
+  * when an event is considered late
+  * when an event is considered ready to flush
+* define the cross-window anomaly contract more explicitly:
+  * what stream-local history is retained
+  * which anomaly types can still be detected after earlier windows have been emitted
+* define correction behavior more precisely for delayed reconnect and resync cases before stress-testing those flows
+* define the legal correction scope:
+  * how far back in already-emitted stream history a correction is allowed to reach
+  * whether that lookback limit is watermark-based, window-based, or policy-based
+  * what the library guarantees once emitted output is older than the supported correction horizon
+* define the correction contract explicitly:
+  * `lateArrivalPolicy: "emit_correction"` implies a correction-capable downstream model
+  * clarify whether the library provides correction logic, correction signals, or only operational notice that previously emitted output may need reconciliation
+  * make the distinction between `ready` output and `final` output explicit enough for users writing to non-transactional or append-only stores
+* add direct semantic coverage for under-tested stream options and behaviors:
+  * custom `watermark`
+  * non-trivial `batchSize` cases
+* keep this release focused on edge-case semantic tightening rather than throughput or memory optimization
+
+Exit criteria:
+
+* custom watermark behavior is documented and testable rather than implicit
+* the relationship between HLC/causal confidence and `maxLateArrivalMs` is clear enough that users do not confuse operational lateness with causal uncertainty
+* late-arrival and ready-to-flush boundaries are consistent
+* correction lookback limits are explicit enough that consumers know when previously emitted output can still change
+* the distinction between `ready` output and `final` output is clear enough that downstream consumers can choose a safe storage pattern
+* the cross-window anomaly contract is stated clearly enough that `0.3.2` can harden it without reopening semantic questions
+
+## `0.3.2` Streaming Hardening And Pressure
+
+Goal:
+Make the `0.3.1` streaming contract operationally credible under pressure.
+
+Focus:
+
+* continue optimizing the `flushReady()` path so remaining repeated scans, compaction, and pressure behavior do not become the next streaming performance cliff
+* treat remaining `flushReady()` performance work as a hardening concern rather than part of the initial semantic contract
+* test pathological late-arrival behavior beyond tiny fixtures
+* pressure-test correction-window behavior during resync and delayed reconnect flows
+* test watermark pressure explicitly
+* test bounded-memory assumptions
+* define memory-ceiling versus backpressure behavior explicitly:
+  * what happens when the internal buffer is full but the watermark has not advanced enough to flush safely
+  * whether the default policy is to block ingestion, fail explicitly, or force an explicitly downgraded flush
+  * how backpressure is surfaced when the buffer cannot grow safely and how bounded-memory claims remain honest under large out-of-order bursts
+* explicitly test heap-pressure behavior when `batchSize` is reached but the watermark is still lagging
+* add backpressure guidance and implementation behavior
+* document memory strategy with concrete examples
+* expand targeted streaming stress coverage beyond the baseline benchmark so the new semantics are not only described but exercised under load
+
+Exit criteria:
+
+* pathological late arrivals are covered by explicit streaming tests or stress profiles
+* correction-window behavior is demonstrated under pressure rather than only described conceptually
+* watermark pressure has dedicated coverage
+* memory-ceiling versus backpressure behavior is explicit rather than accidental
+* `batchSize` pressure with a lagging watermark has dedicated coverage
 * bounded-memory operation is demonstrated, not implied
+* maintainers have concrete guidance for backpressure and memory strategy
 
 ## `0.4.x` Developer Experience
 
@@ -486,6 +587,118 @@ Exit criteria:
 * the team would feel comfortable supporting the API long-term
 * major semantic churn is no longer expected
 
+## `0.6.x` Operational Tooling And Integrations
+
+Goal:
+Make the library easier to operate inside real event pipelines, not just easier to understand in isolation.
+
+Focus:
+
+* add operational tooling around the core package without weakening the core semantics:
+  * replay inspection helpers
+  * anomaly summary helpers
+  * explain-why-this-order debugging output
+* add reference integration patterns for common deployment shapes:
+  * local durable queue to later replay batch
+  * immediate streaming plus periodic reconciliation
+  * append-only downstream projections
+  * mutable downstream projections
+* add more concrete examples for:
+  * database-backed event storage
+  * broker or queue consumption
+  * local file or disk-backed buffering
+* add metrics-oriented guidance for:
+  * watermark progress
+  * late-arrival frequency
+  * anomaly-rate monitoring
+  * correction-rate monitoring
+
+Exit criteria:
+
+* the project includes practical patterns for fitting `causal-order` into real operational pipelines
+* users can see how the same event model supports bounded replay, live streaming, and hybrid reconciliation
+* maintainers have clearer tooling hooks for debugging and operator visibility
+
+## `0.7.x` Ecosystem And Transferability
+
+Goal:
+Reduce dependence on any single team member and make the package easier for a broader team to carry forward safely.
+
+Focus:
+
+* strengthen transferability:
+  * maintenance guide
+  * release process guide
+  * compatibility policy
+  * clearer architecture notes for core modules
+* improve ecosystem maturity:
+  * better examples index and discovery
+  * more explicit migration notes between release lines
+  * clearer public guidance on supported versus intentionally unsupported usage
+* add more public proof that the package solves real problems:
+  * case-study expansion
+  * benchmark reporting
+  * operational walkthroughs
+* make the project easier to evaluate for long-term adoption:
+  * clearer upgrade expectations
+  * clearer support expectations
+  * clearer repository organization
+
+Exit criteria:
+
+* a new team member can understand how to evolve the package without relying on undocumented tribal knowledge
+* the package feels transferable, not dependent on any single team member
+* external evaluators can assess the project with less guesswork about intent and maintenance burden
+
+## `0.8.x` Adoption And Transferability Maturity
+
+Goal:
+Make the package easier to adopt, evaluate, and carry forward as a stable technical asset.
+
+Focus:
+
+* improve adoption and evaluation signals:
+  * stronger onboarding and evaluation flow
+  * clearer operational positioning
+  * clearer handoff and maintenance expectations
+* strengthen trust for real adopters:
+  * more polished public docs
+  * more polished operator guidance
+  * more polished public release discipline
+* prepare the package for adjacent tooling and workflow layers without forcing them into the core package:
+  * stronger operational inspection patterns
+  * stronger reconciliation guidance
+  * stronger anomaly analysis workflows
+  * stronger extension points for future integrations
+
+Exit criteria:
+
+* the package is understandable not only to developers, but also to technical evaluators and maintainers
+* the project reads like a reliable technical foundation for adoption and extension
+* the maintainability and transferability story is strong enough that another team could extend it confidently
+
+## `0.9.x` Final Stabilization Before `1.0.0`
+
+Goal:
+Confirm that the project should actually become a long-term stable public contract.
+
+Focus:
+
+* resolve any remaining ambiguity before `1.0.0`
+* make final naming or compatibility decisions if anything still feels soft
+* do a last pass over:
+  * docs
+  * examples
+  * migration notes
+  * operator guidance
+  * release packaging
+* confirm that the project says exactly what it means and does not overclaim beyond the implemented contract
+
+Exit criteria:
+
+* the team sees no major unresolved semantic or packaging question that should block `1.0.0`
+* the project is ready for stable adoption without needing a conceptual rewrite
+
 ## `1.0.0` Stable Public Release
 
 Goal:
@@ -515,6 +728,7 @@ Possible directions after stability:
 * richer adapters
 * optional integration helpers for `Temporal` at the edges, not the core
 * performance tuning for large streaming workloads
+* richer operational tooling and workflow layers built on top of the core, if they strengthen the event-integrity story
 
 These should only happen if they strengthen the event integrity story.
 The package should not drift into becoming a database, queue, tracing platform, or generic distributed systems framework.

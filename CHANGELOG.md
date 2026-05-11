@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0]
+
+### Added
+
+* built-in streaming watermark helpers: `eventTimeWatermark`, `ingestedAtWatermark`, and `createProcessingTimeWatermark()`
+* direct streaming coverage for `lateArrivalPolicy: "drop"`, conservative invalid-event watermark behavior, opt-in watermark helpers, and stream option validation
+* dedicated streaming recovery and resync documentation, including a correction-contract guide and a runnable reconnect example
+* delayed reconnect scenario coverage for correction-capable late arrivals in streaming recovery flows
+* dedicated `bench:stream` entry point and a `streaming-100k-plateaus` benchmark profile for measuring watermark-driven flush behavior directly
+
+### Changed
+
+* promoted the package to the `0.3.0` baseline streaming release
+* kept default stream watermark progression conservative and event-driven instead of silently advancing from processing time
+* stopped invalid events from advancing stream watermark progress in non-strict mode
+* made `emit_correction` flush correction-capable batches immediately when a late event arrives instead of waiting for `batchSize`
+* clamped computed stream watermarks at `0n` until observed progress exceeds the lateness window
+* documented `emit_correction` as a correction-capable downstream model built around visible provisional output and derived-state reconciliation
+* reduced ordering-path allocation overhead by validating and collecting events in a single pass before anomaly analysis
+* reduced stream flush overhead by avoiding repeated buffer rescans when watermark progress and flush readiness have not changed
+* extended the perf harness so streaming profiles can run through the same reporting flow as batch profiles
+
 ## [0.2.3]
 
 ### Notes
@@ -19,9 +41,11 @@ All notable changes to this project will be documented in this file.
   * published `0.2.0` baseline
   * internal `0.2.1` repo step
   * published `0.2.2` stress-hardening follow-up
-* clarified the `0.3.0` roadmap to distinguish:
-  * `0.2.2` batch recovery using HLC plus event metadata
-  * `0.3.0` streaming recovery using the same event model with watermark, lateness, correction, and bounded-memory behavior
+* clarified the `0.3.x` roadmap to distinguish:
+  * `0.2.2` batch recovery and scheduled reconciliation using HLC plus event metadata
+  * `0.3.0` baseline streaming recovery semantics and the current stream-facing parameters
+  * `0.3.1` edge-case streaming semantic tightening for watermark, lateness, correction, and cross-window behavior
+  * `0.3.2` streaming pressure, bounded-memory demonstration, and additional hardening coverage
 * improved docs cross-linking between case studies, stress hardening, and the new after-hours batch processing guide
 
 ## [0.2.2]
