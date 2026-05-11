@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap describes how `causal-order` should mature from its current public `0.2.x` release line into a stable `1.0.0` npm package.
+This roadmap describes how `causal-order` should mature from its current public `0.3.x` release line into a stable `1.0.0` npm package.
 
 The goal is not to rush publication.
 The goal is to make sure the semantics are trustworthy before the package becomes a long-term contract.
@@ -382,7 +382,7 @@ Success criteria:
 * any serious stress-path regressions are visible before later release lines
 * follow-up performance work, if needed, can be scoped from real benchmark evidence rather than intuition
 
-## `0.3.0` Next Milestone: Streaming Reality
+## `0.3.0` Completed Milestone: Streaming Reality
 
 Goal:
 Ship the core streaming contract cleanly.
@@ -416,20 +416,21 @@ Focus:
   * `emit_correction`
   * `fail`
 * define batch correction behavior more clearly
-* make outage and offline-sync recovery a first-class streaming use case:
+* make routine continuous operations, outage recovery, and offline-sync recovery all first-class streaming use cases:
+  * ordinary day-to-day stream ingestion where output must keep moving
   * local queue to central replay flow
   * delayed reconnect batches
   * correction behavior during resync
   * storing ordered stream output back into DB tables as derived operational state
 * explain the relationship between the two operational modes clearly:
   * batch mode uses HLC plus event metadata to order a finite replayed or scheduled backlog before writing derived results back into central storage
-  * streaming recovery uses the same event model, but adds watermark, lateness, and correction behavior for continuous resync
+  * streaming mode uses the same event model, but adds watermark, lateness, and correction behavior for both steady-state continuous operations and continuous resync
 
-Why this is the next public milestone:
+Why this was the right public milestone:
 
 * `0.2.x` has now done the main semantics and corrupted-dataset stress hardening work it needed to do
 * the most important remaining credibility questions are now on the streaming path, not the large-batch path
-* outage and offline-sync recovery now belong here because the remaining challenge is operational continuous reconciliation, not core ordering meaning
+* steady-state streaming, outage recovery, and offline-sync recovery now belong here because the remaining challenge is operational continuous reconciliation, not core ordering meaning
 * promoting this to `0.3.0` keeps the version story honest:
   * `0.2.0` was the published semantics-hardening baseline
   * `0.2.1` was an internal intermediate repo step
@@ -443,7 +444,15 @@ Exit criteria:
 * baseline watermark and late-arrival behavior are correct for the intended first contract
 * the stream-facing parameters and policies feel intentional rather than provisional
 * watermark configuration has a conservative default plus explicit built-in opt-in strategies for teams that want different liveness tradeoffs
-* the continuous recovery story is documented clearly enough that `0.3.1` can focus on semantic tightening rather than basic framing
+* the continuous operations and recovery story is documented clearly enough that `0.3.1` can focus on semantic tightening rather than basic framing
+
+Completed in the current repo state:
+
+* the stream-facing option surface is implemented and tested around `batchSize`, `maxLateArrivalMs`, `lateArrivalPolicy`, and `watermark`
+* default watermark progression is conservative and event-driven, with opt-in helpers for `ingestedAt` and processing-time strategies
+* `flag`, `drop`, `emit_correction`, and `fail` all have direct streaming coverage
+* steady-state streaming plus delayed reconnect and continuous recovery behavior are documented with a dedicated streaming recovery and resync guide plus runnable example
+* correction-capable downstream handling is documented as provisional derived-state reconciliation rather than hidden finality
 
 ## `0.3.1` Streaming Semantic Tightening
 
@@ -453,7 +462,6 @@ Tighten the edge cases in the `0.3.0` baseline streaming contract before heavier
 Focus:
 
 * clarify custom `watermark` callback semantics so callers know whether they are supplying an event timestamp, a candidate watermark, or another stream-progress signal
-* define how invalid events interact with watermark advancement in non-strict mode
 * make the relationship between operational lateness and causal confidence explicit:
   * `maxLateArrivalMs` and watermark progress control stream handling, not whether causal evidence is `proven`
   * an event may be causally older with explicit evidence and still be operationally too late for the active stream window
@@ -473,16 +481,13 @@ Focus:
   * clarify whether the library provides correction logic, correction signals, or only operational notice that previously emitted output may need reconciliation
   * make the distinction between `ready` output and `final` output explicit enough for users writing to non-transactional or append-only stores
 * add direct semantic coverage for under-tested stream options and behaviors:
-  * `lateArrivalPolicy: "drop"`
   * custom `watermark`
-  * invalid option inputs
   * non-trivial `batchSize` cases
 * keep this release focused on edge-case semantic tightening rather than throughput or memory optimization
 
 Exit criteria:
 
 * custom watermark behavior is documented and testable rather than implicit
-* invalid events cannot accidentally distort stream progress without that behavior being explicitly chosen
 * the relationship between HLC/causal confidence and `maxLateArrivalMs` is clear enough that users do not confuse operational lateness with causal uncertainty
 * late-arrival and ready-to-flush boundaries are consistent
 * correction lookback limits are explicit enough that consumers know when previously emitted output can still change
@@ -580,6 +585,118 @@ Exit criteria:
 * the team would feel comfortable supporting the API long-term
 * major semantic churn is no longer expected
 
+## `0.6.x` Operational Tooling And Integrations
+
+Goal:
+Make the library easier to operate inside real event pipelines, not just easier to understand in isolation.
+
+Focus:
+
+* add operational tooling around the core package without weakening the core semantics:
+  * replay inspection helpers
+  * anomaly summary helpers
+  * explain-why-this-order debugging output
+* add reference integration patterns for common deployment shapes:
+  * local durable queue to later replay batch
+  * immediate streaming plus periodic reconciliation
+  * append-only downstream projections
+  * mutable downstream projections
+* add more concrete examples for:
+  * database-backed event storage
+  * broker or queue consumption
+  * local file or disk-backed buffering
+* add metrics-oriented guidance for:
+  * watermark progress
+  * late-arrival frequency
+  * anomaly-rate monitoring
+  * correction-rate monitoring
+
+Exit criteria:
+
+* the project includes practical patterns for fitting `causal-order` into real operational pipelines
+* users can see how the same event model supports bounded replay, live streaming, and hybrid reconciliation
+* maintainers have clearer tooling hooks for debugging and operator visibility
+
+## `0.7.x` Ecosystem And Transferability
+
+Goal:
+Reduce dependence on any single team member and make the package easier for a broader team to carry forward safely.
+
+Focus:
+
+* strengthen transferability:
+  * maintenance guide
+  * release process guide
+  * compatibility policy
+  * clearer architecture notes for core modules
+* improve ecosystem maturity:
+  * better examples index and discovery
+  * more explicit migration notes between release lines
+  * clearer public guidance on supported versus intentionally unsupported usage
+* add more public proof that the package solves real problems:
+  * case-study expansion
+  * benchmark reporting
+  * operational walkthroughs
+* make the project easier to evaluate for long-term adoption:
+  * clearer upgrade expectations
+  * clearer support expectations
+  * clearer repository organization
+
+Exit criteria:
+
+* a new team member can understand how to evolve the package without relying on undocumented tribal knowledge
+* the package feels transferable, not dependent on any single team member
+* external evaluators can assess the project with less guesswork about intent and maintenance burden
+
+## `0.8.x` Adoption And Transferability Maturity
+
+Goal:
+Make the package easier to adopt, evaluate, and carry forward as a stable technical asset.
+
+Focus:
+
+* improve adoption and evaluation signals:
+  * stronger onboarding and evaluation flow
+  * clearer operational positioning
+  * clearer handoff and maintenance expectations
+* strengthen trust for real adopters:
+  * more polished public docs
+  * more polished operator guidance
+  * more polished public release discipline
+* prepare the package for adjacent tooling and workflow layers without forcing them into the core package:
+  * stronger operational inspection patterns
+  * stronger reconciliation guidance
+  * stronger anomaly analysis workflows
+  * stronger extension points for future integrations
+
+Exit criteria:
+
+* the package is understandable not only to developers, but also to technical evaluators and maintainers
+* the project reads like a reliable technical foundation for adoption and extension
+* the maintainability and transferability story is strong enough that another team could extend it confidently
+
+## `0.9.x` Final Stabilization Before `1.0.0`
+
+Goal:
+Confirm that the project should actually become a long-term stable public contract.
+
+Focus:
+
+* resolve any remaining ambiguity before `1.0.0`
+* make final naming or compatibility decisions if anything still feels soft
+* do a last pass over:
+  * docs
+  * examples
+  * migration notes
+  * operator guidance
+  * release packaging
+* confirm that the project says exactly what it means and does not overclaim beyond the implemented contract
+
+Exit criteria:
+
+* the team sees no major unresolved semantic or packaging question that should block `1.0.0`
+* the project is ready for stable adoption without needing a conceptual rewrite
+
 ## `1.0.0` Stable Public Release
 
 Goal:
@@ -609,6 +726,7 @@ Possible directions after stability:
 * richer adapters
 * optional integration helpers for `Temporal` at the edges, not the core
 * performance tuning for large streaming workloads
+* richer operational tooling and workflow layers built on top of the core, if they strengthen the event-integrity story
 
 These should only happen if they strengthen the event integrity story.
 The package should not drift into becoming a database, queue, tracing platform, or generic distributed systems framework.

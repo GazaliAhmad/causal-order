@@ -24,6 +24,7 @@ If you are new to the project, read these pages first:
 * [Confidence Levels](Confidence-Levels)
 * [Concurrent vs Unknown](Concurrent-vs-Unknown)
 * [Streaming Finality](Streaming-Finality)
+* [Streaming Recovery and Resync](Streaming-Recovery-and-Resync)
 * [Realistic Workloads](Realistic-Workloads)
 * [Stress Hardening](Stress-Hardening)
 * [Design Philosophy](Design-Philosophy)

@@ -12,6 +12,7 @@ import "./scenarios/replay-corruption.test.mjs"
 import "./scenarios/multi-region-drift.test.mjs"
 import "./scenarios/false-audit-timeline.test.mjs"
 import "./scenarios/offline-sync-anomalies.test.mjs"
+import "./scenarios/streaming-recovery-resync.test.mjs"
 import "./scenarios/causal-inversion.test.mjs"
 import "./scenarios/trace-and-partition-noncausal.test.mjs"
 

@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0]
+
+### Added
+
+* built-in streaming watermark helpers: `eventTimeWatermark`, `ingestedAtWatermark`, and `createProcessingTimeWatermark()`
+* direct streaming coverage for `lateArrivalPolicy: "drop"`, conservative invalid-event watermark behavior, opt-in watermark helpers, and stream option validation
+* dedicated streaming recovery and resync documentation, including a correction-contract guide and a runnable reconnect example
+* delayed reconnect scenario coverage for correction-capable late arrivals in streaming recovery flows
+* dedicated `bench:stream` entry point and a `streaming-100k-plateaus` benchmark profile for measuring watermark-driven flush behavior directly
+
+### Changed
+
+* promoted the package to the `0.3.0` baseline streaming release
+* kept default stream watermark progression conservative and event-driven instead of silently advancing from processing time
+* stopped invalid events from advancing stream watermark progress in non-strict mode
+* made `emit_correction` flush correction-capable batches immediately when a late event arrives instead of waiting for `batchSize`
+* clamped computed stream watermarks at `0n` until observed progress exceeds the lateness window
+* documented `emit_correction` as a correction-capable downstream model built around visible provisional output and derived-state reconciliation
+* reduced ordering-path allocation overhead by validating and collecting events in a single pass before anomaly analysis
+* reduced stream flush overhead by avoiding repeated buffer rescans when watermark progress and flush readiness have not changed
+* extended the perf harness so streaming profiles can run through the same reporting flow as batch profiles
+
 ## [0.2.3]
 
 ### Notes

@@ -129,7 +129,7 @@ It is the explanation of why that order exists and how trustworthy it is.
 
 Two rules matter especially for current releases:
 
-* `concurrent` is not a polite word for "I don't know"
+* `concurrent` is not a polite word for "we don't know"
 * lack of a visible causal edge should usually stay `unknown`, especially across nodes
 
 That means:
@@ -193,8 +193,17 @@ for (const item of result.ordered) {
 
 For large or unbounded event flows, use `orderEventStream()` instead of pretending everything belongs in one in-memory batch.
 
+That includes both:
+
+* ordinary day-to-day stream processing
+* delayed reconnect, offline sync, or recovery flows where late arrivals are part of normal operations
+
 ```ts
-import { orderEventStream } from "causal-order"
+import {
+  createProcessingTimeWatermark,
+  ingestedAtWatermark,
+  orderEventStream,
+} from "causal-order"
 
 for await (const batch of orderEventStream(source(), {
   batchSize: 100,
@@ -213,6 +222,38 @@ Important rule:
 * stream finality is operational, not causal certainty
 * `maxLateArrivalMs` is an operational lateness window, not a statement about whether causality is proven
 * an event may still be causally older with `proven` evidence, but be operationally too late for the current stream window and therefore handled through the configured late-arrival policy rather than as normal in-window output
+
+Watermark strategies:
+
+* the default watermark is conservative and event-driven, using validated event time rather than silently moving forward from system time
+* `ingestedAtWatermark` is an opt-in helper for queued or replayed flows where ingest time is the more honest operational progress signal
+* `createProcessingTimeWatermark()` is an opt-in helper for teams that want more liveness-oriented stream progress and are willing to own that tradeoff explicitly
+* if watermark progress depends only on observed events, an idle source can intentionally stall progress; use heartbeats, upstream progress signals, or an explicit opt-in watermark helper when you want different liveness behavior
+
+Example opt-in watermark override:
+
+```ts
+const watermark = createProcessingTimeWatermark({
+  floorToEventTime: true,
+})
+
+for await (const batch of orderEventStream(source(), {
+  batchSize: 100,
+  maxLateArrivalMs: 30_000n,
+  lateArrivalPolicy: "emit_correction",
+  watermark,
+  strict: false,
+})) {
+  console.log(batch.watermark, batch.isFinal)
+}
+```
+
+Streaming is not only an outage or recovery feature.
+It is also the honest model for routine live operations when:
+
+* events arrive continuously
+* watermark progress matters
+* you need explicit late-arrival handling instead of pretending every event is part of one perfect bounded batch
 
 ## When To Use It
 
@@ -321,16 +362,16 @@ Runnable repository examples:
 
 ## Status
 
-`causal-order` is currently in the public `0.2.x` release line. `0.2.2` is the stress-hardening follow-up in that line, `0.3.0` is the next planned core streaming milestone, `0.3.1` is the intended streaming semantic-tightening follow-up, and `0.3.2` is the intended streaming hardening follow-up.
+`causal-order` is currently in the public `0.3.x` release line. `0.3.0` is the baseline streaming release, `0.3.1` is the next planned streaming semantic-tightening follow-up, and `0.3.2` is the intended streaming hardening follow-up.
 
-The recent `0.2.x` work reflects the semantics hardening that began during late `0.1.x` preparation, continued through the `0.2.0` public baseline, passed through an internal `0.2.1` repo step, and was followed by corrupted-dataset stress hardening in `0.2.2`, so the eventual `1.0` contract can be tighter and more settled.
+The recent release history reflects semantics hardening that began during late `0.1.x` preparation, continued through the `0.2.0` public baseline, passed through an internal `0.2.1` repo step, was followed by corrupted-dataset stress hardening in `0.2.2`, had an internal documentation follow-up in `0.2.3`, and now establishes the first public baseline streaming contract in `0.3.0`.
 
 That means:
 
 * the package is usable today
 * the API is expected to evolve
 * semantics matter more than surface churn at this stage
-* the next major area after `0.2.2` is streaming behavior, split into a scoped `0.3.0` baseline streaming contract, a `0.3.1` edge-case semantic-tightening pass, and a `0.3.2` pressure-testing follow-up
+* the current streaming work is split into the shipped `0.3.0` baseline contract, a `0.3.1` edge-case semantic-tightening pass, and a `0.3.2` pressure-testing follow-up
 * `1.0.0` is the point where the semantic contract should feel stable enough to preserve long-term
 
 ## Repository Development

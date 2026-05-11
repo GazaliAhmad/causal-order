@@ -23,6 +23,7 @@ node examples/replay-corruption.mjs
 node examples/multi-region-drift.mjs
 node examples/false-audit-timeline.mjs
 node examples/offline-sync-anomalies.mjs
+node examples/streaming-recovery-resync.mjs
 node examples/causal-inversion.mjs
 ```
 
@@ -40,5 +41,11 @@ Each example shows:
 * confidence labels
 * causal evidence where available
 * anomalies when the timeline is suspicious
+
+The streaming recovery example adds:
+
+* reconnect/resync behavior
+* late-arrival correction batches
+* a concrete `orderEventStream()` operational slice
 
 If you want the larger-batch follow-through beyond these small examples, see the [Stress Hardening guide](../guides/stress-hardening.md).
