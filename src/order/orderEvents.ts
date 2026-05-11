@@ -262,19 +262,25 @@ export function orderEvents<T>(
   }
 
   const strict = options?.strict ?? false
-  const validations = events.map((event) => ({
-    event,
-    validation: validateEvent(event, validationOptions) as ValidationResult<ValidatedEventEnvelope<T>>,
-  }))
-  const anomalies: EventAnomaly<T>[] = options?.detectAnomalies === false
-    ? []
-    : detectAnomalies(events, {
-        ...validationOptions,
-        validations,
-      })
+  const detectAnomaliesEnabled = options?.detectAnomalies !== false
+  const validations = detectAnomaliesEnabled
+    ? new Array<{
+        event: EventEnvelope<T>
+        validation: ValidationResult<ValidatedEventEnvelope<T>>
+      }>()
+    : undefined
+  const anomalies: EventAnomaly<T>[] = []
 
   const validEvents: ValidatedEventEnvelope<T>[] = []
-  for (const { event, validation } of validations) {
+  for (const event of events) {
+    const validation = validateEvent(event, validationOptions) as ValidationResult<ValidatedEventEnvelope<T>>
+    if (validations !== undefined) {
+      validations.push({
+        event,
+        validation,
+      })
+    }
+
     if (!validation.valid) {
       if (strict) {
         throw new Error(
@@ -284,7 +290,7 @@ export function orderEvents<T>(
         )
       }
 
-      if (options?.detectAnomalies === false) {
+      if (!detectAnomaliesEnabled) {
         anomalies.push({
           type: "invalid_clock",
           severity: "error",
@@ -296,6 +302,13 @@ export function orderEvents<T>(
     }
 
     validEvents.push(validation.value)
+  }
+
+  if (validations !== undefined) {
+    anomalies.push(...detectAnomalies(events, {
+      ...validationOptions,
+      validations,
+    }))
   }
 
   const nodes = validEvents.map<GraphNode<T>>((event, index) => ({

@@ -222,7 +222,7 @@ Meaning:
 A and B are both valid, but no causal order exists.
 ```
 
-Do not use `concurrent` as a polite word for "I don't know".
+Do not use `concurrent` as a polite word for "we don't know".
 
 Return `unknown` when the evidence is insufficient or untrustworthy.
 

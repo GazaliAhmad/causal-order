@@ -2,6 +2,7 @@ import {
   getProfile,
   listProfileNames,
   printBenchmarkSummary,
+  runBenchmarkCaseAsync,
   runBenchmarkCase,
   toCsv,
   writeCsvFile,
@@ -76,7 +77,14 @@ async function main() {
       ? options.profiles
       : ["baseline-100k-shuffled"]
 
-  const runs = profileNames.map((name) => runBenchmarkCase(name))
+  const runs = []
+  for (const name of profileNames) {
+    const profile = getProfile(name)
+    const run = profile.mode === "stream"
+      ? await runBenchmarkCaseAsync(profile)
+      : runBenchmarkCase(profile)
+    runs.push(run)
+  }
 
   if (!options.csv) {
     for (const run of runs) {

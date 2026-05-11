@@ -8,6 +8,7 @@ Start here:
 * [Case Studies](./case-studies.md)
 * [Stress Hardening](./stress-hardening.md)
 * [After-Hours Batch Processing](./after-hours-batch-processing.md)
+* [Streaming Recovery And Resync](./streaming-recovery-resync.md)
 
 Failure-mode guides:
 

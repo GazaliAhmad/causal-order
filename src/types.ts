@@ -152,11 +152,15 @@ export type LateArrivalPolicy =
   | "emit_correction"
   | "fail"
 
+export type WatermarkFunction<T> = (
+  event: EventEnvelope<T>,
+) => bigint | undefined
+
 export type StreamOrderOptions<T> = OrderOptions<T> & {
   batchSize?: number
   maxLateArrivalMs?: bigint
   lateArrivalPolicy?: LateArrivalPolicy
-  watermark?: (event: EventEnvelope<T>) => bigint
+  watermark?: WatermarkFunction<T>
 }
 
 export type OrderBatch<T = unknown> = {
