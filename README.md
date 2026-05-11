@@ -342,6 +342,7 @@ Conceptual docs:
 * [Confidence Levels](https://github.com/GazaliAhmad/causal-order/wiki/Confidence-Levels)
 * [Concurrent vs Unknown](https://github.com/GazaliAhmad/causal-order/wiki/Concurrent-vs-Unknown)
 * [Streaming Finality](https://github.com/GazaliAhmad/causal-order/wiki/Streaming-Finality)
+* [Streaming Recovery and Resync](https://github.com/GazaliAhmad/causal-order/wiki/Streaming-Recovery-and-Resync)
 
 Repository guides:
 
@@ -350,6 +351,7 @@ Repository guides:
 * [Case Studies](https://github.com/GazaliAhmad/causal-order/blob/main/guides/case-studies.md)
 * [Stress Hardening](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stress-hardening.md)
 * [After-Hours Batch Processing](https://github.com/GazaliAhmad/causal-order/blob/main/guides/after-hours-batch-processing.md)
+* [Streaming Recovery And Resync](https://github.com/GazaliAhmad/causal-order/blob/main/guides/streaming-recovery-resync.md)
 * [Replay Corruption](https://github.com/GazaliAhmad/causal-order/blob/main/guides/replay-corruption.md)
 * [Multi-Region Drift](https://github.com/GazaliAhmad/causal-order/blob/main/guides/multi-region-drift.md)
 * [False Audit Timelines](https://github.com/GazaliAhmad/causal-order/blob/main/guides/false-audit-timeline.md)
@@ -359,6 +361,7 @@ Repository guides:
 Runnable repository examples:
 
 * [Examples Index](https://github.com/GazaliAhmad/causal-order/blob/main/examples/README.md)
+* [Streaming Recovery And Resync Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/streaming-recovery-resync.mjs)
 
 ## Status
 
@@ -390,6 +393,7 @@ Useful local commands:
 * `npm run demo`
 * `npm run examples`
 * `npm run bench`
+* `npm run bench:stream`
 * `npm run bench:all`
 * `npm run bench:csv`
 * `npm run bench:profile`

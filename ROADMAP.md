@@ -709,6 +709,7 @@ Definition of done:
 * core semantics are stable
 * public API is intentional
 * docs and examples are strong
+* a public website exists for the current wiki content so the conceptual docs are easier to browse as a stable product surface
 * tests are meaningful
 * the package clearly solves a real event-integrity problem
 
@@ -716,6 +717,7 @@ Definition of done:
 
 * consumers can depend on the semantics
 * breaking changes become exceptional
+* the conceptual documentation has graduated from repo wiki pages into a real website suitable for long-term public reference
 * the package is ready for real production evaluation
 
 ## Post-`1.0`

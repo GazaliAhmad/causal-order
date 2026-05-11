@@ -15,6 +15,8 @@ If you are new to the project, read these pages first:
 2. [The Problem With Distributed Timelines](The-Problem-With-Distributed-Timelines)
 3. [Confidence Levels](Confidence-Levels)
 4. [Concurrent vs Unknown](Concurrent-vs-Unknown)
+5. [Streaming Finality](Streaming-Finality)
+6. [Streaming Recovery and Resync](Streaming-Recovery-and-Resync)
 
 ## Conceptual Pages
 
@@ -47,6 +49,8 @@ It is also:
 * showing when order is only derived
 * refusing to flatten concurrency into fake sequence
 * making suspicious or weak metadata visible
+
+In the current `0.3.0` release line, that also includes an explicit streaming model for day-to-day live processing, delayed reconnect, and resync flows.
 
 ## Project Standard
 

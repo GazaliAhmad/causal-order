@@ -41,3 +41,5 @@ That often produces a clean-looking answer.
 But in distributed systems, clean-looking answers are often wrong.
 
 `causal-order` exists to make that uncertainty visible instead of hiding it.
+
+In the current `0.3.0` release line, that scope includes both bounded batch ordering and the baseline streaming contract for late arrivals, watermarks, and reconnect-heavy recovery flows.

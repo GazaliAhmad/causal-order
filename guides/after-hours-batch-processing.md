@@ -187,7 +187,6 @@ That means:
 * `0.3.0` streaming mode uses the same event model, but adds watermark, lateness, correction, and the current stream-facing parameters for both normal live operations and reconnect-heavy flows
 * `0.3.1` is where the remaining stream semantic edge cases should be tightened:
   * watermark callback semantics
-  * invalid-event interaction with watermark advancement
   * boundary rules for lateness vs readiness
   * cross-window anomaly behavior
 * `0.3.2` is where the additional streaming pressure work should land:
