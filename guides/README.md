@@ -10,6 +10,7 @@ Start here:
 * [Mental Model](./mental-model.md)
 * [Clocks, Causality, And Why HLC](./clocks-causality-and-why-hlc.md)
 * [Production Gate `0.3.2`](./production-gate-0.3.2.md)
+* [Anomaly Surface Audit `0.3.2`](./anomaly-surface-0.3.2.md)
 * [Case Studies](./case-studies.md)
 * [Stress Hardening](./stress-hardening.md)
 * [After-Hours Batch Processing](./after-hours-batch-processing.md)

@@ -79,6 +79,10 @@ If a gate category cannot be expressed honestly with the current anomaly model, 
 The goal is not to invent domain-aware semantics.
 The goal is to make the current core claims auditable.
 
+For the current audit of that surface, see:
+
+* [Anomaly Surface Audit `0.3.2`](./anomaly-surface-0.3.2.md)
+
 ## Verification Commands
 
 The current release gate should be backed by repository commands, not only by prose.
