@@ -31,6 +31,14 @@ type GraphNode<T> = {
   eventTime: bigint
   readyOrder: number
   hasSequenceEvidence: boolean
+  isUnresolved: boolean
+  sameTimeCount: number
+  hasDistinctIngestionOrder: boolean
+}
+
+type EventValidationRecord<T> = {
+  event: EventEnvelope<T>
+  validation: ValidationResult<ValidatedEventEnvelope<T>>
 }
 
 const OUTGOING_SET_THRESHOLD = 8
@@ -180,18 +188,13 @@ function popReadyNode<T>(
 }
 
 function buildOrderedMetadata<T>(
-  event: ValidatedEventEnvelope<T>,
+  node: GraphNode<T>,
   orderIndex: bigint,
-  evidence: CausalEvidence[],
-  hasSequenceEvidence: boolean,
-  options: {
-    tieBreaker?: OrderOptions<T>["tieBreaker"]
-    unresolvedEventIds: Set<string>
-    sameTimeEventCounts: Map<bigint, number>
-    sameTimeIngestionTies: Set<string>
-  },
+  tieBreaker?: OrderOptions<T>["tieBreaker"],
 ): OrderedEvent<T> {
-  if (options.unresolvedEventIds.has(event.id)) {
+  const { event, evidence, hasSequenceEvidence } = node
+
+  if (node.isUnresolved) {
     return {
       event,
       orderIndex,
@@ -220,12 +223,9 @@ function buildOrderedMetadata<T>(
     }
   }
 
-  const eventTime = getValidatedEventTime(event)
-  const sameTimeCount = options.sameTimeEventCounts.get(eventTime) ?? 0
-
   if (
-    options.tieBreaker === "ingestion_order" &&
-    options.sameTimeIngestionTies.has(event.id)
+    tieBreaker === "ingestion_order" &&
+    node.hasDistinctIngestionOrder
   ) {
     return {
       event,
@@ -235,7 +235,7 @@ function buildOrderedMetadata<T>(
     }
   }
 
-  if (sameTimeCount > 1) {
+  if (node.sameTimeCount > 1) {
     return {
       event,
       orderIndex,
@@ -252,63 +252,36 @@ function buildOrderedMetadata<T>(
   }
 }
 
-export function orderEvents<T>(
-  events: EventEnvelope<T>[],
+export function orderValidatedEvents<T>(
+  validEvents: ValidatedEventEnvelope<T>[],
   options?: OrderOptions<T>,
+  internal?: {
+    sourceEvents?: EventEnvelope<T>[]
+    validations?: EventValidationRecord<T>[]
+    anomalies?: EventAnomaly<T>[]
+    invalidEvents?: number
+  },
 ): OrderResult<T> {
-  const validationOptions: { maxClockDriftMs?: bigint } = {}
+  const validationOptions: { maxClockDriftMs?: bigint; includeWarnings?: boolean } = {
+    includeWarnings: false,
+  }
   if (options?.maxClockDriftMs !== undefined) {
     validationOptions.maxClockDriftMs = options.maxClockDriftMs
   }
 
   const strict = options?.strict ?? false
-  const detectAnomaliesEnabled = options?.detectAnomalies !== false
-  const validations = detectAnomaliesEnabled
-    ? new Array<{
-        event: EventEnvelope<T>
-        validation: ValidationResult<ValidatedEventEnvelope<T>>
-      }>()
-    : undefined
-  const anomalies: EventAnomaly<T>[] = []
-
-  const validEvents: ValidatedEventEnvelope<T>[] = []
-  for (const event of events) {
-    const validation = validateEvent(event, validationOptions) as ValidationResult<ValidatedEventEnvelope<T>>
-    if (validations !== undefined) {
-      validations.push({
-        event,
-        validation,
-      })
-    }
-
-    if (!validation.valid) {
-      if (strict) {
-        throw new Error(
-          `Invalid event ${event.id || "<unknown>"}: ${validation.errors
-            .map((error) => error.message)
-            .join("; ")}`,
-        )
-      }
-
-      if (!detectAnomaliesEnabled) {
-        anomalies.push({
-          type: "invalid_clock",
-          severity: "error",
-          event,
-          message: validation.errors.map((error) => error.message).join("; "),
-        })
-      }
-      continue
-    }
-
-    validEvents.push(validation.value)
-  }
+  const sourceEvents = internal?.sourceEvents ?? validEvents
+  const validations = internal?.validations
+  const anomalies = internal?.anomalies ?? []
 
   if (validations !== undefined) {
-    anomalies.push(...detectAnomalies(events, {
+    const detectedAnomalies = detectAnomalies(sourceEvents, {
       ...validationOptions,
       validations,
-    }))
+    })
+    for (const anomaly of detectedAnomalies) {
+      anomalies.push(anomaly)
+    }
   }
 
   const nodes = validEvents.map<GraphNode<T>>((event, index) => ({
@@ -320,16 +293,55 @@ export function orderEvents<T>(
     eventTime: getValidatedEventTime(event),
     readyOrder: -1,
     hasSequenceEvidence: false,
+    isUnresolved: false,
+    sameTimeCount: 0,
+    hasDistinctIngestionOrder: false,
   }))
 
   const nodesByEventId = new Map<string, number>()
   const nodesByNodeId = new Map<string, GraphNode<T>[]>()
+  const sameTimeEventCounts = new Map<bigint, number>()
+  const sameTimeIngestionStates = options?.tieBreaker === "ingestion_order"
+    ? new Map<bigint, {
+        firstIngestedAt: bigint | undefined
+        hasDistinctIngestionOrder: boolean
+      }>()
+    : undefined
 
   for (const node of nodes) {
     nodesByEventId.set(node.event.id, node.index)
     const list = nodesByNodeId.get(node.event.nodeId) ?? []
     list.push(node)
     nodesByNodeId.set(node.event.nodeId, list)
+
+    sameTimeEventCounts.set(
+      node.eventTime,
+      (sameTimeEventCounts.get(node.eventTime) ?? 0) + 1,
+    )
+
+    if (sameTimeIngestionStates !== undefined && node.event.ingestedAt !== undefined) {
+      const state = sameTimeIngestionStates.get(node.eventTime)
+      if (state === undefined) {
+        sameTimeIngestionStates.set(node.eventTime, {
+          firstIngestedAt: node.event.ingestedAt,
+          hasDistinctIngestionOrder: false,
+        })
+      } else if (
+        !state.hasDistinctIngestionOrder &&
+        state.firstIngestedAt !== undefined &&
+        node.event.ingestedAt !== state.firstIngestedAt
+      ) {
+        state.hasDistinctIngestionOrder = true
+      }
+    }
+  }
+
+  for (const node of nodes) {
+    node.sameTimeCount = sameTimeEventCounts.get(node.eventTime) ?? 0
+    if (sameTimeIngestionStates !== undefined && node.event.ingestedAt !== undefined) {
+      const state = sameTimeIngestionStates.get(node.eventTime)
+      node.hasDistinctIngestionOrder = state?.hasDistinctIngestionOrder ?? false
+    }
   }
 
   for (const node of nodes) {
@@ -441,6 +453,7 @@ export function orderEvents<T>(
 
   for (const node of unresolvedNodes) {
     if (!isOrdered[node.index]) {
+      node.isUnresolved = true
       anomalies.push({
         type: "unknown_order",
         severity: options?.allowUnknownOrder === false ? "error" : "warning",
@@ -452,67 +465,87 @@ export function orderEvents<T>(
     }
   }
 
-  const unresolvedEventIds = new Set(unresolvedNodes.map((node) => node.event.id))
-  const sameTimeEventCounts = new Map<bigint, number>()
-  const sameTimeIngestionTies = new Set<string>()
-  const sameTimeIngestionStates = options?.tieBreaker === "ingestion_order"
-    ? new Map<bigint, {
-        firstIngestedAt: bigint | undefined
-        hasDistinctIngestionOrder: boolean
-      }>()
-    : undefined
-
-  for (const event of validEvents) {
-    const timeKey = getValidatedEventTime(event)
-    sameTimeEventCounts.set(timeKey, (sameTimeEventCounts.get(timeKey) ?? 0) + 1)
-
-    if (sameTimeIngestionStates !== undefined && event.ingestedAt !== undefined) {
-      const state = sameTimeIngestionStates.get(timeKey)
-      if (state === undefined) {
-        sameTimeIngestionStates.set(timeKey, {
-          firstIngestedAt: event.ingestedAt,
-          hasDistinctIngestionOrder: false,
-        })
-      } else if (
-        !state.hasDistinctIngestionOrder &&
-        state.firstIngestedAt !== undefined &&
-        event.ingestedAt !== state.firstIngestedAt
-      ) {
-        state.hasDistinctIngestionOrder = true
-      }
-    }
-  }
-
-  if (sameTimeIngestionStates !== undefined) {
-    for (const event of validEvents) {
-      if (event.ingestedAt === undefined) {
-        continue
-      }
-
-      const state = sameTimeIngestionStates.get(getValidatedEventTime(event))
-      if (state?.hasDistinctIngestionOrder) {
-        sameTimeIngestionTies.add(event.id)
-      }
-    }
-  }
-
   const ordered = orderedNodes.map((node, index) =>
-    buildOrderedMetadata(node.event, BigInt(index), node.evidence, node.hasSequenceEvidence, {
-      tieBreaker: options?.tieBreaker,
-      unresolvedEventIds,
-      sameTimeEventCounts,
-      sameTimeIngestionTies,
-    }))
+    buildOrderedMetadata(node, BigInt(index), options?.tieBreaker))
 
   return {
     ordered,
     anomalies,
     stats: {
-      totalEvents: events.length,
+      totalEvents: sourceEvents.length,
       validEvents: validEvents.length,
-      invalidEvents: events.length - validEvents.length,
+      invalidEvents: internal?.invalidEvents ?? (sourceEvents.length - validEvents.length),
       orderedEvents: ordered.length,
       anomalyCount: anomalies.length,
     },
   }
+}
+
+export function orderEvents<T>(
+  events: EventEnvelope<T>[],
+  options?: OrderOptions<T>,
+): OrderResult<T> {
+  const validationOptions: { maxClockDriftMs?: bigint; includeWarnings?: boolean } = {
+    includeWarnings: false,
+  }
+  if (options?.maxClockDriftMs !== undefined) {
+    validationOptions.maxClockDriftMs = options.maxClockDriftMs
+  }
+
+  const strict = options?.strict ?? false
+  const detectAnomaliesEnabled = options?.detectAnomalies !== false
+  const validations = detectAnomaliesEnabled
+    ? new Array<EventValidationRecord<T>>()
+    : undefined
+  const anomalies: EventAnomaly<T>[] = []
+
+  const validEvents: ValidatedEventEnvelope<T>[] = []
+  for (const event of events) {
+    const validation = validateEvent(event, validationOptions) as ValidationResult<ValidatedEventEnvelope<T>>
+    if (validations !== undefined) {
+      validations.push({
+        event,
+        validation,
+      })
+    }
+
+    if (!validation.valid) {
+      if (strict) {
+        throw new Error(
+          `Invalid event ${event.id || "<unknown>"}: ${validation.errors
+            .map((error) => error.message)
+            .join("; ")}`,
+        )
+      }
+
+      if (!detectAnomaliesEnabled) {
+        anomalies.push({
+          type: "invalid_clock",
+          severity: "error",
+          event,
+          message: validation.errors.map((error) => error.message).join("; "),
+        })
+      }
+      continue
+    }
+
+    validEvents.push(validation.value)
+  }
+
+  const internalOptions: {
+    sourceEvents: EventEnvelope<T>[]
+    validations?: EventValidationRecord<T>[]
+    anomalies: EventAnomaly<T>[]
+    invalidEvents: number
+  } = {
+    sourceEvents: events,
+    anomalies,
+    invalidEvents: events.length - validEvents.length,
+  }
+
+  if (validations !== undefined) {
+    internalOptions.validations = validations
+  }
+
+  return orderValidatedEvents(validEvents, options, internalOptions)
 }

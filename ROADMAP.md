@@ -393,7 +393,8 @@ Focus:
 * make the semantic role of `flushReady()` explicit:
   * `0.3.0` owns correctness of when events become ready, when corrections are emitted, and when batches are final
   * `0.3.1` owns the remaining semantic edge-case cleanup once the baseline contract is documented
-  * `0.3.2` owns the remaining pressure behavior, bounded-memory hardening, and any follow-up optimization still needed once those semantics are settled
+  * `0.3.2` owns proving that the settled current-core and streaming claims are production-credible through explicit release gates
+  * `0.3.3` owns the broader remaining pressure behavior, bounded-memory hardening, and follow-up optimization once that first production gate is in place
 * lock the first intentional stream-facing option surface around the current parameters:
   * `batchSize`
   * `maxLateArrivalMs`
@@ -408,7 +409,7 @@ Focus:
   * baseline non-late vs late handling is correct for ordinary stream flows
   * idle-source behavior is explicit enough that one silent producer does not accidentally stall the whole ordering pipeline without that being an intentional design choice
 * define silent-producer and idle-source handling explicitly:
-  * if watermark progress depends only on observed event arrival, an idle producer or stalled source can pin stream progress indefinitely
+  * if watermark progress depends only on observed event arrival, stream progress can stall indefinitely when the source stops producing the watermark-driving signals needed to advance it honestly
   * document how users can advance watermark progress or handle idle sources, whether through heartbeats, `maxIdleMs`, an external watermark strategy, or a clearly documented upstream responsibility
 * establish baseline late-arrival policy correctness:
   * `flag`
@@ -456,7 +457,7 @@ Completed in the current repo state:
 * the initial `flushReady()` path has already received baseline overhead reduction work so repeated rescans are no longer entirely unbounded by default behavior
 * the perf harness now includes a dedicated streaming benchmark profile for direct watermark-driven flush measurement
 
-## `0.3.1` Streaming Semantic Tightening
+## `0.3.1` Completed Milestone: Streaming Semantic Tightening
 
 Goal:
 Tighten the edge cases in the `0.3.0` baseline streaming contract before heavier pressure work.
@@ -494,39 +495,123 @@ Exit criteria:
 * late-arrival and ready-to-flush boundaries are consistent
 * correction lookback limits are explicit enough that consumers know when previously emitted output can still change
 * the distinction between `ready` output and `final` output is clear enough that downstream consumers can choose a safe storage pattern
-* the cross-window anomaly contract is stated clearly enough that `0.3.2` can harden it without reopening semantic questions
+* the cross-window anomaly contract is stated clearly enough that `0.3.2` can turn it into an explicit production gate without reopening semantic questions
 
-## `0.3.2` Streaming Hardening And Pressure
+Completed in the current repo state:
+
+* custom `watermark` semantics are explicit in the public docs, runtime messaging, and test coverage as stream-progress signals rather than implicit final watermarks
+* the late-versus-ready boundary contract is explicit and tested:
+  * `eventTime <= batch.watermark` is ready to flush
+  * `eventTime < batch.watermark` is late
+* the relationship between operational lateness and causal confidence is documented more directly so watermark progress and `maxLateArrivalMs` are not confused with causal proof
+* correction signaling is now machine-readable through `batch.correction`
+* the current correction scope is explicit as a policy-based reconciliation model over previously emitted non-final output in the same stream instance
+* the current cross-window anomaly contract is explicit through `batch.anomalyHorizon`, including:
+  * `buffered_window_only` retained emitted-history semantics
+  * `late_arrival_only` cross-window relational anomaly carry
+* under-tested stream options and behaviors now have direct semantic coverage, especially:
+  * custom `watermark`
+  * non-trivial `batchSize`
+  * delayed reconnect correction fragmentation
+  * lagging-watermark ready-subset emission
+* downstream guidance now makes the distinction between provisional non-final output and terminal final output explicit enough for mutable, append-only, non-transactional, and partially transactional sinks
+* streaming flushes now reuse already-validated buffered events through an internal fast path instead of revalidating every ready batch from scratch
+* the `streaming-100k-plateaus` benchmark profile is now actually anomaly-free as intended, and `perf/check` includes a dedicated streaming guard to catch future synthetic-clock regressions
+* the README, guides, wiki, examples, changelog, and tests now present the same safer deployment-oriented story:
+  * the library is designed for systems that cannot rely on a globally synchronized clock
+  * it supports operationally honest event processing without claiming universal production proof or globally complete ordering
+
+## `0.3.2` Production Gate Hardening
 
 Goal:
-Make the `0.3.1` streaming contract operationally credible under pressure.
+Prove that the current `0.3.1` semantics are production-credible before expanding the scope again.
+
+This milestone is not about adding a new semantic layer.
+It is about making sure the current core claims are backed by explicit release gates, explicit tests, and explicit operational honesty.
+
+Focus:
+
+* add a production release-gate document that defines what must pass before a release can be called production-credible
+* harden and verify the current-core gate categories that already fit the library's present model:
+  * missing parent events
+  * offline device merge
+  * duplicate event storms for exact duplicate IDs
+  * clock reset scenarios
+  * massive out-of-order replay
+  * partial log corruption
+* make sure each of those categories has explicit pass/fail assertions rather than only scenario-style examples
+* ensure the current anomaly surface is sufficient for the current-core gate set, or make the missing current-core signals explicit
+* keep determinism as a hard release requirement:
+  * same input must produce the same ordered output
+  * same input must produce the same anomaly output
+  * shuffled arrival order must not change causally justified conclusions
+* strengthen streaming pressure coverage where it directly supports the current shipped contract:
+  * pathological late arrivals
+  * reconnect correction pressure
+  * watermark pressure
+  * lagging-watermark plus `batchSize` pressure
+  * bounded-memory and backpressure behavior
+* align tests, perf checks, docs, and release policy so the repo makes one consistent claim about what is currently production-credible
+
+Why this should be a separate milestone:
+
+* `0.3.1` has already defined the current streaming semantics more clearly
+* the next honest question is not "what else could the library do?"
+* the next honest question is "which of the current claims are strong enough to call production-credible?"
+* separating this work prevents production language from outrunning test evidence
+* it also avoids mixing current-core hardening with later domain-semantic features that need new product design
+
+What this milestone does not try to solve yet:
+
+* contradictory domain events
+* entity fork semantics
+* semantic duplicate detection for different event IDs that represent the same action
+
+Those are important, but they require domain-aware policy or extension-point design rather than only more pressure on the current payload-agnostic core.
+
+Exit criteria:
+
+* the repo contains an explicit production gate document for the current release line
+* the current-core gate categories have direct automated coverage with release-blocking assertions
+* deterministic behavior is explicitly tested across repeated runs and shuffled inputs for the covered categories
+* streaming pressure behavior is covered strongly enough that the current streaming contract is operationally credible rather than only conceptually described
+* docs and release wording do not claim more than the tested current-core semantics can honestly support
+
+## `0.3.3` Streaming Hardening And Pressure
+
+Goal:
+Continue the broader streaming hardening and pressure work after the current semantics have passed the first production gate milestone.
+
+This release should build on the credibility established in `0.3.2` rather than trying to establish that credibility and broaden the pressure scope at the same time.
 
 Focus:
 
 * continue optimizing the `flushReady()` path so remaining repeated scans, compaction, and pressure behavior do not become the next streaming performance cliff
-* treat remaining `flushReady()` performance work as a hardening concern rather than part of the initial semantic contract
-* test pathological late-arrival behavior beyond tiny fixtures
-* pressure-test correction-window behavior during resync and delayed reconnect flows
-* test watermark pressure explicitly
-* test bounded-memory assumptions
-* define memory-ceiling versus backpressure behavior explicitly:
-  * what happens when the internal buffer is full but the watermark has not advanced enough to flush safely
-  * whether the default policy is to block ingestion, fail explicitly, or force an explicitly downgraded flush
-  * how backpressure is surfaced when the buffer cannot grow safely and how bounded-memory claims remain honest under large out-of-order bursts
-* explicitly test heap-pressure behavior when `batchSize` is reached but the watermark is still lagging
-* add backpressure guidance and implementation behavior
-* document memory strategy with concrete examples
-* expand targeted streaming stress coverage beyond the baseline benchmark so the new semantics are not only described but exercised under load
+* continue profiling and tightening anomaly-heavy batch and stream paths, especially where large anomaly volumes create GC pressure or throughput cliffs
+* extend streaming stress coverage beyond the minimum release-gate set once the baseline production gates are already in place
+* pressure-test correction-window behavior during resync and delayed reconnect flows beyond small semantic fixtures
+* extend watermark-pressure coverage from correctness-only toward sustained operational pressure
+* strengthen bounded-memory demonstrations and backpressure guidance with more explicit heavy-pressure cases
+* decide which additional streaming stress profiles are stable enough to enforce in perf checks
+* keep optimization discipline evidence-driven:
+  * retain optimizations that measurably improve guarded or stressed workloads
+  * revert micro-optimizations that preserve correctness but do not produce meaningful wins
+  * let CPU profiles, GC behavior, and guarded stress runs decide the next hotspot
+
+Why this should follow `0.3.2`:
+
+* `0.3.2` should answer whether the current contract is already credible enough to defend
+* `0.3.3` can then safely widen the pressure work without blurring the release story
+* this keeps the sequencing honest:
+  * first prove the current claims
+  * then keep hardening the pressure envelope around those claims
 
 Exit criteria:
 
-* pathological late arrivals are covered by explicit streaming tests or stress profiles
-* correction-window behavior is demonstrated under pressure rather than only described conceptually
-* watermark pressure has dedicated coverage
-* memory-ceiling versus backpressure behavior is explicit rather than accidental
-* `batchSize` pressure with a lagging watermark has dedicated coverage
-* bounded-memory operation is demonstrated, not implied
-* maintainers have concrete guidance for backpressure and memory strategy
+* broader streaming pressure coverage exists beyond the minimum `0.3.2` release-gate set
+* the most important remaining streaming hotspots have fresh profile-backed evidence
+* bounded-memory and backpressure behavior are not only documented, but exercised under stronger pressure conditions
+* maintainers have clearer evidence for which streaming stress cases should become future enforced guards
 
 ## `0.4.x` Developer Experience
 
@@ -560,10 +645,13 @@ Exit criteria:
 * examples teach the mental shift effectively
 * common use cases are obvious from docs alone
 
-## `0.5.x` Stability Candidate
+## `0.5.x` Stability Candidate And Domain-Semantic Contract Design
 
 Goal:
-Decide whether the API is truly ready to become a stable public contract.
+Decide whether the public contract is truly ready to stabilize, and explicitly design the domain-semantic extension areas that `1.0.0` must either support clearly or leave out of scope clearly.
+
+This milestone should not pretend that all important semantics belong in the payload-agnostic core.
+Instead, it should decide which semantics are core, which belong behind extension points or policies, and which should remain intentionally unsupported for `1.0`.
 
 Focus:
 
@@ -574,18 +662,49 @@ Focus:
 * add compatibility and migration notes
 * expand test coverage around public surface area
 
+In addition, explicitly scope the domain-semantic design work that is not fully handled by the current payload-agnostic core:
+
+* contradictory events:
+  * define whether contradiction handling belongs in the core runtime, an extension hook, or a higher-layer policy model
+  * define what contradiction output should look like
+  * define strict versus non-strict behavior for contradiction detection
+* entity forks:
+  * define how logical entity identity is supplied
+  * define when two histories count as a fork
+  * define what unresolved fork output should look like
+  * define where human or domain-policy resolution begins
+* semantic duplicate detection for different IDs:
+  * define whether this is detection-only or merge-capable
+  * define what evidence a dedupe policy can use
+  * define replay-safe behavior
+  * define how operator visibility is preserved so semantic dedupe does not become silent history rewriting
+
 Questions to answer before `1.0.0`:
 
 * are confidence semantics stable enough to preserve?
-* is `CausalEvidence` expressive enough?
-* is streaming behavior honest and understandable?
-* are anomaly types sufficient for debugging and audits?
-* are the docs strong enough to prevent misuse?
+* are the current anomaly types sufficient for real debugging and audit work?
+* is the streaming behavior honest and understandable enough to preserve long-term?
+* which domain-semantic behaviors are part of the core contract?
+* which domain-semantic behaviors require extension hooks or policy interfaces?
+* what should the library explicitly not claim before `1.0.0`?
+
+Why this belongs here:
+
+* these questions affect the long-term public contract more than they affect short-term developer ergonomics
+* they are not just implementation tasks:
+  * they influence anomaly types
+  * they influence extension points
+  * they influence what the library is allowed to claim publicly
+* doing this work here reduces the risk of last-minute semantic churn near `1.0.0`
 
 Exit criteria:
 
 * the team would feel comfortable supporting the API long-term
-* major semantic churn is no longer expected
+* major semantic churn is no longer expected in the core release line
+* the boundary between core semantics and domain-semantic extension behavior is explicit
+* contradictory-event handling, entity-fork handling, and semantic dedupe across different IDs are each either:
+  * designed clearly enough to implement before `1.0.0`, or
+  * explicitly declared out of the `1.0.0` core claim surface
 
 ## `0.6.x` Operational Tooling And Integrations
 
@@ -709,6 +828,7 @@ Definition of done:
 * core semantics are stable
 * public API is intentional
 * docs and examples are strong
+* a public website exists for the current wiki content so the conceptual docs are easier to browse as a stable product surface
 * tests are meaningful
 * the package clearly solves a real event-integrity problem
 
@@ -716,6 +836,7 @@ Definition of done:
 
 * consumers can depend on the semantics
 * breaking changes become exceptional
+* the conceptual documentation has graduated from repo wiki pages into a real website suitable for long-term public reference
 * the package is ready for real production evaluation
 
 ## Post-`1.0`

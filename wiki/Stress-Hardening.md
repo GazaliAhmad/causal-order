@@ -1,93 +1,54 @@
 # Stress Hardening
 
-`causal-order` should not only look correct on small examples.
-It should stay honest when the input is large, corrupted, and operationally messy.
+Stress hardening exists to answer a different question from small semantic fixtures.
 
-That is the purpose of the `0.2.2` stress-hardening work.
+Small fixtures tell you whether the logic is correct on readable examples.
+Stress hardening tells you whether that same logic stays honest when the input becomes large, corrupted, and operationally messy.
 
-## Why This Matters
+## Why It Matters
 
-Small scenario fixtures answer questions like:
+Without stress work, a library can look correct while still hiding problems such as:
 
-* does replay corruption remain visible?
-* does weak cross-node evidence stay `unknown`?
-* does same-node sequence outrank misleading ingestion order?
+* anomaly-heavy performance cliffs
+* pathological allocation behavior
+* large-batch failure modes that never appear on tiny fixtures
 
-Those are necessary semantic checks.
-But they do not tell us what happens when the same failure shape is repeated across a large batch.
+For `causal-order`, the point of stress hardening is not abstract number chasing.
+It is to pressure-test realistic failure shapes at a size where implementation weaknesses become visible.
 
-Stress hardening exists to answer:
+## The Conceptual Rule
 
-* does the semantic model still hold under `150k` corrupted events?
-* do anomaly-heavy workloads expose hidden performance cliffs?
-* does the implementation remain usable when corruption is dense rather than rare?
+The important distinction is:
 
-## Current Workload Posture
+* benchmark numbers by themselves are not the product story
+* semantic honesty under ugly data is the product story
 
-The project now uses two practical workload bands:
+That is why the project treats corrupted-dataset stress work as credibility work, not just speed work.
 
-* `100k` is the routine credible batch band
-* `150k` is the corrupted-dataset stress band for hardening and visibility
+In practice, that means the stress suite should help answer questions like:
 
-This is deliberate.
+* does weak evidence still remain weak under pressure?
+* do anomalies stay visible instead of being flattened away?
+* does the implementation remain usable when corruption is dense?
 
-The point is not to chase the largest abstract number.
-The point is to pressure-test the kinds of ugly slices a real team might actually need to inspect together.
+## Why The `150k` Band Matters
 
-## Current Stress Matrix
+The `150k` stress band is best understood as a hardening envelope, not a bragging number.
 
-The current `150k` stress profiles cover:
+It is meant to represent a believable operational slice such as:
 
-* duplicate explosion density
-* inversion chain density
-* malformed-event ratios
-* sparse-causality graphs
-* massive same-timestamp clusters
-* replay storms
-* cyclic dependency attempts
-* sequence conflicts
+* a central server outage lasting several hours
+* many nodes continuing locally
+* a large delayed backlog arriving for reconciliation later
 
-These are concentrated versions of the same failure shapes already described in the scenario and case-study materials.
+So the scale matters because it makes the corruption patterns operationally meaningful, not because the project is trying to claim unlimited in-memory scale.
 
-## What This Work Proved
+## Where To Go Next
 
-The stress work was worthwhile for two reasons:
+For the canonical operational guide, profile shapes, commands, and benchmark interpretation, see:
 
-* it confirmed that the package semantics still hold under corrupted large-batch pressure
-* it exposed a real implementation bottleneck in the ordering queue path that small fixtures did not make obvious
+* [Stress Hardening guide](../guides/stress-hardening.md)
 
-That means the stress suite improved more than benchmark numbers.
-It improved the credibility of the package story.
+For the workload-shaping discussion around `100k`, `150k`, and when streaming becomes the more honest model, see:
 
-The project can now say not only:
-
-```txt
-our examples look right
-```
-
-but also:
-
-```txt
-our semantics still hold when the data gets ugly at scale
-```
-
-## What This Is Not
-
-This is not a claim that every caller should sort giant in-memory batches by default.
-
-For truly large or unbounded workloads, the more honest model is often:
-
-* streaming
-* batching
-* partitioning
-
-That is why `orderEventStream()` remains important.
-
-## The Main Lesson
-
-The key lesson from this work is simple:
-
-* targeted corrupted-dataset pressure is valuable
-* open-ended number chasing is not
-
-The stress suite matters because it is tied to specific operational corruption shapes, not because it uses a bigger number for its own sake.
+* [Realistic Workloads](Realistic-Workloads)

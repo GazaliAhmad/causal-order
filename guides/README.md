@@ -1,10 +1,14 @@
 # Guides
 
-These guides explain how to think about `causal-order` and why a distributed timeline can look clean while still being wrong.
+These guides are the practical, repository-coupled layer of the documentation.
+They explain how to use `causal-order`, how the main deployment patterns work, and how the current implementation behaves in real operational shapes.
+
+For the deeper conceptual layer, mental-model pages, and explanatory write-ups that are less tied to operational walkthroughs, see the wiki.
 
 Start here:
 
 * [Mental Model](./mental-model.md)
+* [Clocks, Causality, And Why HLC](./clocks-causality-and-why-hlc.md)
 * [Case Studies](./case-studies.md)
 * [Stress Hardening](./stress-hardening.md)
 * [After-Hours Batch Processing](./after-hours-batch-processing.md)

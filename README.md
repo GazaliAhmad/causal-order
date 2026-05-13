@@ -1,8 +1,8 @@
 # causal-order
 
-An event integrity library for distributed systems.
+An event integrity library for distributed systems that cannot rely on a globally synchronized clock.
 
-`causal-order` helps developers reconstruct event timelines without pretending the system knows more than it does.
+`causal-order` helps developers design and run event processing, replay, and recovery flows without pretending the system has one perfect global time source.
 
 Instead of only sorting by timestamp, it helps you:
 
@@ -26,6 +26,29 @@ That answer is often false.
 
 `causal-order` exists to make that uncertainty visible instead of hiding it.
 
+## Mental Model
+
+`causal-order` is built around a simple rule:
+
+> Be easy to use at the surface, but hard to misuse into false certainty.
+
+In practice, that means:
+
+* not every event set should be forced into one total order
+* explicit causal evidence outranks clock appearance
+* cross-node events without supported causal evidence should usually remain `unknown`
+* shared `traceId` or `partition` metadata does not, by itself, imply causality
+* streaming finality is operational, not causal truth
+
+Supported causal evidence today is intentionally narrow:
+
+* `parentEventId`
+* `dependencyEventIds`
+* same-node monotonic `sequence`
+
+This library is not trying to eliminate clocks.
+It is trying to stop treating wall-clock agreement as the truth model for a distributed system.
+
 ## What You Get
 
 Given a set of distributed events, the library returns more than a sorted list.
@@ -42,15 +65,6 @@ Confidence is explicit:
 * `derived`: order was inferred from useful but weaker metadata
 * `fallback`: deterministic ordering was imposed for stability
 * `unknown`: the library cannot honestly justify the claim
-
-Current semantic posture:
-
-* cross-node events without explicit supported causal evidence should usually remain `unknown`
-* supported causal evidence today is intentionally narrow:
-  * `parentEventId`
-  * `dependencyEventIds`
-  * same-node monotonic `sequence`
-* shared `traceId` or `partition` metadata does not, by itself, imply causality
 
 ## Install
 
@@ -125,71 +139,7 @@ Example output shape:
 The important part is not just the order.
 It is the explanation of why that order exists and how trustworthy it is.
 
-## Semantic Notes
-
-Two rules matter especially for current releases:
-
-* `concurrent` is not a polite word for "we don't know"
-* lack of a visible causal edge should usually stay `unknown`, especially across nodes
-
-That means:
-
-* explicit parent and dependency links can produce `proven` causal ordering
-* same-node monotonic sequence can produce strong ordering evidence
-* HLC, ingestion order, shared `traceId`, or shared `partition` metadata can still be useful without becoming causal proof
-
-## Common Workflow
-
-### 1. Create or ingest clocks
-
-```ts
-import { createHlcClock } from "causal-order"
-
-const clock = createHlcClock({
-  nodeId: "api-sg-1",
-})
-
-const event = {
-  id: "evt-1",
-  nodeId: "api-sg-1",
-  clock: clock.now(),
-  payload: { type: "user.created" },
-  sequence: 1n,
-}
-```
-
-### 2. Validate events
-
-```ts
-import { validateEvent } from "causal-order"
-
-const validation = validateEvent(event)
-
-if (!validation.valid) {
-  console.error(validation.errors)
-}
-```
-
-### 3. Order the batch honestly
-
-```ts
-import { orderEvents } from "causal-order"
-
-const result = orderEvents(events, {
-  strict: false,
-  detectAnomalies: true,
-})
-```
-
-### 4. Inspect confidence and evidence
-
-```ts
-for (const item of result.ordered) {
-  console.log(item.event.id, item.orderBasis, item.confidence)
-}
-```
-
-## Streaming
+## Streaming Overview
 
 For large or unbounded event flows, use `orderEventStream()` instead of pretending everything belongs in one in-memory batch.
 
@@ -199,11 +149,7 @@ That includes both:
 * delayed reconnect, offline sync, or recovery flows where late arrivals are part of normal operations
 
 ```ts
-import {
-  createProcessingTimeWatermark,
-  ingestedAtWatermark,
-  orderEventStream,
-} from "causal-order"
+import { orderEventStream } from "causal-order"
 
 for await (const batch of orderEventStream(source(), {
   batchSize: 100,
@@ -217,43 +163,16 @@ for await (const batch of orderEventStream(source(), {
 }
 ```
 
-Important rule:
+Keep this mental model in mind:
 
-* stream finality is operational, not causal certainty
-* `maxLateArrivalMs` is an operational lateness window, not a statement about whether causality is proven
-* an event may still be causally older with `proven` evidence, but be operationally too late for the current stream window and therefore handled through the configured late-arrival policy rather than as normal in-window output
+* the watermark controls operational readiness, not causal truth
+* late events are handled by explicit policy rather than being silently hidden
+* non-final output may need later reconciliation, especially in reconnect-heavy flows
 
-Watermark strategies:
+For the full stream contract, see:
 
-* the default watermark is conservative and event-driven, using validated event time rather than silently moving forward from system time
-* `ingestedAtWatermark` is an opt-in helper for queued or replayed flows where ingest time is the more honest operational progress signal
-* `createProcessingTimeWatermark()` is an opt-in helper for teams that want more liveness-oriented stream progress and are willing to own that tradeoff explicitly
-* if watermark progress depends only on observed events, an idle source can intentionally stall progress; use heartbeats, upstream progress signals, or an explicit opt-in watermark helper when you want different liveness behavior
-
-Example opt-in watermark override:
-
-```ts
-const watermark = createProcessingTimeWatermark({
-  floorToEventTime: true,
-})
-
-for await (const batch of orderEventStream(source(), {
-  batchSize: 100,
-  maxLateArrivalMs: 30_000n,
-  lateArrivalPolicy: "emit_correction",
-  watermark,
-  strict: false,
-})) {
-  console.log(batch.watermark, batch.isFinal)
-}
-```
-
-Streaming is not only an outage or recovery feature.
-It is also the honest model for routine live operations when:
-
-* events arrive continuously
-* watermark progress matters
-* you need explicit late-arrival handling instead of pretending every event is part of one perfect bounded batch
+* [Streaming Recovery And Resync](https://github.com/GazaliAhmad/causal-order/blob/main/guides/streaming-recovery-resync.md)
+* [Streaming Finality](https://github.com/GazaliAhmad/causal-order/wiki/Streaming-Finality)
 
 ## When To Use It
 
@@ -274,104 +193,61 @@ It is especially useful when:
 * concurrency matters
 * suspicious metadata should not be silently normalized
 
-## Realistic Workloads
+It is less useful when:
 
-This package is not designed around the idea that every user needs to sort millions of unrelated events in one call.
-
-The more realistic question is:
-how many events need to be interpreted together to answer one operational question honestly?
-
-Typical real-world ranges are more often:
-
-* `100` to `10,000` events for focused debugging or audit slices
-* `10,000` to `100,000` events for larger replay, sync, or incident workloads
-* `100,000+` events for heavier batch analysis, where benchmarking and batching matter
-
-A practical mental model is:
-
-* `10k` should feel easy
-* `100k` should feel solid
-* `150k` corrupted-dataset profiles are useful stress visibility for hardening work, but not yet the enforced baseline promise
-* million-scale workloads should be treated as an explicit scalability target, not the default assumption
-
-If the workload is naturally unbounded, `orderEventStream()` is the more honest model.
-
-## What The Package Believes
-
-`causal-order` is built around a simple idea:
-
-> Be easy to use at the surface, but hard to misuse into false certainty.
-
-That means:
-
-* `concurrent` is not the same thing as `unknown`
-* HLC ordering alone is useful, but not full proof
-* shared `traceId` or `partition` metadata does not, by itself, prove causality
-* deterministic output is not the same thing as justified causal order
-* invalid or weak metadata should become visible, not silently repaired
-
-## Why Not Just Use Clock Libraries?
-
-There are already npm packages for pieces of this problem:
-
-* vector clocks
-* version vectors
-* hybrid logical clocks
-* infrastructure-specific causal ordering primitives
-
-Those packages are useful, but they usually stop at the clock or ordering primitive itself.
-
-`causal-order` is trying to solve a different package-level problem:
-
-* validate distributed event records
-* order batches of events
-* surface concurrency explicitly
-* detect anomalies
-* return confidence and evidence with the result
-
-So the goal is not to replace clock libraries.
-It is to provide a higher-level event interpretation layer for developers who need an honest timeline, not just a timestamp primitive.
+* you already have authoritative causal ordering elsewhere
+* you only need a plain timestamp sort
 
 ## Documentation
 
-Conceptual docs:
+Start here:
 
 * [Wiki Home](https://github.com/GazaliAhmad/causal-order/wiki)
 * [What This Library Is](https://github.com/GazaliAhmad/causal-order/wiki/What-This-Library-Is)
-* [The Problem With Distributed Timelines](https://github.com/GazaliAhmad/causal-order/wiki/The-Problem-With-Distributed-Timelines)
-* [Confidence Levels](https://github.com/GazaliAhmad/causal-order/wiki/Confidence-Levels)
-* [Concurrent vs Unknown](https://github.com/GazaliAhmad/causal-order/wiki/Concurrent-vs-Unknown)
-* [Streaming Finality](https://github.com/GazaliAhmad/causal-order/wiki/Streaming-Finality)
-
-Repository guides:
-
-* [Guides Index](https://github.com/GazaliAhmad/causal-order/blob/main/guides/README.md)
 * [Mental Model](https://github.com/GazaliAhmad/causal-order/blob/main/guides/mental-model.md)
+* [Clocks, Causality, And Why HLC](https://github.com/GazaliAhmad/causal-order/blob/main/guides/clocks-causality-and-why-hlc.md)
+
+Streaming:
+
+* [Streaming Recovery And Resync](https://github.com/GazaliAhmad/causal-order/blob/main/guides/streaming-recovery-resync.md)
+* [Streaming Finality](https://github.com/GazaliAhmad/causal-order/wiki/Streaming-Finality)
+* [Streaming Recovery and Resync Wiki](https://github.com/GazaliAhmad/causal-order/wiki/Streaming-Recovery-and-Resync)
+
+Failure modes and case studies:
+
 * [Case Studies](https://github.com/GazaliAhmad/causal-order/blob/main/guides/case-studies.md)
-* [Stress Hardening](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stress-hardening.md)
-* [After-Hours Batch Processing](https://github.com/GazaliAhmad/causal-order/blob/main/guides/after-hours-batch-processing.md)
 * [Replay Corruption](https://github.com/GazaliAhmad/causal-order/blob/main/guides/replay-corruption.md)
 * [Multi-Region Drift](https://github.com/GazaliAhmad/causal-order/blob/main/guides/multi-region-drift.md)
 * [False Audit Timelines](https://github.com/GazaliAhmad/causal-order/blob/main/guides/false-audit-timeline.md)
 * [Offline Sync Anomalies](https://github.com/GazaliAhmad/causal-order/blob/main/guides/offline-sync-anomalies.md)
 * [Causal Inversion](https://github.com/GazaliAhmad/causal-order/blob/main/guides/causal-inversion.md)
 
-Runnable repository examples:
+Workloads and hardening:
+
+* [Stress Hardening](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stress-hardening.md)
+* [After-Hours Batch Processing](https://github.com/GazaliAhmad/causal-order/blob/main/guides/after-hours-batch-processing.md)
+* [Realistic Workloads](https://github.com/GazaliAhmad/causal-order/wiki/Realistic-Workloads)
+
+Runnable examples:
 
 * [Examples Index](https://github.com/GazaliAhmad/causal-order/blob/main/examples/README.md)
+* [Streaming Recovery And Resync Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/streaming-recovery-resync.mjs)
 
 ## Status
 
-`causal-order` is currently in the public `0.3.x` release line. `0.3.0` is the baseline streaming release, `0.3.1` is the next planned streaming semantic-tightening follow-up, and `0.3.2` is the intended streaming hardening follow-up.
+`causal-order` is in the public `0.3.x` release line.
 
-The recent release history reflects semantics hardening that began during late `0.1.x` preparation, continued through the `0.2.0` public baseline, passed through an internal `0.2.1` repo step, was followed by corrupted-dataset stress hardening in `0.2.2`, had an internal documentation follow-up in `0.2.3`, and now establishes the first public baseline streaming contract in `0.3.0`.
+Current release shape:
+
+* `0.3.1` is the current publish target and semantic-tightening follow-up to the published `0.3.0` baseline streaming release
+* `0.3.2` is the next production-gate hardening follow-up for the settled `0.3.1` semantics
+* `0.3.3` is the broader streaming hardening and pressure follow-up after that production-gate milestone
 
 That means:
 
 * the package is usable today
-* the API is expected to evolve
+* the API is still evolving
 * semantics matter more than surface churn at this stage
-* the current streaming work is split into the shipped `0.3.0` baseline contract, a `0.3.1` edge-case semantic-tightening pass, and a `0.3.2` pressure-testing follow-up
 * `1.0.0` is the point where the semantic contract should feel stable enough to preserve long-term
 
 ## Repository Development
@@ -390,12 +266,10 @@ Useful local commands:
 * `npm run demo`
 * `npm run examples`
 * `npm run bench`
+* `npm run bench:stream`
 * `npm run bench:all`
 * `npm run bench:csv`
 * `npm run bench:profile`
-
-The perf guard is intentionally a broad safety rail, not a machine-independent promise.
-It is meant to catch obvious regressions in realistic workload bands.
 
 Current benchmark posture:
 

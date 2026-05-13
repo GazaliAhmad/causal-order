@@ -82,6 +82,8 @@ function createStreamingPlateauEvents(profile) {
   const plateauSize = profile.plateauSize ?? 128
   const physicalTimeStepMs = profile.physicalTimeStepMs ?? 100n
   const nodeSequences = Array.from({ length: profile.nodeCount }, () => 0n)
+  const nodeLogicalCounters = Array.from({ length: profile.nodeCount }, () => 0)
+  const lastPhysicalTimeByNode = Array.from({ length: profile.nodeCount }, () => undefined)
   const lastEventIdByNode = Array.from({ length: profile.nodeCount }, () => undefined)
 
   return Array.from({ length: profile.totalEvents }, (_, index) => {
@@ -92,6 +94,12 @@ function createStreamingPlateauEvents(profile) {
 
     const plateauIndex = Math.floor(index / plateauSize)
     const physicalTimeMs = 1_000n + BigInt(plateauIndex) * physicalTimeStepMs
+    const previousPhysicalTimeMs = lastPhysicalTimeByNode[nodeIndex]
+    const logicalCounter = previousPhysicalTimeMs === physicalTimeMs
+      ? nodeLogicalCounters[nodeIndex] + 1
+      : 0
+    nodeLogicalCounters[nodeIndex] = logicalCounter
+    lastPhysicalTimeByNode[nodeIndex] = physicalTimeMs
     const id = `evt-${index + 1}`
     const parentEventId = lastEventIdByNode[nodeIndex]
     lastEventIdByNode[nodeIndex] = id
@@ -101,7 +109,7 @@ function createStreamingPlateauEvents(profile) {
       nodeId,
       clock: {
         physicalTimeMs,
-        logicalCounter: Number(sequence % 4n),
+        logicalCounter,
         nodeId,
       },
       payload: {

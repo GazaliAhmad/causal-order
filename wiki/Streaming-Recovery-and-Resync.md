@@ -1,148 +1,64 @@
 # Streaming Recovery and Resync
 
-`0.3.0` is where `causal-order` starts being honest about continuous streaming generally, not just bounded replay.
+Streaming recovery and resync is the point where distributed timelines stop being a neat batch problem and become an operational one.
 
-That includes both:
+This is not only about unusual outages.
+It also describes ordinary systems where:
 
-* ordinary daily stream processing where events keep arriving as part of normal operations
-* delayed reconnect, offline sync, and recovery flows where late arrivals are part of the operational reality
+* producers reconnect late
+* offline devices sync after a delay
+* central output must keep moving while delayed history still arrives
 
-This page focuses on the reconnect and resync slice of that broader streaming story, where:
+## Why It Matters
 
-* a local queue or offline device keeps producing events
-* the central system continues moving
-* reconnect happens later
-* the delayed batch must be merged back into a live stream without pretending nothing changed
+In a bounded replay, you can wait for the full set and then order it.
 
-## The Recovery Shape
+In a live stream, you usually cannot.
+The system has to emit useful output now while staying honest that:
 
-Typical flow:
+* more events may still arrive
+* some of those events may be operationally late
+* previously emitted non-final output may need reconciliation
 
-1. the central system emits and stores normal stream output
-2. one producer goes silent or disconnected
-3. other producers keep moving the watermark forward
-4. the silent producer reconnects and uploads its queued events
-5. those events may now be operationally late even when their own local sequence is still truthful
+That is why the streaming model uses:
 
-That is one important reason `0.3.0` has watermark, lateness, and correction behavior at all.
+* watermarks
+* lateness windows
+* late-arrival policies
+* provisional versus final output
 
-The same machinery also matters in normal daily operations when a live stream is simply too large or too continuous to model honestly as one bounded batch.
+## The Conceptual Rule
 
-## Recommended `0.3.0` Baseline
+The key distinction is:
 
-For delayed reconnect and resync flows, the most honest first baseline is usually:
+* causal truth is one question
+* operational readiness is another
 
-```ts
-import {
-  ingestedAtWatermark,
-  orderEventStream,
-} from "causal-order"
+A stream batch can be ready to emit because the watermark advanced enough for an operational decision.
+That does not mean the system has proved no older relevant event could still appear.
 
-for await (const batch of orderEventStream(source(), {
-  batchSize: 500,
-  maxLateArrivalMs: 30_000n,
-  lateArrivalPolicy: "emit_correction",
-  watermark: ingestedAtWatermark,
-  strict: false,
-})) {
-  await applyBatch(batch)
-}
-```
+In the current `0.3.1` contract, this also means:
 
-Why this shape:
+* correction scope is policy-based across previously emitted non-final output in the same stream instance
+* cross-window relational anomaly history is intentionally narrow
+* non-final output should be treated as replaceable derived state rather than as irreversible truth
 
-* `ingestedAtWatermark` lets central observation time drive stream progress during reconnect
-* `emit_correction` keeps late arrivals visible instead of silently dropping them
-* `strict: false` allows malformed reconnect payloads to surface as anomalies instead of taking down the whole stream immediately
+## Typical Deployment Shape
 
-For ordinary daily operations without reconnect-heavy behavior, the same `orderEventStream()` surface still applies.
-The main difference is usually the chosen watermark strategy and late-arrival policy, not whether streaming is conceptually the right model.
+This model is especially relevant when:
 
-## What `emit_correction` Means
+* a producer goes silent and reconnects later
+* the central server is down for several hours
+* nodes continue locally and sync once central availability returns
 
-In the `0.3.0` baseline contract, `lateArrivalPolicy: "emit_correction"` means:
+That is one of the reasons `causal-order` treats streaming as a first-class operational model rather than just an afterthought to bounded replay.
 
-* late events are still emitted
-* a correction-capable batch can be flushed immediately when that late event arrives
-* reconnect correction output may arrive as several batches rather than one giant replay bundle
-* `isFinal: false` means downstream output must still tolerate change
-* only the terminal batch is marked `isFinal: true`
+## Where To Go Next
 
-What it does not mean:
+For the full operational guide, stream contract details, downstream write patterns, and reconnect example, see:
 
-* the library does not rewrite your database for you
-* the library does not define a universal correction storage schema
-* the library does not claim that an emitted batch was causally complete just because it was operationally ready
+* [Streaming Recovery And Resync guide](../guides/streaming-recovery-resync.md)
 
-So the correction contract in `0.3.0` is:
+For the focused conceptual treatment of operational versus causal finality, see:
 
-* the library tells you output was ready enough to emit now
-* the library tells you when a late arrival means previously emitted state may need reconciliation
-* your downstream storage pattern decides how that reconciliation is applied
-
-## Safe Downstream Patterns
-
-The safest first `0.3.0` patterns are:
-
-* store ordered stream output as derived state, not as irreplaceable truth
-* keep raw events separately
-* keep anomalies separately
-* let reconnect correction batches update or rebuild the derived projection
-
-A practical table split is:
-
-* `raw_events`
-* `ordered_stream_events`
-* `stream_anomalies`
-* optional `stream_batches`
-
-## Append-Only Versus Mutable Projections
-
-If your downstream store is mutable:
-
-* treat non-final batches as provisional derived state
-* update or replace affected rows when correction-capable batches arrive
-
-If your downstream store is append-only:
-
-* persist the emitted batch
-* persist the late-arrival anomaly and correction-capable follow-up batch
-* run a separate reconciliation reader that understands newer derived output may supersede older output
-
-The important `0.3.0` rule is not "never emit early."
-It is "never hide that the output may still change."
-
-## Delayed Reconnect Example
-
-The repository includes a matching runnable example and scenario coverage for delayed reconnect behavior.
-
-The important `0.3.0` baseline is:
-
-* server-side events can be emitted first
-* device-local history can arrive later from a reconnecting queue
-* late-arrival anomalies should stay visible
-* reconnect events should stay visible instead of being silently dropped
-
-The richer cross-window semantic tightening around how far stream-local proof should carry is still part of the planned `0.3.1` follow-up, not the `0.3.0` baseline.
-
-## Relationship to Batch Replay
-
-This does not replace the simpler bounded replay story, and it also does not mean streaming is only for incidents.
-
-Use bounded batch replay when:
-
-* the backlog is naturally finite
-* you can wait for the full replay window
-* you want one bounded ordering pass before writing derived results
-
-Use this streaming recovery model when:
-
-* central output must keep moving while reconnects happen
-* watermark progress matters
-* operational lateness and correction behavior are part of the real problem
-
-Use the same streaming model for ordinary daily operations when:
-
-* events arrive continuously during normal business activity
-* you need rolling emitted output instead of one end-of-day ordering pass
-* late arrivals and provisional finality are normal operational concerns, not exceptional ones
+* [Streaming Finality](Streaming-Finality)

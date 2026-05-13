@@ -12,9 +12,11 @@ Recommended publish order:
 6. `Confidence-Levels`
 7. `Concurrent-vs-Unknown`
 8. `Streaming-Finality`
-9. `Realistic-Workloads`
-10. `Design-Philosophy`
-11. `When-to-Use-causal-order`
+9. `Streaming-Recovery-and-Resync`
+10. `Realistic-Workloads`
+11. `Stress-Hardening`
+12. `Design-Philosophy`
+13. `When-to-Use-causal-order`
 
 ## Notes
 
@@ -34,6 +36,8 @@ Recommended publish order:
 * `Confidence-Levels` -> [Confidence-Levels.md](./Confidence-Levels.md)
 * `Concurrent-vs-Unknown` -> [Concurrent-vs-Unknown.md](./Concurrent-vs-Unknown.md)
 * `Streaming-Finality` -> [Streaming-Finality.md](./Streaming-Finality.md)
+* `Streaming-Recovery-and-Resync` -> [Streaming-Recovery-and-Resync.md](./Streaming-Recovery-and-Resync.md)
 * `Realistic-Workloads` -> [Realistic-Workloads.md](./Realistic-Workloads.md)
+* `Stress-Hardening` -> [Stress-Hardening.md](./Stress-Hardening.md)
 * `Design-Philosophy` -> [Design-Philosophy.md](./Design-Philosophy.md)
 * `When-to-Use-causal-order` -> [When-to-Use-causal-order.md](./When-to-Use-causal-order.md)

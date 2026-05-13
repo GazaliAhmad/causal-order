@@ -9,15 +9,15 @@ import { isBigInt, isNonEmptyString, isSafeInteger } from "../internal/utils.js"
 
 export function validateClock(
   clock: HlcTimestamp,
-  options?: { maxDriftMs?: bigint; now?: () => bigint },
+  options?: { maxDriftMs?: bigint; now?: () => bigint; includeWarnings?: boolean },
 ): ValidationResult<ValidatedHlcTimestamp>
 export function validateClock(
   clock: unknown,
-  options?: { maxDriftMs?: bigint; now?: () => bigint },
+  options?: { maxDriftMs?: bigint; now?: () => bigint; includeWarnings?: boolean },
 ): ValidationResult<ValidatedHlcTimestamp>
 export function validateClock(
   clock: unknown,
-  options?: { maxDriftMs?: bigint; now?: () => bigint },
+  options?: { maxDriftMs?: bigint; now?: () => bigint; includeWarnings?: boolean },
 ): ValidationResult<ValidatedHlcTimestamp> {
   const errors: ValidationError[] = []
   const warnings: ValidationWarning[] = []
@@ -73,6 +73,7 @@ export function validateClock(
   }
 
   if (
+    options?.includeWarnings !== false &&
     currentTime !== undefined &&
     isBigInt(physicalTimeMs) &&
     physicalTimeMs > currentTime

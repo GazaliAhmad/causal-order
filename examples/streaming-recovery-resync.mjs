@@ -65,6 +65,8 @@ export async function run() {
     console.log(JSON.stringify({
       watermark: batch.watermark.toString(),
       isFinal: batch.isFinal,
+      correction: batch.correction ?? null,
+      anomalyHorizon: batch.anomalyHorizon,
       events: batch.events.map((entry) => ({
         id: entry.event.id,
         orderBasis: entry.orderBasis,
