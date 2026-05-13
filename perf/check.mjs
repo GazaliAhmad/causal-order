@@ -1,4 +1,9 @@
-import { printBenchmarkSummary, runBenchmarkCase } from "./benchmark-lib.mjs"
+import {
+  getProfile,
+  printBenchmarkSummary,
+  runBenchmarkCase,
+  runBenchmarkCaseAsync,
+} from "./benchmark-lib.mjs"
 
 function formatMemory(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MiB`
@@ -17,6 +22,14 @@ const policies = [
     profileName: "guard-100k-shuffled-no-anomalies",
     description: "larger-batch guardrail for catastrophic regressions in the realistic upper-range batch target",
     maxOrderingMs: 6_000,
+    maxHeapDeltaBytes: 256 * 1024 * 1024,
+    expectedOrderedEvents: 100_000,
+    expectedAnomalyCount: 0,
+  },
+  {
+    profileName: "streaming-100k-plateaus",
+    description: "streaming guardrail for the anomaly-free plateau benchmark so synthetic clock shapes do not silently drift",
+    maxOrderingMs: 2_000,
     maxHeapDeltaBytes: 256 * 1024 * 1024,
     expectedOrderedEvents: 100_000,
     expectedAnomalyCount: 0,
@@ -53,15 +66,21 @@ function assertPolicy(run, policy) {
   return failures
 }
 
-function runWithWarmup(profileName) {
-  runBenchmarkCase(profileName)
-  return runBenchmarkCase(profileName)
+async function runWithWarmup(profileName) {
+  const profile = getProfile(profileName)
+  if (profile.mode === "stream") {
+    await runBenchmarkCaseAsync(profile)
+    return runBenchmarkCaseAsync(profile)
+  }
+
+  runBenchmarkCase(profile)
+  return runBenchmarkCase(profile)
 }
 
 let failureCount = 0
 
 for (const policy of policies) {
-  const run = runWithWarmup(policy.profileName)
+  const run = await runWithWarmup(policy.profileName)
   printBenchmarkSummary(run)
   console.log(`Perf policy: ${policy.description}`)
 

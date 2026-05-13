@@ -34,6 +34,15 @@ This distinction is intentional.
 The goal is not to chase the biggest possible number.
 The goal is to pressure-test the kinds of ugly batches that real users might actually need to inspect together.
 
+One concrete real-world deployment example is a central server outage where:
+
+* the server is down for `4` to `8` hours
+* individual nodes continue producing events locally the whole time
+* reconnect or scheduled sync later pushes a large backlog into central reconciliation
+
+In that sense, the `150k` stress band is not only a lab exercise.
+It is a plausible deployment envelope for systems with many nodes or with busy nodes accumulating several hours of local history before sync.
+
 ## Stress Matrix
 
 Current `150k` corrupted-dataset stress profiles cover:

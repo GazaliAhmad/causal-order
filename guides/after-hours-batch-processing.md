@@ -14,6 +14,12 @@ Use this pattern when:
 * you want to replay and order a bounded backlog after midnight or during off-peak hours
 * the central DB should be updated in one controlled batch instead of many small live updates
 
+It also fits a very real deployment shape:
+
+* the central server or DB can be unavailable for `4` to `8` hours
+* individual nodes continue collecting and preserving local event history during that downtime
+* when the server returns, those bounded backlogs are synced and reconciled in a controlled batch
+
 This is not an outage-only pattern.
 It is a normal operating model for teams that prefer scheduled reconciliation.
 
@@ -96,6 +102,7 @@ During the day:
 
 * write raw events into a local queue, staging table, or append-only store
 * do not rewrite their original HLC or dependency metadata
+* let individual nodes continue independently even if the central server is down for hours
 
 After business hours:
 
@@ -175,6 +182,12 @@ The `150k` stress work makes this after-hours batch model more credible, because
 
 It is also usable on serious bounded backlogs.
 
+That `150k` band should be read as a real-world deployment example, not just a synthetic bragging number:
+
+* a central server can be down for `4` to `8` hours
+* several nodes can keep producing events locally during that outage
+* the resumed sync can easily produce a backlog large enough that serious bounded replay is the honest operational model
+
 ## Relationship To `0.3.0`
 
 This guide describes the batch recovery and scheduled reconciliation story.
@@ -185,7 +198,7 @@ That means:
 
 * batch mode uses HLC plus event metadata to order a finite replayed backlog
 * `0.3.0` streaming mode uses the same event model, but adds watermark, lateness, correction, and the current stream-facing parameters for both normal live operations and reconnect-heavy flows
-* `0.3.1` is where the remaining stream semantic edge cases should be tightened:
+* the completed `0.3.1` repo-state follow-up tightened the remaining stream semantic edge cases around:
   * watermark callback semantics
   * boundary rules for lateness vs readiness
   * cross-window anomaly behavior

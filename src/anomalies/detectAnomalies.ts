@@ -3,6 +3,7 @@ import type {
   EventEnvelope,
   HlcTimestamp,
   OrderOptions,
+  ValidationError,
   ValidationResult,
   ValidatedEventEnvelope,
 } from "../types.js"
@@ -21,11 +22,6 @@ const SEQUENCE_REGRESSION_MESSAGE = "Sequence regressed for node"
 const SAME_NODE_SEQUENCE_CONFLICT_MESSAGE = "Sequence conflict detected for node"
 const CAUSAL_INVERSION_MESSAGE = "Parent event appears after child by HLC order"
 
-type FirstSeenEventRecord<T> = {
-  event: EventEnvelope<T>
-  validation: ValidationResult<ValidatedEventEnvelope<T>>
-}
-
 function isClockAfter(
   a: HlcTimestamp,
   b: HlcTimestamp,
@@ -41,6 +37,34 @@ function isClockAfter(
   return a.nodeId > b.nodeId
 }
 
+function joinValidationMessages(errors: ValidationError[]): string {
+  if (errors.length === 0) {
+    return ""
+  }
+
+  let message = errors[0]?.message ?? ""
+  for (let index = 1; index < errors.length; index += 1) {
+    const error = errors[index]
+    if (error !== undefined) {
+      message += `; ${error.message}`
+    }
+  }
+
+  return message
+}
+
+function* iterateValidationRecords<T>(
+  events: EventEnvelope<T>[],
+  validationOptions: { maxClockDriftMs?: bigint },
+): Iterable<EventValidationRecord<T>> {
+  for (const event of events) {
+    yield {
+      event,
+      validation: validateEvent(event, validationOptions),
+    }
+  }
+}
+
 export function detectAnomalies<T>(
   events: EventEnvelope<T>[],
   options?: Pick<OrderOptions<T>, "maxClockDriftMs"> & {
@@ -48,7 +72,7 @@ export function detectAnomalies<T>(
   },
 ): EventAnomaly<T>[] {
   const anomalies: EventAnomaly<T>[] = []
-  const seenEventIds = new Map<string, FirstSeenEventRecord<T>>()
+  const seenEventIds = new Map<string, EventValidationRecord<T>>()
   const waitingChildrenByParentId = new Map<string, EventValidationRecord<T>[]>()
   const lastSequenceByNode = new Map<string, bigint>()
   const sequenceOwnerByNode = new Map<string, Map<bigint, EventEnvelope<T>>>()
@@ -56,13 +80,10 @@ export function detectAnomalies<T>(
   if (options?.maxClockDriftMs !== undefined) {
     validationOptions.maxClockDriftMs = options.maxClockDriftMs
   }
-  const validations = options?.validations ?? events.map((event) => ({
-    event,
-    validation: validateEvent(event, validationOptions),
-  }))
+  const validations = options?.validations ?? iterateValidationRecords(events, validationOptions)
 
   function maybePushCausalInversion(
-    parentRecord: FirstSeenEventRecord<T>,
+    parentRecord: EventValidationRecord<T>,
     childRecord: EventValidationRecord<T>,
   ): void {
     if (!parentRecord.validation.valid || !childRecord.validation.valid) {
@@ -86,7 +107,7 @@ export function detectAnomalies<T>(
         type: "invalid_clock",
         severity: "error",
         event,
-        message: validation.errors.map((error) => error.message).join("; "),
+        message: joinValidationMessages(validation.errors),
       })
     }
 
@@ -100,17 +121,18 @@ export function detectAnomalies<T>(
         })
       }
 
-      if (warning.code === "missing_sequence") {
-        anomalies.push({
-          type: "missing_sequence",
-          severity: "info",
-          event,
-          message: MISSING_SEQUENCE_MESSAGE,
-        })
-      }
     }
 
-    const currentRecord: FirstSeenEventRecord<T> = {
+    if (event.sequence === undefined) {
+      anomalies.push({
+        type: "missing_sequence",
+        severity: "info",
+        event,
+        message: MISSING_SEQUENCE_MESSAGE,
+      })
+    }
+
+    const currentRecord: EventValidationRecord<T> = {
       event,
       validation,
     }

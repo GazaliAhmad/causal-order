@@ -40,6 +40,12 @@ It is about staying anchored to the workloads teams actually inspect together.
 
 The important distinction is that `100k` is still the routine credible batch story, while `150k` is used to pressure-test anomaly-heavy and corruption-heavy workloads.
 
+That `150k` band is also a believable deployment example rather than just a benchmark tier:
+
+* a central server can be down for `4` to `8` hours
+* devices or nodes keep producing events locally during that outage
+* the resumed sync can create a backlog large enough that serious bounded replay is the honest operational model
+
 For more on that distinction, see [Stress Hardening](Stress-Hardening).
 
 ## Why Streaming Exists

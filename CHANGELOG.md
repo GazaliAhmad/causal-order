@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1]
+
+### Added
+
+* explicit streaming contract coverage for custom watermark signal semantics and the equality boundary between `ready` output and `late` output
+* machine-readable correction notices on streaming batches via `batch.correction` for `lateArrivalPolicy: "emit_correction"`
+* explicit streaming anomaly-horizon metadata via `batch.anomalyHorizon` covering the current `buffered_window_only` retained-history contract and `late_arrival_only` cross-window relational detection
+* targeted streaming coverage for non-trivial `batchSize` behavior, including lagging-watermark flush attempts, ready-subset emission, and reconnect correction fragmentation when `batchSize` is small
+* additional reconnect scenario coverage showing correction-capable batches, retained anomaly-horizon semantics, and multi-batch delayed-sync behavior
+
+### Changed
+
+* tightened the `0.3.x` streaming semantics around watermark callbacks so custom `watermark` functions are described as stream-progress signals rather than as the final emitted watermark directly
+* made the boundary contract explicit that events with `eventTime <= batch.watermark` are ready to flush while events with `eventTime < batch.watermark` are late
+* documented `emit_correction` more precisely as a policy-based reconciliation model whose current correction scope may reach any previously emitted non-final output in the same stream instance
+* documented the current cross-window anomaly contract more explicitly:
+  * emitted history is not retained for later duplicate, sequence-regression, same-node-sequence-conflict, causal-inversion, or unknown-order comparison
+  * cross-window relational anomaly carry is currently limited to operational `late_arrival`
+* clarified the current `batchSize` contract:
+  * `batchSize` triggers a safe flush attempt rather than forcing unready events out
+  * lagging-watermark cases may emit nothing or only the ready subset
+  * correction-triggered reconnect flushes may exceed nominal `batchSize`
+* strengthened downstream guidance for mutable, append-only, non-transactional, and partially transactional sinks so non-final output is treated as replaceable derived state and `batch.correction` is treated as a reconciliation signal rather than a patch payload
+* rewrote the README, guides, and wiki positioning to emphasize the safest honest claim:
+  * the library is designed for distributed systems that cannot rely on a globally synchronized clock
+  * it supports deployment-oriented event integrity without claiming globally complete ordering or universal production proof
+* expanded the operational documentation to describe realistic server-down deployment windows where central systems may be unavailable for `4` to `8` hours while individual nodes continue locally and sync later
+* reframed the `150k` stress band as a plausible real-world backlog envelope for delayed sync and bounded replay rather than only as an abstract benchmark tier
+
 ## [0.3.0]
 
 ### Added

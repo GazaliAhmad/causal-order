@@ -26,6 +26,9 @@ Examples:
 * a worker can observe a consequence before another service records the cause
 * two events can be truly concurrent, not merely hard to sort
 
+Those delays are not always tiny.
+In a real deployment, the central server can be down for `4` to `8` hours while individual nodes continue locally and only sync once central availability returns.
+
 ## The Real Design Question
 
 The problem is not whether these edge cases are real.

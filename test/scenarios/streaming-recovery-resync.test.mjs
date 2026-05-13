@@ -35,6 +35,15 @@ test("streaming recovery fixture surfaces correction-capable late arrivals durin
   )
   assert.ok(firstReconnectBatch)
   assert.equal(firstReconnectBatch?.isFinal, false)
+  assert.deepEqual(firstReconnectBatch?.anomalyHorizon, {
+    retainedEventHistory: "buffered_window_only",
+    crossWindowRelationalDetection: "late_arrival_only",
+  })
+  assert.deepEqual(firstReconnectBatch?.correction, {
+    reason: "late_arrival",
+    scope: "all_non_final_output",
+    triggerEventId: "draft-created",
+  })
 
   const reconnectEntries = batches
     .flatMap((batch) => batch.events)
@@ -50,4 +59,37 @@ test("streaming recovery fixture surfaces correction-capable late arrivals durin
   assert.ok(reconnectEntries.every((entry) => entry.confidence === "derived"))
 
   assert.equal(batches.at(-1)?.isFinal, true)
+})
+
+test("streaming recovery fixture can split reconnect correction flow into several batches when batchSize is small", async () => {
+  const fixture = streamingRecoveryResyncFixture()
+
+  async function* source() {
+    for (const event of fixture.events) {
+      yield event
+    }
+  }
+
+  const batches = await collectAsync(orderEventStream(source(), {
+    batchSize: 1,
+    maxLateArrivalMs: 500n,
+    lateArrivalPolicy: "emit_correction",
+    watermark: ingestedAtWatermark,
+    strict: false,
+  }))
+
+  const correctionBatches = batches.filter((batch) => batch.correction !== undefined)
+  assert.equal(correctionBatches.length, 3)
+  assert.deepEqual(
+    correctionBatches.map((batch) => batch.correction?.triggerEventId),
+    ["draft-created", "draft-edited", "draft-submitted"],
+  )
+
+  const firstCorrectionBatch = correctionBatches[0]
+  assert.ok(firstCorrectionBatch)
+  assert.ok((firstCorrectionBatch?.events.length ?? 0) > 1)
+  assert.deepEqual(
+    firstCorrectionBatch?.events.map((entry) => entry.event.id),
+    ["draft-created", "review-started", "notification-sent"],
+  )
 })

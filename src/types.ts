@@ -146,26 +146,94 @@ export type OrderOptions<T> = {
   maxClockDriftMs?: bigint
 }
 
+export type CorrectionScope = "all_non_final_output"
+
+export type CorrectionNotice = {
+  /**
+   * Why this batch should be treated as reconciliation-capable follow-up
+   * rather than ordinary in-window output.
+   */
+  reason: "late_arrival"
+  /**
+   * In the current streaming contract, correction reach is policy-based rather
+   * than watermark-bounded: any previously emitted non-final output in the
+   * same stream instance may need reconciliation.
+   */
+  scope: CorrectionScope
+  /**
+   * The late event that triggered the correction-capable batch.
+   */
+  triggerEventId: EventId
+}
+
+export type StreamAnomalyHorizon = {
+  /**
+   * Previously emitted events are not retained for later relational anomaly
+   * comparisons. Only the currently buffered window participates in
+   * duplicate/sequence/causal cross-event checks.
+   */
+  retainedEventHistory: "buffered_window_only"
+  /**
+   * Once earlier windows have been emitted, the only relational stream-wide
+   * anomaly still tracked is operational `late_arrival` against the active
+   * watermark.
+   */
+  crossWindowRelationalDetection: "late_arrival_only"
+}
+
 export type LateArrivalPolicy =
   | "flag"
   | "drop"
   | "emit_correction"
   | "fail"
 
+/**
+ * A monotonic stream-progress signal observed while processing an event.
+ * `orderEventStream()` converts the largest observed signal into the active
+ * stream watermark by subtracting `maxLateArrivalMs`.
+ */
+export type WatermarkSignal = bigint
+
+/**
+ * Returns the stream-progress signal contributed by an event. This is not
+ * necessarily the final emitted `batch.watermark`.
+ */
 export type WatermarkFunction<T> = (
   event: EventEnvelope<T>,
-) => bigint | undefined
+) => WatermarkSignal | undefined
 
 export type StreamOrderOptions<T> = OrderOptions<T> & {
   batchSize?: number
   maxLateArrivalMs?: bigint
   lateArrivalPolicy?: LateArrivalPolicy
+  /**
+   * Supplies the stream-progress signal used to advance the active watermark.
+   * The active `batch.watermark` is derived from the largest observed signal
+   * minus `maxLateArrivalMs`.
+   */
   watermark?: WatermarkFunction<T>
 }
 
 export type OrderBatch<T = unknown> = {
   events: OrderedEvent<T>[]
   anomalies: EventAnomaly<T>[]
+  /**
+   * The active operational watermark after applying `maxLateArrivalMs` to the
+   * largest observed stream-progress signal.
+   *
+   * Events with `eventTime <= watermark` are ready to flush.
+   * Events with `eventTime < watermark` are late.
+   */
   watermark: bigint
+  /**
+   * Describes what anomaly history this stream instance still retains after
+   * earlier windows have been emitted.
+   */
+  anomalyHorizon: StreamAnomalyHorizon
+  /**
+   * Present when the batch is a correction-capable follow-up triggered by a
+   * late arrival under `lateArrivalPolicy: "emit_correction"`.
+   */
+  correction?: CorrectionNotice
   isFinal: boolean
 }

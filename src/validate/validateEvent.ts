@@ -10,15 +10,15 @@ import { validateClock } from "./validateClock.js"
 
 export function validateEvent<T>(
   event: EventEnvelope<T>,
-  options?: { maxClockDriftMs?: bigint; now?: () => bigint },
+  options?: { maxClockDriftMs?: bigint; now?: () => bigint; includeWarnings?: boolean },
 ): ValidationResult<ValidatedEventEnvelope<T>>
 export function validateEvent(
   event: unknown,
-  options?: { maxClockDriftMs?: bigint; now?: () => bigint },
+  options?: { maxClockDriftMs?: bigint; now?: () => bigint; includeWarnings?: boolean },
 ): ValidationResult<ValidatedEventEnvelope<unknown>>
 export function validateEvent<T>(
   event: unknown,
-  options?: { maxClockDriftMs?: bigint; now?: () => bigint },
+  options?: { maxClockDriftMs?: bigint; now?: () => bigint; includeWarnings?: boolean },
 ): ValidationResult<ValidatedEventEnvelope<T>> {
   const errors: ValidationError[] = []
   const warnings: ValidationWarning[] = []
@@ -42,12 +42,15 @@ export function validateEvent<T>(
     })
   }
 
-  const clockOptions: { maxDriftMs?: bigint; now?: () => bigint } = {}
+  const clockOptions: { maxDriftMs?: bigint; now?: () => bigint; includeWarnings?: boolean } = {}
   if (options?.maxClockDriftMs !== undefined) {
     clockOptions.maxDriftMs = options.maxClockDriftMs
   }
   if (options?.now !== undefined) {
     clockOptions.now = options.now
+  }
+  if (options?.includeWarnings !== undefined) {
+    clockOptions.includeWarnings = options.includeWarnings
   }
 
   const clockValidation = validateClock(candidate?.clock, clockOptions)
@@ -65,7 +68,7 @@ export function validateEvent<T>(
     })
   }
 
-  if (candidate?.sequence === undefined) {
+  if (options?.includeWarnings !== false && candidate?.sequence === undefined) {
     warnings.push({
       code: "missing_sequence",
       message: "event.sequence is not present",

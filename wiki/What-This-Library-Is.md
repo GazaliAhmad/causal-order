@@ -1,8 +1,9 @@
 # What This Library Is
 
-`causal-order` is an event integrity library for distributed systems.
+`causal-order` is an event integrity library for distributed systems that cannot rely on a globally synchronized clock.
 
 It is designed for situations where events come from multiple services, devices, workers, regions, or replicas, and where ordinary wall-clock timestamps are not enough to tell a trustworthy story.
+The library's job is to help those systems stay operationally honest without requiring one perfect global time source.
 
 ## What It Does
 
@@ -13,6 +14,7 @@ At a high level, the library helps a developer:
 * preserve concurrency only when it can be justified honestly
 * flag anomalies and suspicious records
 * preserve the difference between strong evidence and weak inference
+* run batch and streaming workflows without pretending global clock sync is the truth model
 
 ## What It Is Not
 
@@ -42,4 +44,7 @@ But in distributed systems, clean-looking answers are often wrong.
 
 `causal-order` exists to make that uncertainty visible instead of hiding it.
 
-In the current `0.3.0` release line, that scope includes both bounded batch ordering and the baseline streaming contract for late arrivals, watermarks, and reconnect-heavy recovery flows.
+In the current `0.3.x` release line, that scope includes both bounded batch ordering and the streaming contract for late arrivals, watermarks, correction-capable output, and reconnect-heavy recovery flows.
+
+That means this library has become more than a nicer sort function.
+It is now a deployment-oriented event-integrity layer for event pipelines that need to survive drift, replay, late sync, and partial causal evidence without falling back to fake global-clock certainty.

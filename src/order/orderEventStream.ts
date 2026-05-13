@@ -1,22 +1,30 @@
 import type {
+  CorrectionNotice,
   EventAnomaly,
   EventEnvelope,
   LateArrivalPolicy,
   OrderBatch,
   StreamOrderOptions,
+  ValidationResult,
   ValidatedEventEnvelope,
   WatermarkFunction,
 } from "../types.js"
 import { detectAnomalies } from "../anomalies/detectAnomalies.js"
 import { getValidatedEventTime } from "../internal/utils.js"
-import { orderEvents } from "./orderEvents.js"
+import { orderValidatedEvents } from "./orderEvents.js"
 import { eventTimeWatermark } from "./watermarkStrategies.js"
 import { validateEvent } from "../validate/validateEvent.js"
 
 type BufferedEvent<T> = {
   event: ValidatedEventEnvelope<T>
   eventTime: bigint
+  validation: ValidationResult<ValidatedEventEnvelope<T>>
 }
+
+const STREAM_ANOMALY_HORIZON = {
+  retainedEventHistory: "buffered_window_only",
+  crossWindowRelationalDetection: "late_arrival_only",
+} as const
 
 const LATE_ARRIVAL_POLICIES: readonly LateArrivalPolicy[] = [
   "flag",
@@ -61,7 +69,7 @@ function assertValidStreamOptions<T>(
   }
 }
 
-function getCurrentWatermark(
+function getActiveWatermark(
   maxObservedWatermarkSignal: bigint,
   maxLateArrivalMs: bigint,
 ): bigint {
@@ -70,6 +78,20 @@ function getCurrentWatermark(
   }
 
   return maxObservedWatermarkSignal - maxLateArrivalMs
+}
+
+function isEventReadyForWatermark(
+  eventTime: bigint,
+  watermark: bigint,
+): boolean {
+  return eventTime <= watermark
+}
+
+function isEventLateForWatermark(
+  eventTime: bigint,
+  watermark: bigint,
+): boolean {
+  return eventTime < watermark
 }
 
 function resolveWatermarkSignal<T>(
@@ -82,7 +104,9 @@ function resolveWatermarkSignal<T>(
   }
 
   if (typeof value !== "bigint" || value < 0n) {
-    throw new Error("Watermark strategy must return a non-negative bigint or undefined")
+    throw new Error(
+      "Watermark function must return a non-negative bigint stream-progress signal or undefined",
+    )
   }
 
   return value
@@ -98,7 +122,9 @@ export async function* orderEventStream<T>(
   const maxLateArrivalMs = options?.maxLateArrivalMs ?? 30_000n
   const lateArrivalPolicy = options?.lateArrivalPolicy ?? "flag"
   const getWatermark = options?.watermark ?? eventTimeWatermark
-  const validationOptions: { maxClockDriftMs?: bigint } = {}
+  const validationOptions: { maxClockDriftMs?: bigint; includeWarnings?: boolean } = {
+    includeWarnings: false,
+  }
   if (options?.maxClockDriftMs !== undefined) {
     validationOptions.maxClockDriftMs = options.maxClockDriftMs
   }
@@ -111,13 +137,18 @@ export async function* orderEventStream<T>(
   const flushReady = (
     flushAll: boolean,
     isTerminal: boolean,
+    correction?: CorrectionNotice,
   ): OrderBatch<T> | undefined => {
-    const watermark = getCurrentWatermark(
+    const watermark = getActiveWatermark(
       maxObservedWatermarkSignal,
       maxLateArrivalMs,
     )
     lastFlushedWatermark = watermark
     const ready: ValidatedEventEnvelope<T>[] = []
+    const readyValidations: Array<{
+      event: ValidatedEventEnvelope<T>
+      validation: ValidationResult<ValidatedEventEnvelope<T>>
+    }> = []
     let writeIndex = 0
 
     for (let readIndex = 0; readIndex < buffer.length; readIndex += 1) {
@@ -126,8 +157,12 @@ export async function* orderEventStream<T>(
         continue
       }
 
-      if (flushAll || entry.eventTime <= watermark) {
+      if (flushAll || isEventReadyForWatermark(entry.eventTime, watermark)) {
         ready.push(entry.event)
+        readyValidations.push({
+          event: entry.event,
+          validation: entry.validation,
+        })
         continue
       }
 
@@ -142,7 +177,10 @@ export async function* orderEventStream<T>(
     }
 
     const result = ready.length > 0
-      ? orderEvents(ready, options)
+      ? orderValidatedEvents(ready, options, {
+          sourceEvents: ready,
+          validations: readyValidations,
+        })
       : {
           ordered: [],
           anomalies: [],
@@ -152,12 +190,19 @@ export async function* orderEventStream<T>(
       : pendingAnomalies
     pendingAnomalies = []
 
-    return {
+    const batch: OrderBatch<T> = {
       events: result.ordered,
       anomalies,
       watermark,
+      anomalyHorizon: STREAM_ANOMALY_HORIZON,
       isFinal: isTerminal && buffer.length === 0,
     }
+
+    if (correction !== undefined) {
+      batch.correction = correction
+    }
+
+    return batch
   }
 
   for await (const event of source) {
@@ -191,13 +236,13 @@ export async function* orderEventStream<T>(
     const validatedEventTime = validation.valid
       ? getValidatedEventTime(validation.value)
       : undefined
-    const currentWatermark = getCurrentWatermark(
+    const currentWatermark = getActiveWatermark(
       maxObservedWatermarkSignal,
       maxLateArrivalMs,
     )
     const isLate =
       validatedEventTime !== undefined &&
-      validatedEventTime < currentWatermark
+      isEventLateForWatermark(validatedEventTime, currentWatermark)
 
     if (isLate) {
       const anomaly: EventAnomaly<T> = {
@@ -231,6 +276,7 @@ export async function* orderEventStream<T>(
       buffer.push({
         event: validation.value,
         eventTime,
+        validation,
       })
     }
 
@@ -243,10 +289,14 @@ export async function* orderEventStream<T>(
       pendingAnomalies.length !== pendingAnomalyCountBefore
     const hasNewReadyEvent =
       validatedEventTime !== undefined &&
-      validatedEventTime <= currentWatermark
+      isEventReadyForWatermark(validatedEventTime, currentWatermark)
 
     if (shouldForceCorrectionFlush) {
-      const correctionBatch = flushReady(true, false)
+      const correctionBatch = flushReady(true, false, {
+        reason: "late_arrival",
+        scope: "all_non_final_output",
+        triggerEventId: event.id,
+      })
       if (correctionBatch !== undefined) {
         yield correctionBatch
       }
