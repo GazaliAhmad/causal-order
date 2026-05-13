@@ -176,12 +176,19 @@ For the full stream contract, see:
 
 ## When To Use It
 
-`causal-order` is a good fit for:
+`causal-order` is primarily for deployable operational event processing in distributed systems that cannot rely on one perfect global clock.
 
-* audit timeline reconstruction
-* replay analysis
-* multi-region debugging
+That includes:
+
+* continuous stream processing with explicit late-arrival and reconciliation behavior
+* delayed reconnect and recovery workflows
 * offline sync inspection
+* replay analysis
+
+Other strong use cases include:
+
+* multi-region debugging
+* audit timeline reconstruction
 * late-arrival stream handling
 * distributed incident analysis
 
