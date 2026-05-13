@@ -202,7 +202,10 @@ That means:
   * watermark callback semantics
   * boundary rules for lateness vs readiness
   * cross-window anomaly behavior
-* `0.3.2` is where the additional streaming pressure work should land:
+* `0.3.2` is the production-gate hardening milestone for the settled `0.3.1` semantics:
+  * release-gate coverage for the current contract
+  * stronger determinism and current-core verification
+* `0.3.3` is where the broader additional streaming pressure work should land:
   * pathological late arrivals
   * correction-window hardening
   * watermark pressure

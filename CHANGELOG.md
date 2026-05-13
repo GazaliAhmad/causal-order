@@ -74,7 +74,8 @@ All notable changes to this project will be documented in this file.
   * `0.2.2` batch recovery and scheduled reconciliation using HLC plus event metadata
   * `0.3.0` baseline streaming recovery semantics and the current stream-facing parameters
   * `0.3.1` edge-case streaming semantic tightening for watermark, lateness, correction, and cross-window behavior
-  * `0.3.2` streaming pressure, bounded-memory demonstration, and additional hardening coverage
+  * `0.3.2` production-gate hardening for the settled `0.3.1` semantics
+  * `0.3.3` broader streaming pressure, bounded-memory hardening, and follow-up optimization after that production gate
 * improved docs cross-linking between case studies, stress hardening, and the new after-hours batch processing guide
 
 ## [0.2.2]

@@ -239,9 +239,9 @@ Runnable examples:
 
 Current release shape:
 
-* `0.3.0` is the published baseline streaming release
-* `0.3.1` is the completed semantic-tightening follow-up in the current repo state
-* `0.3.2` is the next hardening and pressure-focused follow-up
+* `0.3.1` is the current publish target and semantic-tightening follow-up to the published `0.3.0` baseline streaming release
+* `0.3.2` is the next production-gate hardening follow-up for the settled `0.3.1` semantics
+* `0.3.3` is the broader streaming hardening and pressure follow-up after that production-gate milestone
 
 That means:
 
