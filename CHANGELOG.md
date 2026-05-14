@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.2]
+
+### Added
+
+* explicit `0.3.2` production-gate documentation for the current release line
+* direct release-gate coverage for the current-core hardening categories:
+  * missing parent events
+  * offline device merge
+  * duplicate event storms for exact duplicate IDs
+  * clock reset scenarios
+  * massive out-of-order replay
+  * partial log corruption
+* direct streaming release-gate pressure coverage for:
+  * pathological late arrivals
+  * reconnect correction pressure
+  * watermark pressure
+  * lagging-watermark plus `batchSize` pressure
+  * bounded-memory cross-window behavior
+* seeded batch fuzz coverage for outage, replay, duplicate, drift, and corruption noise
+* seeded streaming reconnect fuzz coverage for reproducible late-arrival and correction behavior
+* explicit anomaly-surface audit documentation for the `0.3.2` production gate
+* dedicated fuzz-testing documentation in `guides/` plus a matching conceptual wiki page
+
+### Changed
+
+* aligned the README, guides, roadmap, and wiki around the `0.3.2` production-gate hardening story
+* clarified that the current fuzz layer is part of the `0.3.2` release gate while broader exploratory fuzz campaigns remain part of `0.3.3`
+* narrowed CI to pull requests into `main` so merged PRs do not rerun the same matrix after passing branch validation
+* updated CI path filtering so workflow changes count as code-facing changes while docs-only PRs still skip the test matrix
+
 ## [0.3.1]
 
 ### Added
@@ -14,7 +44,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-* tightened the `0.3.x` streaming semantics around watermark callbacks so custom `watermark` functions are described as stream-progress signals rather than as the final emitted watermark directly
+* tightened the `0.3.1` streaming semantics around watermark callbacks so custom `watermark` functions are described as stream-progress signals rather than as the final emitted watermark directly
 * made the boundary contract explicit that events with `eventTime <= batch.watermark` are ready to flush while events with `eventTime < batch.watermark` are late
 * documented `emit_correction` more precisely as a policy-based reconciliation model whose current correction scope may reach any previously emitted non-final output in the same stream instance
 * documented the current cross-window anomaly contract more explicitly:
@@ -53,31 +83,6 @@ All notable changes to this project will be documented in this file.
 * reduced stream flush overhead by avoiding repeated buffer rescans when watermark progress and flush readiness have not changed
 * extended the perf harness so streaming profiles can run through the same reporting flow as batch profiles
 
-## [0.2.3]
-
-### Notes
-
-* internal repo follow-up after the published `0.2.2` release
-* not intended as a separate npm publication
-
-### Added
-
-* after-hours batch processing guide covering scheduled replay, HLC-backed batch ordering, recommended DB table patterns, and how batch mode relates to the later streaming story
-
-### Changed
-
-* corrected the `0.2.x` publish history wording so the docs now distinguish:
-  * published `0.2.0` baseline
-  * internal `0.2.1` repo step
-  * published `0.2.2` stress-hardening follow-up
-* clarified the `0.3.x` roadmap to distinguish:
-  * `0.2.2` batch recovery and scheduled reconciliation using HLC plus event metadata
-  * `0.3.0` baseline streaming recovery semantics and the current stream-facing parameters
-  * `0.3.1` edge-case streaming semantic tightening for watermark, lateness, correction, and cross-window behavior
-  * `0.3.2` production-gate hardening for the settled `0.3.1` semantics
-  * `0.3.3` broader streaming pressure, bounded-memory hardening, and follow-up optimization after that production gate
-* improved docs cross-linking between case studies, stress hardening, and the new after-hours batch processing guide
-
 ## [0.2.2]
 
 ### Added
@@ -93,12 +98,6 @@ All notable changes to this project will be documented in this file.
 * aligned the README, roadmap, examples, guides, and wiki to the completed `0.2.2` stress-hardening story
 * explicitly parked the next meaningful streaming optimization work under `0.3.0` instead of extending the `0.2.x` line further
 
-## [0.2.1]
-
-### Changed
-
-* internal intermediate `0.2.x` repo step between the published `0.2.0` baseline and the dedicated corrupted-dataset stress-testing work later tracked as `0.2.2`
-
 ## [0.2.0]
 
 ### Added
@@ -111,8 +110,6 @@ All notable changes to this project will be documented in this file.
 
 * package version advanced to `0.2.0`
 * npm publishing automation now uses npm trusted publishing via GitHub Actions OIDC instead of a long-lived npm token
-* CI workflow now runs only for code-facing changes instead of docs, wiki, or workflow-only edits
-* `.gitignore` now ignores all local `.npm-cache*` directories created during npm publish and dry-run checks
 * cross-node events without explicit supported causal evidence now remain `unknown` instead of being grouped as `concurrent`
 * roadmap guidance now makes `0.2.0` semantics explicit for `concurrent` vs `unknown`, and clarifies that `traceId` and `partition` remain non-causal metadata in that release line
 * exported causal evidence and ordering option types now match the currently supported runtime semantics more closely, removing unsupported evidence variants and the unused `getPartition` option
