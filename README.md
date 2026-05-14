@@ -233,9 +233,16 @@ Workloads and hardening:
 
 * [Production Gate `0.3.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/production-gate-0.3.2.md)
 * [Anomaly Surface Audit `0.3.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/anomaly-surface-0.3.2.md)
+* [Fuzz Testing `0.3.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/fuzz-testing-0.3.2.md)
 * [Stress Hardening](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stress-hardening.md)
 * [After-Hours Batch Processing](https://github.com/GazaliAhmad/causal-order/blob/main/guides/after-hours-batch-processing.md)
 * [Realistic Workloads](https://github.com/GazaliAhmad/causal-order/wiki/Realistic-Workloads)
+
+The `0.3.2` hardening story is now explicit:
+
+* production-gate criteria define what the current contract must prove
+* anomaly-surface notes explain what the runtime can and cannot currently signal
+* seeded fuzz coverage pressure-tests outage, replay, reconnect, duplicate, and clock-noise cases reproducibly
 
 Runnable examples:
 
@@ -248,9 +255,15 @@ Runnable examples:
 
 Current release shape:
 
-* `0.3.1` is the current publish target and semantic-tightening follow-up to the published `0.3.0` baseline streaming release
-* `0.3.2` is the next production-gate hardening follow-up for the settled `0.3.1` semantics
-* `0.3.3` is the broader streaming hardening and pressure follow-up after that production-gate milestone
+* `0.3.2` is the current production-gate hardening release
+* `0.3.3` is the next broader streaming hardening and pressure follow-up after that production-gate milestone
+
+Current `0.3.2` repo work is centered on:
+
+* explicit production gates
+* current-core release-blocking coverage
+* anomaly-surface clarity
+* seeded batch and streaming fuzz coverage for realistic outage and reconnect noise
 
 That means:
 
@@ -280,6 +293,12 @@ Useful local commands:
 * `npm run bench:all`
 * `npm run bench:csv`
 * `npm run bench:profile`
+
+Current test posture:
+
+* `npm test` includes the direct release-gate suites plus seeded `0.3.2` fuzz coverage
+* the fuzz layer currently covers batch outage/replay noise and streaming reconnect noise
+* broader exploratory fuzz campaigns remain part of the planned `0.3.3` pressure expansion
 
 Current benchmark posture:
 

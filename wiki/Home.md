@@ -30,6 +30,7 @@ If you are new to the project, read these pages first:
 * [Streaming Finality](Streaming-Finality)
 * [Streaming Recovery and Resync](Streaming-Recovery-and-Resync)
 * [Realistic Workloads](Realistic-Workloads)
+* [Operational Fuzzing](Operational-Fuzzing)
 * [Stress Hardening](Stress-Hardening)
 * [Design Philosophy](Design-Philosophy)
 * [When to Use causal-order](When-to-Use-causal-order)

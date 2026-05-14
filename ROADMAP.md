@@ -551,6 +551,22 @@ Focus:
   * watermark pressure
   * lagging-watermark plus `batchSize` pressure
   * bounded-memory and backpressure behavior
+* add a seeded operational fuzz suite for the current contract so realistic outage and recovery randomness can be replayed exactly:
+  * randomized delays simulating `4` to `8` hour outage backlog
+  * randomized drops simulating local node fire-and-forget behavior
+  * randomized exact-duplicate uploads simulating manual plus automatic replay
+  * randomized reordering simulating after-hours batch jobs and delayed processing
+  * randomized clock drift simulating wrong-time clinic or hospital workstations
+  * randomized concurrency storms simulating many nodes updating at once
+* keep the first fuzz suite scoped to current-core and current-stream semantics rather than future domain-aware merge policy:
+  * same seed must reproduce the same ordered output
+  * same seed must reproduce the same anomaly output
+  * shuffled arrival order must not change causally justified conclusions
+  * exact duplicate IDs must remain visible
+  * invalid clocks must not be silently normalized
+  * same-node sequence truth must survive replay, reconnect, and delay noise
+  * stream late-arrival handling must match the configured policy
+  * conflicting-edit fuzzing may be explored only insofar as it checks current-core honesty, not domain-aware merge semantics
 * align tests, perf checks, docs, and release policy so the repo makes one consistent claim about what is currently production-credible
 
 Why this should be a separate milestone:
@@ -575,6 +591,7 @@ Exit criteria:
 * the current-core gate categories have direct automated coverage with release-blocking assertions
 * deterministic behavior is explicitly tested across repeated runs and shuffled inputs for the covered categories
 * streaming pressure behavior is covered strongly enough that the current streaming contract is operationally credible rather than only conceptually described
+* seeded fuzz failures are reproducible enough that a failing operational scenario can be rerun from its recorded seed
 * docs and release wording do not claim more than the tested current-core semantics can honestly support
 
 ## `0.3.3` Streaming Hardening And Pressure
@@ -589,6 +606,10 @@ Focus:
 * continue optimizing the `flushReady()` path so remaining repeated scans, compaction, and pressure behavior do not become the next streaming performance cliff
 * continue profiling and tightening anomaly-heavy batch and stream paths, especially where large anomaly volumes create GC pressure or throughput cliffs
 * extend streaming stress coverage beyond the minimum release-gate set once the baseline production gates are already in place
+* add longer-running exploratory seeded fuzz campaigns beyond the `0.3.2` release-gate suite:
+  * use higher-cardinality randomized outage, recovery, replay, and concurrency runs to expose sustained pressure behavior
+  * use these campaigns to discover correction-window churn, watermark-lag, memory-growth, and throughput cliffs that smaller release-gate fuzzing is not designed to exhaust
+  * treat these campaigns as hotspot-discovery and pressure-evidence tooling rather than as the primary correctness gate for the current contract
 * pressure-test correction-window behavior during resync and delayed reconnect flows beyond small semantic fixtures
 * extend watermark-pressure coverage from correctness-only toward sustained operational pressure
 * strengthen bounded-memory demonstrations and backpressure guidance with more explicit heavy-pressure cases
@@ -853,6 +874,46 @@ Possible directions after stability:
 
 These should only happen if they strengthen the event integrity story.
 The package should not drift into becoming a database, queue, tracing platform, or generic distributed systems framework.
+
+## Tentative Ideas
+
+These are not assigned to a release line yet.
+They are here to capture potentially important directions without implying commitment, sequencing, or near-term scope.
+
+### Causal Timestamp API
+
+One tentative direction is to design a smaller causal timestamp primitive that could sit beneath libraries like `causal-order`, or be used independently by runtimes, databases, storage engines, replication layers, and sync systems.
+
+The appeal of this idea is not "another timestamp format."
+The appeal would be a portable causal-time primitive that can be created, merged, compared, serialized, and interpreted honestly across environments that cannot rely on one globally synchronized clock.
+
+If explored, this should stay intentionally small.
+It should not turn into:
+
+* a database protocol
+* a tracing platform
+* a CRDT framework
+* a broad distributed-systems abstraction layer
+
+The most promising shape would likely focus on a narrow contract such as:
+
+* create or advance a causal timestamp
+* receive or merge a remote timestamp
+* compare two timestamps
+* serialize and parse them safely
+* explain whether a comparison represents causal proof, monotonic same-node progression, a weaker derived hint, or an honest inability to justify more
+
+Why this might matter:
+
+* many systems have wall-clock timestamps but no honest causal-time primitive
+* a portable causal timestamp surface could be useful outside this library
+* `causal-order` itself could eventually consume that primitive rather than being the only place the model lives
+
+This idea should remain tentative until there is enough clarity on whether it is:
+
+* a reusable low-level primitive
+* a separately publishable library
+* or simply an internal conceptual foundation for later work
 
 ## Success Criteria
 

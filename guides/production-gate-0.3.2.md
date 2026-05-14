@@ -82,6 +82,7 @@ The goal is to make the current core claims auditable.
 For the current audit of that surface, see:
 
 * [Anomaly Surface Audit `0.3.2`](./anomaly-surface-0.3.2.md)
+* [Fuzz Testing `0.3.2`](./fuzz-testing-0.3.2.md)
 
 ## Verification Commands
 
@@ -97,6 +98,8 @@ npm run release:check
 ```
 
 As `0.3.2` progresses, the release gate should become easier to map directly to these commands and to the tests they cover.
+
+The seeded fuzz suite is now part of that production-gate evidence rather than only a future roadmap item.
 
 ## Docs And Release Wording
 
