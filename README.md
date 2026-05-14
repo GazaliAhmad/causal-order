@@ -231,9 +231,9 @@ Failure modes and case studies:
 
 Workloads and hardening:
 
-* [Production Gate `0.3.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/production-gate-0.3.2.md)
-* [Anomaly Surface Audit `0.3.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/anomaly-surface-0.3.2.md)
-* [Fuzz Testing `0.3.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/fuzz-testing-0.3.2.md)
+* [Production Gate `0.3.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/production-gate-0.3.2.md)
+* [Anomaly Surface Audit `0.3.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/anomaly-surface-0.3.2.md)
+* [Fuzz Testing `0.3.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/fuzz-testing-0.3.2.md)
 * [Stress Hardening](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stress-hardening.md)
 * [After-Hours Batch Processing](https://github.com/GazaliAhmad/causal-order/blob/main/guides/after-hours-batch-processing.md)
 * [Realistic Workloads](https://github.com/GazaliAhmad/causal-order/wiki/Realistic-Workloads)

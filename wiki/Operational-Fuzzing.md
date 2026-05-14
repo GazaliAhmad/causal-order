@@ -45,6 +45,6 @@ That later work should widen into:
 
 For the repository-coupled operational details, see:
 
-* [`guides/fuzz-testing-0.3.2.md`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/fuzz-testing-0.3.2.md)
+* [`guides/hardening/fuzz-testing-0.3.2.md`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/fuzz-testing-0.3.2.md)
 
 That guide explains the current seeded fuzz scope, the current invariants, and how the `0.3.2` production gate uses the fuzz suite today.
