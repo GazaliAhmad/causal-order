@@ -306,7 +306,7 @@ Useful local commands:
 Current test posture:
 
 * `npm test` includes the direct release-gate suites plus seeded `0.3.2` fuzz coverage
-* the fuzz layer currently covers batch outage/replay noise and streaming reconnect noise
+* the fuzz layer currently covers batch outage/replay noise plus streaming reconnect, fragmented watermark-lag, correction-burst, sustained correction-churn, and reconnect-burst pressure
 * broader exploratory fuzz campaigns remain part of the planned `0.3.3` pressure expansion
 
 Current benchmark posture:

@@ -156,6 +156,13 @@ The `0.3.2` fuzz layer is the bounded, reproducible release-gate suite.
 
 These runs should be treated as repeatable pressure evidence and hotspot-discovery tooling.
 
+The current exploratory layer now includes seeded stream fuzz coverage for:
+
+* fragmented watermark-lag pressure
+* correction-burst pressure
+* sustained correction-churn pressure
+* fragmented reconnect-burst pressure
+
 They should not replace the named `0.3.2` release-gate suite as the primary correctness gate for the current contract.
 
 ## Correction-Window And Reconnect Pressure

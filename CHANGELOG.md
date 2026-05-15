@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 * dedicated `0.3.3` stream stress profiles for correction churn, watermark lag, fragmented ready subsets, and anomaly-heavy reconnect backlog
 * explicit `150k` and `250k` watermark-lag stream profiles so broader `0.3.3` pressure work has named higher-scale visibility targets
 * exploratory `0.3.3` streaming fuzz coverage for fragmented watermark-lag pressure and correction-burst pressure with seeded reproducibility checks
+* additional `0.3.3` streaming fuzz coverage for sustained correction-churn pressure and fragmented reconnect-burst pressure
 * richer streaming benchmark visibility for:
   * correction-batch counts
   * late-arrival counts
