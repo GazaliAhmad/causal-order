@@ -8,6 +8,7 @@ For the deeper conceptual layer, mental-model pages, and explanatory write-ups t
 Start here:
 
 * [Mental Model](./mental-model.md)
+* [How Order Is Written](./how-order-is-written.md)
 * [Clocks, Causality, And Why HLC](./clocks-causality-and-why-hlc.md)
 * [Case Studies](./case-studies.md)
 * [Stress Hardening](./stress-hardening.md)
@@ -19,6 +20,8 @@ Release-specific hardening:
 * [Production Gate `0.3.2`](./hardening/production-gate-0.3.2.md)
 * [Anomaly Surface Audit `0.3.2`](./hardening/anomaly-surface-0.3.2.md)
 * [Fuzz Testing `0.3.2`](./hardening/fuzz-testing-0.3.2.md)
+* [Streaming Hardening And Pressure `0.3.3`](./hardening/streaming-hardening-0.3.3.md)
+* [Implementation Guide `0.3.3`](./hardening/implementation-guide-0.3.3.md)
 
 Failure-mode guides:
 

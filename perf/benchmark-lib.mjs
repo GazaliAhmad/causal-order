@@ -3,6 +3,7 @@ import { dirname } from "node:path"
 import { performance } from "node:perf_hooks"
 import { orderEventStream, orderEvents } from "../dist/index.js"
 import { stressBenchmarkProfiles } from "./stress-profiles.mjs"
+import { streamStressBenchmarkProfiles } from "./stream-stress-profiles.mjs"
 
 function createGenerator({
   nodeCount,
@@ -383,6 +384,7 @@ export const benchmarkProfiles = {
       detectAnomalies: false,
     },
   },
+  ...streamStressBenchmarkProfiles,
   ...stressBenchmarkProfiles,
 }
 
