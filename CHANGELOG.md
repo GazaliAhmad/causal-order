@@ -8,6 +8,12 @@ All notable changes to this project will be documented in this file.
 
 * dedicated `0.3.3` stream stress profiles for correction churn, watermark lag, fragmented ready subsets, and anomaly-heavy reconnect backlog
 * explicit `150k` and `250k` watermark-lag stream profiles so broader `0.3.3` pressure work has named higher-scale visibility targets
+* exploratory `0.3.3` streaming fuzz coverage for fragmented watermark-lag pressure and correction-burst pressure with seeded reproducibility checks
+* richer streaming benchmark visibility for:
+  * correction-batch counts
+  * late-arrival counts
+  * empty emitted batches
+  * max anomalies per batch
 
 ### Changed
 
@@ -15,6 +21,10 @@ All notable changes to this project will be documented in this file.
   * `100k` remains the routine comparison band
   * `150k` is the main stream stress-visibility band
   * `250k` remains exploratory stretch visibility rather than a routine guard target
+* fixed the `streaming-100k-watermark-lag` synthetic profile so same-node clock behavior stays monotonic under plateau-style time pressure and the profile no longer generates malformed `causal_inversion` noise
+* extended benchmark visibility with start, end, and peak heap sampling, peak RSS, and best-effort GC metrics so `0.3.3` memory-pressure work is observable before it becomes enforceable
+* documented current `0.3.3` forced-GC evidence for the `150k` and `250k` watermark-lag stream profiles as descriptive hardening evidence rather than as a hard guard
+* clarified the docs so bounded batch recovery, replay, reconciliation, and audit-style workloads are described as the stronger current deployment story, while the larger remaining proof bar stays on streaming
 
 ## [0.3.2]
 

@@ -245,6 +245,8 @@ The `0.3.2` hardening story is now explicit:
 * production-gate criteria define what the current contract must prove
 * anomaly-surface notes explain what the runtime can and cannot currently signal
 * seeded fuzz coverage pressure-tests outage, replay, reconnect, duplicate, and clock-noise cases reproducibly
+* bounded batch recovery, replay, and audit-style workloads are the stronger current deployment story within the existing contract
+* the larger remaining proof bar is on long-running streaming behavior rather than on bounded batch ordering
 
 Runnable examples:
 
@@ -266,6 +268,11 @@ Current `0.3.2` repo work is centered on:
 * current-core release-blocking coverage
 * anomaly-surface clarity
 * seeded batch and streaming fuzz coverage for realistic outage and reconnect noise
+
+Current deployment posture:
+
+* bounded batch recovery, replay, reconciliation, and audit-style workloads are the stronger production-credible side of the current contract
+* the main remaining operational hardening work is on prolonged and constrained-runtime streaming behavior
 
 That means:
 

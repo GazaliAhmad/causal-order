@@ -55,6 +55,21 @@ So `0.3.3` should treat memory in two layers:
 
 The current milestone should strengthen the second layer without pretending it already has stable enough numbers to enforce broadly in CI.
 
+For the current benchmark tooling, that visibility should include simple observable signals such as:
+
+* start, end, and peak heap
+* peak RSS
+* best-effort GC event counts and durations
+
+Those numbers should remain descriptive for now rather than treated as hard release thresholds.
+
+Current local evidence for this sub-goal is encouraging but still observational.
+Using `--expose-gc` with the `streaming-150k-watermark-lag` and `streaming-250k-watermark-lag` profiles, the measured heap growth during the run was reclaimed cleanly after an explicit forced GC.
+That is useful evidence that the larger `0.3.3` stream-pressure profiles are exercising transient working-set growth rather than showing an obvious retained-heap leak.
+
+That evidence should not be promoted to a hard guard yet.
+It is still a local visibility signal, not a stable CI threshold.
+
 ## Why This Follows `0.3.2`
 
 `0.3.2` is the release gate.
@@ -229,6 +244,14 @@ And where practical, those commands should expose memory-pressure evidence clear
 * which profiles keep pending state small?
 * which profiles allow large buffered accumulation?
 * which workloads create fragmentation or churn without obvious correctness failure?
+
+For example, the current `150k` and `250k` watermark-lag profiles can now be rerun with `--expose-gc` to compare:
+
+* heap before the run
+* heap after the run
+* heap after an explicit forced GC
+
+That is useful `0.3.3` evidence even before the repo decides whether any part of it belongs in an enforced benchmark policy.
 
 ## Docs And Release Wording
 

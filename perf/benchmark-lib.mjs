@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises"
 import { dirname } from "node:path"
-import { performance } from "node:perf_hooks"
+import { PerformanceObserver, performance } from "node:perf_hooks"
 import { orderEventStream, orderEvents } from "../dist/index.js"
 import { stressBenchmarkProfiles } from "./stress-profiles.mjs"
 import { streamStressBenchmarkProfiles } from "./stream-stress-profiles.mjs"
@@ -133,6 +133,67 @@ function formatMemory(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MiB`
 }
 
+function createResourceObserver() {
+  let peakHeapUsedBytes = 0
+  let peakRssBytes = 0
+  let gcCount = 0
+  let gcDurationMs = 0
+  let maxGcDurationMs = 0
+  let gcObservationSupported = false
+  let observer
+
+  function recordMemorySample() {
+    const usage = process.memoryUsage()
+    if (usage.heapUsed > peakHeapUsedBytes) {
+      peakHeapUsedBytes = usage.heapUsed
+    }
+    if (usage.rss > peakRssBytes) {
+      peakRssBytes = usage.rss
+    }
+  }
+
+  function collectGcEntries(entries) {
+    for (const entry of entries) {
+      gcCount += 1
+      gcDurationMs += entry.duration
+      if (entry.duration > maxGcDurationMs) {
+        maxGcDurationMs = entry.duration
+      }
+    }
+  }
+
+  try {
+    observer = new PerformanceObserver((list) => {
+      collectGcEntries(list.getEntries())
+    })
+    observer.observe({ entryTypes: ["gc"] })
+    gcObservationSupported = true
+  } catch {
+    observer = undefined
+  }
+
+  recordMemorySample()
+
+  return {
+    recordMemorySample,
+    stop() {
+      if (observer !== undefined) {
+        collectGcEntries(observer.takeRecords())
+        observer.disconnect()
+      }
+
+      return {
+        gcObservationSupported,
+        gcCount,
+        gcDurationMs,
+        maxGcDurationMs,
+        peakHeapUsedBytes,
+        peakRssBytes,
+      }
+    },
+  }
+}
+
 function summarizeConfidence(result) {
   const counts = {
     proven: 0,
@@ -213,6 +274,7 @@ async function* createAsyncEventSource(events) {
 
 async function runStreamingBenchmarkCase(profile, events, generationMs) {
   const memoryBefore = process.memoryUsage().heapUsed
+  const resourceObserver = createResourceObserver()
   const orderingStart = performance.now()
 
   const confidenceCounts = createConfidenceCounts()
@@ -234,6 +296,7 @@ async function runStreamingBenchmarkCase(profile, events, generationMs) {
     createAsyncEventSource(events),
     profile.streamOptions,
   )) {
+    resourceObserver.recordMemorySample()
     batchCount += 1
     if (batch.isFinal) {
       finalBatchCount += 1
@@ -275,6 +338,8 @@ async function runStreamingBenchmarkCase(profile, events, generationMs) {
 
   const orderingMs = performance.now() - orderingStart
   const memoryAfter = process.memoryUsage().heapUsed
+  resourceObserver.recordMemorySample()
+  const resourceMetrics = resourceObserver.stop()
 
   return {
     profile,
@@ -289,6 +354,14 @@ async function runStreamingBenchmarkCase(profile, events, generationMs) {
       generationMs,
       orderingMs,
       heapDeltaBytes: memoryAfter - memoryBefore,
+      startHeapUsedBytes: memoryBefore,
+      endHeapUsedBytes: memoryAfter,
+      peakHeapUsedBytes: Math.max(resourceMetrics.peakHeapUsedBytes, memoryBefore, memoryAfter),
+      peakRssBytes: resourceMetrics.peakRssBytes,
+      gcObservationSupported: resourceMetrics.gcObservationSupported,
+      gcCount: resourceMetrics.gcCount,
+      gcDurationMs: resourceMetrics.gcDurationMs,
+      maxGcDurationMs: resourceMetrics.maxGcDurationMs,
       validEvents: orderedEvents,
       invalidEvents: 0,
       orderedEvents,
@@ -438,6 +511,7 @@ export function runBenchmarkCase(inputProfile) {
   const generationMs = performance.now() - generationStart
 
   const memoryBefore = process.memoryUsage().heapUsed
+  const resourceObserver = createResourceObserver()
   const orderingStart = performance.now()
   const result = orderEvents(events, {
     strict: false,
@@ -445,6 +519,8 @@ export function runBenchmarkCase(inputProfile) {
   })
   const orderingMs = performance.now() - orderingStart
   const memoryAfter = process.memoryUsage().heapUsed
+  resourceObserver.recordMemorySample()
+  const resourceMetrics = resourceObserver.stop()
 
   return {
     profile,
@@ -458,6 +534,14 @@ export function runBenchmarkCase(inputProfile) {
       generationMs,
       orderingMs,
       heapDeltaBytes: memoryAfter - memoryBefore,
+      startHeapUsedBytes: memoryBefore,
+      endHeapUsedBytes: memoryAfter,
+      peakHeapUsedBytes: Math.max(resourceMetrics.peakHeapUsedBytes, memoryBefore, memoryAfter),
+      peakRssBytes: resourceMetrics.peakRssBytes,
+      gcObservationSupported: resourceMetrics.gcObservationSupported,
+      gcCount: resourceMetrics.gcCount,
+      gcDurationMs: resourceMetrics.gcDurationMs,
+      maxGcDurationMs: resourceMetrics.maxGcDurationMs,
       validEvents: result.stats.validEvents,
       invalidEvents: result.stats.invalidEvents,
       orderedEvents: result.ordered.length,
@@ -490,6 +574,7 @@ export async function runBenchmarkCaseAsync(inputProfile) {
   }
 
   const memoryBefore = process.memoryUsage().heapUsed
+  const resourceObserver = createResourceObserver()
   const orderingStart = performance.now()
   const result = orderEvents(events, {
     strict: false,
@@ -497,6 +582,8 @@ export async function runBenchmarkCaseAsync(inputProfile) {
   })
   const orderingMs = performance.now() - orderingStart
   const memoryAfter = process.memoryUsage().heapUsed
+  resourceObserver.recordMemorySample()
+  const resourceMetrics = resourceObserver.stop()
 
   return {
     profile,
@@ -511,6 +598,14 @@ export async function runBenchmarkCaseAsync(inputProfile) {
       generationMs,
       orderingMs,
       heapDeltaBytes: memoryAfter - memoryBefore,
+      startHeapUsedBytes: memoryBefore,
+      endHeapUsedBytes: memoryAfter,
+      peakHeapUsedBytes: Math.max(resourceMetrics.peakHeapUsedBytes, memoryBefore, memoryAfter),
+      peakRssBytes: resourceMetrics.peakRssBytes,
+      gcObservationSupported: resourceMetrics.gcObservationSupported,
+      gcCount: resourceMetrics.gcCount,
+      gcDurationMs: resourceMetrics.gcDurationMs,
+      maxGcDurationMs: resourceMetrics.maxGcDurationMs,
       validEvents: result.stats.validEvents,
       invalidEvents: result.stats.invalidEvents,
       orderedEvents: result.ordered.length,
@@ -533,6 +628,15 @@ export function printBenchmarkSummary(run) {
   console.log(`Generation + shuffle: ${formatMs(metrics.generationMs)}`)
   console.log(`Ordering: ${formatMs(metrics.orderingMs)}`)
   console.log(`Heap delta: ${formatMemory(metrics.heapDeltaBytes)}`)
+  console.log(`Start heap: ${formatMemory(metrics.startHeapUsedBytes)}`)
+  console.log(`End heap: ${formatMemory(metrics.endHeapUsedBytes)}`)
+  console.log(`Peak heap: ${formatMemory(metrics.peakHeapUsedBytes)}`)
+  console.log(`Peak RSS: ${formatMemory(metrics.peakRssBytes)}`)
+  if (metrics.gcObservationSupported) {
+    console.log(`GC events: ${metrics.gcCount.toLocaleString()}`)
+    console.log(`GC total: ${formatMs(metrics.gcDurationMs)}`)
+    console.log(`Max GC pause: ${formatMs(metrics.maxGcDurationMs)}`)
+  }
   console.log(`Valid events: ${metrics.validEvents.toLocaleString()}`)
   console.log(`Invalid events: ${metrics.invalidEvents.toLocaleString()}`)
   console.log(`Ordered events: ${metrics.orderedEvents.toLocaleString()}`)
@@ -579,6 +683,14 @@ export function toCsv(runs) {
       "generation_ms",
       "ordering_ms",
       "heap_delta_bytes",
+      "start_heap_used_bytes",
+      "end_heap_used_bytes",
+      "peak_heap_used_bytes",
+      "peak_rss_bytes",
+      "gc_observation_supported",
+      "gc_count",
+      "gc_duration_ms",
+      "max_gc_duration_ms",
       "valid_events",
       "invalid_events",
       "ordered_events",
@@ -610,6 +722,14 @@ export function toCsv(runs) {
       run.metrics.generationMs.toFixed(2),
       run.metrics.orderingMs.toFixed(2),
       run.metrics.heapDeltaBytes,
+      run.metrics.startHeapUsedBytes,
+      run.metrics.endHeapUsedBytes,
+      run.metrics.peakHeapUsedBytes,
+      run.metrics.peakRssBytes,
+      run.metrics.gcObservationSupported,
+      run.metrics.gcCount,
+      run.metrics.gcDurationMs.toFixed(2),
+      run.metrics.maxGcDurationMs.toFixed(2),
       run.metrics.validEvents,
       run.metrics.invalidEvents,
       run.metrics.orderedEvents,

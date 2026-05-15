@@ -373,6 +373,7 @@ Current outcome snapshot:
 * this also clarifies the current operational posture:
   * `0.2.2` is the batch recovery and scheduled reconciliation story
   * HLC, same-node `sequence`, and explicit dependency metadata are used to reconstruct a delayed replay batch honestly after outage recovery
+  * bounded batch recovery, replay, and audit-style workloads are the stronger current deployment story in the core library
 
 Success criteria:
 
@@ -576,6 +577,7 @@ Why this should be a separate milestone:
 * the next honest question is "which of the current claims are strong enough to call production-credible?"
 * separating this work prevents production language from outrunning test evidence
 * it also avoids mixing current-core hardening with later domain-semantic features that need new product design
+* the batch side already has the stronger bounded-workload deployment story, so the larger remaining credibility question belongs on the streaming path
 
 What this milestone does not try to solve yet:
 
@@ -633,6 +635,44 @@ Exit criteria:
 * the most important remaining streaming hotspots have fresh profile-backed evidence
 * bounded-memory and backpressure behavior are not only documented, but exercised under stronger pressure conditions
 * maintainers have clearer evidence for which streaming stress cases should become future enforced guards
+
+## `0.3.4` Sustained Operational Stability Under Prolonged And Constrained Runtime Conditions
+
+Goal:
+Prove that the current streaming contract remains operationally stable not only under broader pressure, but also under prolonged runtime and constrained-memory conditions.
+
+This milestone should follow `0.3.3`.
+`0.3.3` widens pressure visibility and hotspot evidence.
+`0.3.4` should turn the most important runtime questions from that work into stronger stability proof.
+
+Focus:
+
+* long-running multi-hour stability
+* repeated stream cycles without process restart
+* anomaly-heavy streaming stability under sustained pressure
+* reconnect correction churn under sustained load
+* stability under smaller Node heap limits
+* stability when GC triggers during the run
+
+Why this should be a separate milestone:
+
+* this is a stronger claim than broader pressure visibility
+* it moves from exploratory hardening evidence toward sustained runtime proof
+* it requires longer-running and more operationally constrained evidence than the earlier `0.3.3` pressure work
+
+Why this should happen before ecosystem expansion:
+
+* the core library is the trust boundary
+* ecosystem packages should not solidify around a core runtime contract that still feels operationally unsettled
+* the safer sequence is to settle the core contract first, prove it under sustained runtime pressure, and expand into higher-level ecosystem work later
+
+Exit criteria:
+
+* the repo has explicit endurance-oriented evidence for multi-hour stream stability rather than only shorter pressure snapshots
+* repeated benchmark or stress cycles can run in one process without obvious retained-heap drift or instability
+* anomaly-heavy and reconnect-correction-heavy workloads remain operationally credible under sustained load
+* smaller-heap runs produce honest and documented behavior rather than only best-case default-runtime behavior
+* GC-triggered runs are observed directly enough that maintainers can reason about the current streaming contract under real collection pressure
 
 ## `0.4.x` Developer Experience
 
@@ -879,6 +919,20 @@ The package should not drift into becoming a database, queue, tracing platform, 
 
 These are not assigned to a release line yet.
 They are here to capture potentially important directions without implying commitment, sequencing, or near-term scope.
+
+### Future Ecosystem Packages
+
+Once the core contract feels settled, one likely direction is to add ecosystem packages on top of the core runtime rather than folding those concerns into the core package itself.
+
+That could include:
+
+* `@causal-order/production`
+* `@causal-order/kafka`
+* `@causal-order/postgres`
+* `@causal-order/replay-tools`
+* `@causal-order/metrics`
+
+These should stay tentative until the core runtime is stable enough that downstream packages are not forced to absorb semantic or operational churn from the center of the project.
 
 ### Causal Timestamp API
 
