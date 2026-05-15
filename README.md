@@ -306,6 +306,7 @@ Current benchmark posture:
 
 * `10k` and `100k` are the main enforced guardrail bands
 * `150k` corrupted-dataset profiles are available for stress visibility, but are not currently enforced in `npm run bench:check`
+* for the current `0.3.3` streaming pressure work, `150k` is the main stream stress-visibility band while `250k` remains exploratory stretch visibility rather than a routine guard target
 * `npm run bench:profile` is available when you need CPU profiles for the slowest stress cases
 
 ## License

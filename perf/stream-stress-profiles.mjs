@@ -143,9 +143,11 @@ function createReconnectPressureEvents(profile, options = {}) {
 }
 
 function createWatermarkLagEvents(profile) {
-  const plateauSize = profile.plateauSize ?? 4_096
-  const physicalTimeStepMs = profile.physicalTimeStepMs ?? 1n
+  const plateauSize = profile.plateauSize ?? 1_024
+  const physicalTimeStepMs = profile.physicalTimeStepMs ?? 2_048n
   const nodeSequences = Array.from({ length: profile.nodeCount }, () => 0n)
+  const nodeLogicalCounters = Array.from({ length: profile.nodeCount }, () => 0)
+  const lastPhysicalTimeByNode = Array.from({ length: profile.nodeCount }, () => undefined)
   const lastEventIdByNode = Array.from({ length: profile.nodeCount }, () => undefined)
 
   return Array.from({ length: profile.totalEvents }, (_, index) => {
@@ -156,6 +158,12 @@ function createWatermarkLagEvents(profile) {
 
     const plateauIndex = Math.floor(index / plateauSize)
     const physicalTimeMs = 50_000n + BigInt(plateauIndex) * physicalTimeStepMs
+    const previousPhysicalTimeMs = lastPhysicalTimeByNode[nodeIndex]
+    const logicalCounter = previousPhysicalTimeMs === physicalTimeMs
+      ? nodeLogicalCounters[nodeIndex] + 1
+      : 0
+    nodeLogicalCounters[nodeIndex] = logicalCounter
+    lastPhysicalTimeByNode[nodeIndex] = physicalTimeMs
     const parentEventId = lastEventIdByNode[nodeIndex]
     const id = `${nodeId}-evt-${sequence}`
     lastEventIdByNode[nodeIndex] = id
@@ -164,7 +172,7 @@ function createWatermarkLagEvents(profile) {
       id,
       nodeId,
       physicalTimeMs,
-      logicalCounter: Number(sequence % 4n),
+      logicalCounter,
       payload: {
         type: "watermark_lag",
         pressureKind: profile.streamStressKind,
@@ -271,12 +279,54 @@ export const streamStressBenchmarkProfiles = {
     crossDependencyEvery: 0,
     dependencyFanIn: 0,
     streamStressKind: "watermark_lag",
-    plateauSize: 4_096,
-    physicalTimeStepMs: 1n,
+    plateauSize: 1_024,
+    physicalTimeStepMs: 2_048n,
     createEvents: createStreamStressEvents,
     streamOptions: {
       batchSize: 1_024,
-      maxLateArrivalMs: 10_000n,
+      maxLateArrivalMs: 8_192n,
+      lateArrivalPolicy: "flag",
+      strict: false,
+      detectAnomalies: false,
+    },
+  },
+  "streaming-150k-watermark-lag": {
+    description: "150k events, sustained watermark-lag streaming pressure, intended as the main 0.3.3 stream stress-visibility band beyond the routine 100k baseline",
+    mode: "stream",
+    totalEvents: 150_000,
+    nodeCount: 32,
+    detectAnomalies: false,
+    shuffle: false,
+    crossDependencyEvery: 0,
+    dependencyFanIn: 0,
+    streamStressKind: "watermark_lag",
+    plateauSize: 1_024,
+    physicalTimeStepMs: 2_048n,
+    createEvents: createStreamStressEvents,
+    streamOptions: {
+      batchSize: 1_024,
+      maxLateArrivalMs: 8_192n,
+      lateArrivalPolicy: "flag",
+      strict: false,
+      detectAnomalies: false,
+    },
+  },
+  "streaming-250k-watermark-lag": {
+    description: "250k events, sustained watermark-lag streaming pressure, intended as an exploratory stretch profile rather than a routine guardrail",
+    mode: "stream",
+    totalEvents: 250_000,
+    nodeCount: 32,
+    detectAnomalies: false,
+    shuffle: false,
+    crossDependencyEvery: 0,
+    dependencyFanIn: 0,
+    streamStressKind: "watermark_lag",
+    plateauSize: 1_024,
+    physicalTimeStepMs: 2_048n,
+    createEvents: createStreamStressEvents,
+    streamOptions: {
+      batchSize: 1_024,
+      maxLateArrivalMs: 8_192n,
       lateArrivalPolicy: "flag",
       strict: false,
       detectAnomalies: false,

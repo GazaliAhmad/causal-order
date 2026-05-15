@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+* dedicated `0.3.3` stream stress profiles for correction churn, watermark lag, fragmented ready subsets, and anomaly-heavy reconnect backlog
+* explicit `150k` and `250k` watermark-lag stream profiles so broader `0.3.3` pressure work has named higher-scale visibility targets
+
+### Changed
+
+* clarified the `0.3.3` stream-pressure posture in the docs:
+  * `100k` remains the routine comparison band
+  * `150k` is the main stream stress-visibility band
+  * `250k` remains exploratory stretch visibility rather than a routine guard target
+
 ## [0.3.2]
 
 ### Added

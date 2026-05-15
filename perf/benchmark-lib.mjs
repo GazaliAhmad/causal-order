@@ -224,6 +224,10 @@ async function runStreamingBenchmarkCase(profile, events, generationMs) {
   let batchCount = 0
   let finalBatchCount = 0
   let maxBatchEventCount = 0
+  let correctionBatchCount = 0
+  let lateArrivalCount = 0
+  let emptyEventBatchCount = 0
+  let maxAnomaliesPerBatch = 0
   let lastWatermark = 0n
 
   for await (const batch of orderEventStream(
@@ -234,8 +238,17 @@ async function runStreamingBenchmarkCase(profile, events, generationMs) {
     if (batch.isFinal) {
       finalBatchCount += 1
     }
+    if (batch.correction !== undefined) {
+      correctionBatchCount += 1
+    }
     if (batch.events.length > maxBatchEventCount) {
       maxBatchEventCount = batch.events.length
+    }
+    if (batch.events.length === 0) {
+      emptyEventBatchCount += 1
+    }
+    if (batch.anomalies.length > maxAnomaliesPerBatch) {
+      maxAnomaliesPerBatch = batch.anomalies.length
     }
     lastWatermark = batch.watermark
 
@@ -250,6 +263,9 @@ async function runStreamingBenchmarkCase(profile, events, generationMs) {
 
     for (const anomaly of batch.anomalies) {
       anomalyCount += 1
+      if (anomaly.type === "late_arrival") {
+        lateArrivalCount += 1
+      }
       anomalyBreakdown.set(
         anomaly.type,
         (anomalyBreakdown.get(anomaly.type) ?? 0) + 1,
@@ -285,6 +301,10 @@ async function runStreamingBenchmarkCase(profile, events, generationMs) {
       batchCount,
       finalBatchCount,
       maxBatchEventCount,
+      correctionBatchCount,
+      lateArrivalCount,
+      emptyEventBatchCount,
+      maxAnomaliesPerBatch,
       lastWatermark: lastWatermark.toString(),
     },
     sample,
@@ -521,6 +541,10 @@ export function printBenchmarkSummary(run) {
     console.log(`Batches emitted: ${metrics.batchCount.toLocaleString()}`)
     console.log(`Final batches: ${metrics.finalBatchCount.toLocaleString()}`)
     console.log(`Max batch events: ${metrics.maxBatchEventCount.toLocaleString()}`)
+    console.log(`Correction batches: ${metrics.correctionBatchCount.toLocaleString()}`)
+    console.log(`Late-arrival anomalies: ${metrics.lateArrivalCount.toLocaleString()}`)
+    console.log(`Empty event batches: ${metrics.emptyEventBatchCount.toLocaleString()}`)
+    console.log(`Max anomalies in one batch: ${metrics.maxAnomaliesPerBatch.toLocaleString()}`)
     console.log(`Last watermark: ${metrics.lastWatermark}`)
   }
   if (metrics.anomalyCount > 0) {
@@ -562,6 +586,14 @@ export function toCsv(runs) {
       "anomaly_breakdown",
       "confidence_counts",
       "order_basis_counts",
+      "batch_count",
+      "final_batch_count",
+      "max_batch_event_count",
+      "correction_batch_count",
+      "late_arrival_count",
+      "empty_event_batch_count",
+      "max_anomalies_per_batch",
+      "last_watermark",
     ],
   ]
 
@@ -585,6 +617,14 @@ export function toCsv(runs) {
       JSON.stringify(run.metrics.anomalyBreakdown),
       JSON.stringify(run.metrics.confidenceCounts),
       JSON.stringify(run.metrics.orderBasisCounts),
+      run.metrics.batchCount ?? "",
+      run.metrics.finalBatchCount ?? "",
+      run.metrics.maxBatchEventCount ?? "",
+      run.metrics.correctionBatchCount ?? "",
+      run.metrics.lateArrivalCount ?? "",
+      run.metrics.emptyEventBatchCount ?? "",
+      run.metrics.maxAnomaliesPerBatch ?? "",
+      run.metrics.lastWatermark ?? "",
     ])
   }
 
