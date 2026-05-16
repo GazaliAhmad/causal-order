@@ -1,6 +1,10 @@
 node_modules/
 dist/
 .npm-cache*/
+website/node_modules/
+website/dist/
+website/.astro/
+website/.vite/
 
 *.log
 npm-debug.log*

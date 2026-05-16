@@ -1,0 +1,115 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getFeaturedDocs } from "../lib/docs.js";
+
+const featured = getFeaturedDocs();
+---
+
+<BaseLayout>
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="hero-badge">Distributed systems docs</div>
+      <h1>Order by justified causality, not by timestamp alone.</h1>
+      <p>
+        <code>causal-order</code> is an event integrity library for distributed systems that still use
+        clocks, but cannot rely on one globally synchronized clock as the truth model.
+      </p>
+
+      <div class="hero-install">
+        <div class="install-kicker">Published on npm</div>
+        <div class="install-command">
+          <code>npm install causal-order</code>
+          <a
+            class="install-link"
+            href="https://www.npmjs.com/package/causal-order"
+            target="_blank"
+            rel="noreferrer"
+          >
+            View package
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a class="button button-primary" href="/guides/">Read the guides</a>
+        <a class="button button-secondary" href="/wiki/">Explore the wiki</a>
+      </div>
+    </div>
+
+    <div class="hero-panel">
+      <div class="signal-card">
+        <span class="signal-label">Output contract</span>
+        <ul>
+          <li><code>proven</code> for explicit causal evidence</li>
+          <li><code>derived</code> for useful but weaker support</li>
+          <li><code>fallback</code> for deterministic safety output</li>
+          <li><code>unknown</code> when the system cannot justify more</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="why-strip">
+    <div>
+      <span class="card-kicker">Why this exists</span>
+      <h2>Distributed timelines often look cleaner than they really are.</h2>
+    </div>
+    <p>
+      Replayed events can look newer than originals. Offline devices sync late. Ingestion order
+      differs from creation order. <code>causal-order</code> helps surface those realities without
+      forcing them into fake certainty.
+    </p>
+  </section>
+
+  <section class="home-grid">
+    <article class="home-card">
+      <span class="card-kicker">Practical layer</span>
+      <h2>Guides</h2>
+      <p>
+        Deployment patterns, operational walkthroughs, failure modes, and the current runtime
+        contract.
+      </p>
+      <ul class="home-links">
+        {featured.guides.map((item) => (
+          <li><a href={item.href}>{item.title}</a></li>
+        ))}
+      </ul>
+    </article>
+
+    <article class="home-card">
+      <span class="card-kicker">Conceptual layer</span>
+      <h2>Wiki</h2>
+      <p>
+        Mental models, design philosophy, and the deeper reasoning behind the library’s ordering
+        choices.
+      </p>
+      <ul class="home-links">
+        {featured.wiki.map((item) => (
+          <li><a href={item.href}>{item.title}</a></li>
+        ))}
+      </ul>
+    </article>
+  </section>
+
+  <section class="api-strip">
+    <article class="home-card">
+      <div class="split-card">
+        <div>
+          <span class="card-kicker">Reference layer</span>
+          <h2>API</h2>
+          <p>
+            Public entry points, result types, ordering options, streaming batches, and the current
+            exported contract.
+          </p>
+        </div>
+
+        <ul class="home-links home-links-compact">
+          <li><a href="/api/order-events/">orderEvents()</a></li>
+          <li><a href="/api/order-event-stream/">orderEventStream()</a></li>
+          <li><a href="/api/validate-event/">validateEvent()</a></li>
+          <li><a href="/api/types/">Types</a></li>
+        </ul>
+      </div>
+    </article>
+  </section>
+</BaseLayout>

@@ -1,0 +1,22 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import { getDocsByCollection, getNavigation } from "../../lib/docs.js";
+
+export function getStaticPaths() {
+  return getDocsByCollection("guides")
+    .filter((doc) => !doc.isLanding)
+    .map((doc) => ({
+      params: {
+        slug: doc.routePath.replace(/^\/guides\/|\/$/g, ""),
+      },
+      props: {
+        doc,
+      },
+    }));
+}
+
+const { doc } = Astro.props;
+const navigation = getNavigation("guides");
+---
+
+<DocsLayout doc={doc} navigation={navigation} sectionLabel="Guides" />

@@ -1,0 +1,63 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+
+const { doc, navigation, sectionLabel } = Astro.props;
+const currentPath = Astro.url.pathname;
+---
+
+<BaseLayout title={`${doc.title} | causal-order`} description={doc.description}>
+  <div class="docs-shell">
+    <aside class="docs-sidebar">
+      <div class="sidebar-label">{sectionLabel}</div>
+
+      {navigation.map((section) => (
+        <section class="sidebar-section">
+          <h2>{section.title}</h2>
+          <ul>
+            {section.items.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class:list={{
+                    active: currentPath === item.href,
+                  }}
+                >
+                  {item.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </aside>
+
+    <article class="docs-article">
+      <div class="docs-eyebrow">
+        <span>{sectionLabel}</span>
+        <a href={doc.sourceUrl} target="_blank" rel="noreferrer">View source</a>
+      </div>
+
+      <header class="docs-header">
+        <h1>{doc.title}</h1>
+        {doc.description && <p>{doc.description}</p>}
+      </header>
+
+      <div class="markdown-body" set:html={doc.html} />
+    </article>
+
+    <aside class="docs-toc">
+      {doc.toc.length > 0 && (
+        <>
+          <div class="toc-label">On this page</div>
+          <ul>
+            {doc.toc.map((heading) => (
+              <li class:list={{ nested: heading.depth === 3 }}>
+                <a href={`#${heading.id}`}>{heading.text}</a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </aside>
+  </div>
+</BaseLayout>

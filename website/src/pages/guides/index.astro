@@ -1,0 +1,9 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import { getDoc, getNavigation } from "../../lib/docs.js";
+
+const doc = getDoc("guides", "/guides/");
+const navigation = getNavigation("guides");
+---
+
+<DocsLayout doc={doc} navigation={navigation} sectionLabel="Guides" />

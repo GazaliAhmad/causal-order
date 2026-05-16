@@ -1,0 +1,58 @@
+---
+import ApiLayout from "../../layouts/ApiLayout.astro";
+import { apiNavigation, apiSourceUrls } from "../../lib/api.js";
+
+const toc = [
+  { id: "signature", text: "Signature", depth: 2 },
+  { id: "usage", text: "Usage", depth: 2 },
+  { id: "result-shape", text: "Result shape", depth: 2 },
+  { id: "validation-rules", text: "Validation rules", depth: 2 },
+];
+---
+
+<ApiLayout
+  title="validateEvent()"
+  description="Validates an event envelope and returns either a branded validated value or structured errors and warnings."
+  sourceUrl={apiSourceUrls.validateEvent}
+  toc={toc}
+  navigation={apiNavigation}
+>
+  <h2 id="signature">Signature</h2>
+  <pre><code>{`function validateEvent<T>(
+  event: EventEnvelope<T> | unknown,
+  options?: {
+    maxClockDriftMs?: bigint
+    now?: () => bigint
+    includeWarnings?: boolean
+  },
+): ValidationResult<ValidatedEventEnvelope<T>>`}</code></pre>
+
+  <h2 id="usage">Usage</h2>
+  <pre><code>{`import { validateEvent } from "causal-order"
+
+const validation = validateEvent(event, {
+  includeWarnings: true,
+})
+
+if (!validation.valid) {
+  console.error(validation.errors)
+} else {
+  console.log(validation.value)
+  console.log(validation.warnings)
+}`}</code></pre>
+
+  <h2 id="result-shape">Result shape</h2>
+  <ul>
+    <li><code>valid: true</code> returns a branded <code>value</code> plus any warnings.</li>
+    <li><code>valid: false</code> returns structured <code>errors</code> and <code>warnings</code>.</li>
+  </ul>
+
+  <h2 id="validation-rules">Validation rules</h2>
+  <ul>
+    <li><code>event.id</code> must be a non-empty string.</li>
+    <li><code>event.nodeId</code> must be a non-empty string.</li>
+    <li><code>event.clock</code> must pass HLC validation.</li>
+    <li><code>event.sequence</code>, when present, must be a non-negative <code>bigint</code>.</li>
+    <li>Missing sequence can produce a warning when warnings are enabled.</li>
+  </ul>
+</ApiLayout>

@@ -8,6 +8,7 @@ For the deeper conceptual layer, mental-model pages, and explanatory write-ups t
 Start here:
 
 * [Mental Model](./mental-model.md)
+* [Notation And Runtime Contract](./notation-and-runtime-contract.md)
 * [How Order Is Written](./how-order-is-written.md)
 * [Clocks, Causality, And Why HLC](./clocks-causality-and-why-hlc.md)
 * [Case Studies](./case-studies.md)

@@ -6,10 +6,17 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+* an Astro-based documentation website under `website/` that reads directly from the repository’s `guides/` and `wiki/` content without maintaining a duplicated docs tree
+* public docs-site surfaces for:
+  * practical guides
+  * conceptual wiki pages
+  * API reference pages with short usage snippets for the main entry points
+* a lightweight privacy page and a branded 404 page for the docs site
 * dedicated `0.3.3` stream stress profiles for correction churn, watermark lag, fragmented ready subsets, and anomaly-heavy reconnect backlog
 * explicit `150k` and `250k` watermark-lag stream profiles so broader `0.3.3` pressure work has named higher-scale visibility targets
 * exploratory `0.3.3` streaming fuzz coverage for fragmented watermark-lag pressure and correction-burst pressure with seeded reproducibility checks
 * additional `0.3.3` streaming fuzz coverage for sustained correction-churn pressure and fragmented reconnect-burst pressure
+* additional `0.3.3` streaming fuzz coverage for bounded-window lagging-watermark pressure and bounded-memory cross-window replay pressure
 * richer streaming benchmark visibility for:
   * correction-batch counts
   * late-arrival counts
@@ -18,6 +25,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+* refined the docs-site shell and homepage presentation:
+  * npm install and package-link surfacing
+  * stronger header/navigation treatment
+  * automatic npm version badge sourced from the root package version
+  * theme preference persistence plus light/dark controls
+  * footer privacy/copyright treatment
 * clarified the `0.3.3` stream-pressure posture in the docs:
   * `100k` remains the routine comparison band
   * `150k` is the main stream stress-visibility band

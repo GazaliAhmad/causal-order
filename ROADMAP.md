@@ -126,7 +126,7 @@ Current status snapshot:
 | The README describes the real shipped package, not a still-evolving intended shape | Partial | The README is now npm-facing and package-oriented, but the broader documentation set still needs to feel fully settled as a long-term contract. |
 | Examples clearly show why this library is safer than naive timestamp sorting | Partial | The examples are good and aligned to failure modes, but can still be made more central for `1.0`. |
 | Performance guidance is honest about routine workloads, heavier batch workloads, and when streaming is the better model | Partial | This is much improved and grounded, but still relatively fresh. |
-| Large-batch behavior has been benchmarked and pressure-tested enough that major surprises are unlikely in realistic use | Partial | Benchmarks and guardrails are now in place, but more repeated pressure would strengthen confidence further. |
+| Large-batch behavior has been benchmarked and pressure-tested enough that major surprises are unlikely in realistic use | Partial | This is the stronger current posture in the core library, but more repeated pressure would still strengthen confidence further and the larger remaining runtime-hardening question is on streaming. |
 | Anomaly and error messages are useful enough to support real debugging and audit work | Partial | Coverage is stronger, but message quality still feels like a polish area rather than a closed one. |
 | The project is ready to preserve the semantics as a public contract, not just the function names | Not Yet | This is the real `1.0` threshold, and the project does not appear to be claiming that yet. |
 
@@ -933,6 +933,47 @@ That could include:
 * `@causal-order/metrics`
 
 These should stay tentative until the core runtime is stable enough that downstream packages are not forced to absorb semantic or operational churn from the center of the project.
+
+### Confidence-Aware Operational Glue
+
+Another tentative direction is to add confidence-aware operational glue on top of the core runtime rather than pushing it directly into the core package by default.
+
+This could include things such as:
+
+* confidence-grouped result helpers
+* sink-policy helpers that reject or warn on `fallback` or `unknown`
+* stricter operational wrappers for audit, replay, or projection workflows
+* confidence-aware metrics or reporting helpers
+
+The motivation is real:
+
+* the core library can preserve uncertainty correctly
+* downstream systems can still flatten that uncertainty away if they ignore confidence and anomaly semantics
+
+But the right implementation shape is still open.
+This may never belong in the core package itself.
+It may fit better as higher-level glue or ecosystem packages once the core runtime is stable enough to build around safely.
+
+### Public Docs Website
+
+Another tentative direction is to keep building a public documentation site for `causal-order` ahead of `1.0.0`, without turning it into a release-track promise too early.
+
+The main value would be:
+
+* a friendlier public reading surface for the README, guides, and wiki
+* a clearer conceptual entry point for developers who are new to the library
+* a long-term home for examples, mental-model pages, and operational write-ups
+
+The important constraint is that the website should not create a second duplicated docs tree inside the repo.
+The source of truth should remain the existing documentation set, especially:
+
+* `/guides`
+* `/wiki`
+
+The site layer can evolve as a separate app or publishing surface, but the content should continue to be authored once and rendered from that shared source.
+
+This is a directional docs effort, not a core milestone promise.
+It should become more serious closer to `1.0.0`, once the package contract and the documentation surface both feel settled enough to present publicly with confidence.
 
 ### Causal Timestamp API
 

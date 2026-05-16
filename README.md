@@ -1,10 +1,13 @@
 # causal-order
 
-An event integrity library for distributed systems that cannot rely on a globally synchronized clock.
+An event integrity library for distributed systems that still use clocks, but cannot rely on one globally synchronized clock as the truth model.
 
-`causal-order` helps developers design and run event processing, replay, and recovery flows without pretending the system has one perfect global time source.
+`causal-order` helps developers design and run event processing, replay, and recovery flows without assuming the system has one perfect global time source.
 
-Instead of only sorting by timestamp, it helps you:
+It does not replace clocks or timestamps.
+It helps when timestamp order alone is not enough to explain what happened.
+
+It helps you:
 
 * order what can be ordered
 * preserve concurrency only when it can be justified honestly
@@ -13,7 +16,7 @@ Instead of only sorting by timestamp, it helps you:
 
 ## Why This Exists
 
-Distributed systems produce misleading timelines all the time:
+Distributed systems often produce misleading timelines:
 
 * clocks drift across regions
 * replayed events can look newer than original events
@@ -21,8 +24,8 @@ Distributed systems produce misleading timelines all the time:
 * ingestion order differs from creation order
 * some events are truly concurrent
 
-A naive timestamp sort produces a clean-looking answer.
-That answer is often false.
+A timestamp-only sort produces a clean-looking answer.
+In distributed systems, clean-looking timestamp order is often not the same as causal truth.
 
 `causal-order` exists to make that uncertainty visible instead of hiding it.
 
@@ -141,7 +144,7 @@ It is the explanation of why that order exists and how trustworthy it is.
 
 ## Streaming Overview
 
-For large or unbounded event flows, use `orderEventStream()` instead of pretending everything belongs in one in-memory batch.
+For large or unbounded event flows, use `orderEventStream()` instead of assuming everything belongs in one in-memory batch.
 
 That includes both:
 
@@ -306,8 +309,8 @@ Useful local commands:
 Current test posture:
 
 * `npm test` includes the direct release-gate suites plus seeded `0.3.2` fuzz coverage
-* the fuzz layer currently covers batch outage/replay noise plus streaming reconnect, fragmented watermark-lag, correction-burst, sustained correction-churn, and reconnect-burst pressure
-* broader exploratory fuzz campaigns remain part of the planned `0.3.3` pressure expansion
+* the fuzz layer currently covers batch outage/replay noise plus streaming reconnect, fragmented watermark-lag, correction-burst, sustained correction-churn, reconnect-burst, bounded-window lagging-watermark, and bounded-memory cross-window replay pressure
+* broader exploratory fuzz campaigns are now underway as part of the `0.3.3` pressure expansion
 
 Current benchmark posture:
 
@@ -319,3 +322,7 @@ Current benchmark posture:
 ## License
 
 MIT. See [LICENSE](https://github.com/GazaliAhmad/causal-order/blob/main/LICENSE).
+
+## Security
+
+See [SECURITY.md](https://github.com/GazaliAhmad/causal-order/blob/main/SECURITY.md) for supported versions and private vulnerability reporting guidance.

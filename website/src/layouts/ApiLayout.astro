@@ -1,0 +1,65 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+
+const { title, description, sourceUrl, toc = [], navigation = [] } = Astro.props;
+const currentPath = Astro.url.pathname;
+---
+
+<BaseLayout title={`${title} | causal-order API`} description={description}>
+  <div class="docs-shell">
+    <aside class="docs-sidebar">
+      <div class="sidebar-label">API</div>
+
+      {navigation.map((section) => (
+        <section class="sidebar-section">
+          <h2>{section.title}</h2>
+          <ul>
+            {section.items.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class:list={{
+                    active: currentPath === item.href,
+                  }}
+                >
+                  {item.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </aside>
+
+    <article class="docs-article">
+      <div class="docs-eyebrow">
+        <span>API</span>
+        <a href={sourceUrl} target="_blank" rel="noreferrer">View source</a>
+      </div>
+
+      <header class="docs-header">
+        <h1>{title}</h1>
+        {description && <p>{description}</p>}
+      </header>
+
+      <div class="markdown-body">
+        <slot />
+      </div>
+    </article>
+
+    <aside class="docs-toc">
+      {toc.length > 0 && (
+        <>
+          <div class="toc-label">On this page</div>
+          <ul>
+            {toc.map((heading) => (
+              <li class:list={{ nested: heading.depth === 3 }}>
+                <a href={`#${heading.id}`}>{heading.text}</a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </aside>
+  </div>
+</BaseLayout>
