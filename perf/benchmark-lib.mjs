@@ -430,6 +430,15 @@ export const benchmarkProfiles = {
     crossDependencyEvery: 25,
     dependencyFanIn: 1,
   },
+  "baseline-250k-shuffled": {
+    description: "250k events, 32 nodes, anomalies on, shuffled input, intended as an exploratory batch stretch profile beyond the current 150k visibility band",
+    totalEvents: 250_000,
+    nodeCount: 32,
+    detectAnomalies: true,
+    shuffle: true,
+    crossDependencyEvery: 25,
+    dependencyFanIn: 1,
+  },
   "baseline-100k-shuffled-no-anomalies": {
     description: "100k events, 32 nodes, anomalies off, shuffled input",
     totalEvents: 100_000,

@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 * a lightweight privacy page and a branded 404 page for the docs site
 * dedicated `0.3.3` stream stress profiles for correction churn, watermark lag, fragmented ready subsets, and anomaly-heavy reconnect backlog
 * explicit `150k` and `250k` watermark-lag stream profiles so broader `0.3.3` pressure work has named higher-scale visibility targets
+* explicit `250k` shuffled batch stretch profile so batch-side exploratory pressure can be rerun as a named benchmark target
 * exploratory `0.3.3` streaming fuzz coverage for fragmented watermark-lag pressure and correction-burst pressure with seeded reproducibility checks
 * additional `0.3.3` streaming fuzz coverage for sustained correction-churn pressure and fragmented reconnect-burst pressure
 * additional `0.3.3` streaming fuzz coverage for bounded-window lagging-watermark pressure and bounded-memory cross-window replay pressure
@@ -38,6 +39,7 @@ All notable changes to this project will be documented in this file.
 * fixed the `streaming-100k-watermark-lag` synthetic profile so same-node clock behavior stays monotonic under plateau-style time pressure and the profile no longer generates malformed `causal_inversion` noise
 * extended benchmark visibility with start, end, and peak heap sampling, peak RSS, and best-effort GC metrics so `0.3.3` memory-pressure work is observable before it becomes enforceable
 * documented current `0.3.3` forced-GC evidence for the `150k` and `250k` watermark-lag stream profiles as descriptive hardening evidence rather than as a hard guard
+* optimized the `orderEventStream()` flush path so ready events are buffered separately from pending events, reducing repeated full-backlog rescans and compaction work under watermark-lag pressure
 * clarified the docs so bounded batch recovery, replay, reconciliation, and audit-style workloads are described as the stronger current deployment story, while the larger remaining proof bar stays on streaming
 
 ## [0.3.2]
