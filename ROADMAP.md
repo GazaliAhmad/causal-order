@@ -122,11 +122,11 @@ Current status snapshot:
 | Top-level API names and exported result types feel stable enough to support long-term | Partial | The surface is getting coherent, but semantics are still being hardened through testing and iteration. |
 | Confidence semantics are crisp and no longer expected to change materially | Partial | The model is strong, but still feels like it is being frozen rather than already frozen. |
 | `orderBasis`, `causalEvidence`, anomaly types, and strict-mode behavior feel intentional rather than exploratory | Partial | Stronger than before, but some stream semantics and a few public-contract decisions still feel actively defined. |
-| The difference between `orderEvents()` and `orderEventStream()` is clear in both code and docs | Partial | The boundary is clearer, but can still be made more explicit in the docs. |
-| The README describes the real shipped package, not a still-evolving intended shape | Partial | The README is now npm-facing and package-oriented, but the broader documentation set still needs to feel fully settled as a long-term contract. |
+| The difference between `orderEvents()` and `orderEventStream()` is clear in both code and docs | Partial | The boundary is now clearer in the README, guides, examples, and website surface, but it can still be made more explicit before `1.0`. |
+| The README describes the real shipped package, not a still-evolving intended shape | Partial | The README is now npm-facing, package-oriented, and better aligned with the current `0.3.3` work, but the broader documentation set still needs to feel fully settled as a long-term contract. |
 | Examples clearly show why this library is safer than naive timestamp sorting | Partial | The examples are good and aligned to failure modes, but can still be made more central for `1.0`. |
-| Performance guidance is honest about routine workloads, heavier batch workloads, and when streaming is the better model | Partial | This is much improved and grounded, but still relatively fresh. |
-| Large-batch behavior has been benchmarked and pressure-tested enough that major surprises are unlikely in realistic use | Partial | Benchmarks and guardrails are now in place, but more repeated pressure would strengthen confidence further. |
+| Performance guidance is honest about routine workloads, heavier batch workloads, and when streaming is the better model | Partial | This is now grounded by named `100k`, `150k`, and exploratory `250k` profiles plus explicit stream-guard policy, but it still needs more time and repetition to feel fully settled. |
+| Large-batch behavior has been benchmarked and pressure-tested enough that major surprises are unlikely in realistic use | Partial | This is the stronger current posture in the core library, but more repeated pressure would still strengthen confidence further and the larger remaining runtime-hardening question is on streaming. |
 | Anomaly and error messages are useful enough to support real debugging and audit work | Partial | Coverage is stronger, but message quality still feels like a polish area rather than a closed one. |
 | The project is ready to preserve the semantics as a public contract, not just the function names | Not Yet | This is the real `1.0` threshold, and the project does not appear to be claiming that yet. |
 
@@ -373,6 +373,7 @@ Current outcome snapshot:
 * this also clarifies the current operational posture:
   * `0.2.2` is the batch recovery and scheduled reconciliation story
   * HLC, same-node `sequence`, and explicit dependency metadata are used to reconstruct a delayed replay batch honestly after outage recovery
+  * bounded batch recovery, replay, and audit-style workloads are the stronger current deployment story in the core library
 
 Success criteria:
 
@@ -576,6 +577,7 @@ Why this should be a separate milestone:
 * the next honest question is "which of the current claims are strong enough to call production-credible?"
 * separating this work prevents production language from outrunning test evidence
 * it also avoids mixing current-core hardening with later domain-semantic features that need new product design
+* the batch side already has the stronger bounded-workload deployment story, so the larger remaining credibility question belongs on the streaming path
 
 What this milestone does not try to solve yet:
 
@@ -597,32 +599,32 @@ Exit criteria:
 ## `0.3.3` Streaming Hardening And Pressure
 
 Goal:
-Continue the broader streaming hardening and pressure work after the current semantics have passed the first production gate milestone.
+Broaden the streaming hardening and pressure work after the current semantics passed the first production gate milestone.
 
-This release should build on the credibility established in `0.3.2` rather than trying to establish that credibility and broaden the pressure scope at the same time.
+This release builds on the credibility established in `0.3.2` rather than trying to establish that credibility and broaden the pressure scope at the same time.
 
 Focus:
 
-* continue optimizing the `flushReady()` path so remaining repeated scans, compaction, and pressure behavior do not become the next streaming performance cliff
-* continue profiling and tightening anomaly-heavy batch and stream paths, especially where large anomaly volumes create GC pressure or throughput cliffs
-* extend streaming stress coverage beyond the minimum release-gate set once the baseline production gates are already in place
-* add longer-running exploratory seeded fuzz campaigns beyond the `0.3.2` release-gate suite:
+* continued optimizing the `flushReady()` path so repeated scans, compaction, and pressure behavior did not remain the next streaming performance cliff
+* continued profiling and tightening anomaly-heavy batch and stream paths, especially where large anomaly volumes create GC pressure or throughput cliffs
+* extended streaming stress coverage beyond the minimum release-gate set once the baseline production gates were in place
+* added longer-running exploratory seeded fuzz campaigns beyond the `0.3.2` release-gate suite:
   * use higher-cardinality randomized outage, recovery, replay, and concurrency runs to expose sustained pressure behavior
   * use these campaigns to discover correction-window churn, watermark-lag, memory-growth, and throughput cliffs that smaller release-gate fuzzing is not designed to exhaust
   * treat these campaigns as hotspot-discovery and pressure-evidence tooling rather than as the primary correctness gate for the current contract
-* pressure-test correction-window behavior during resync and delayed reconnect flows beyond small semantic fixtures
-* extend watermark-pressure coverage from correctness-only toward sustained operational pressure
-* strengthen bounded-memory demonstrations and backpressure guidance with more explicit heavy-pressure cases
-* decide which additional streaming stress profiles are stable enough to enforce in perf checks
-* keep optimization discipline evidence-driven:
+* pressure-tested correction-window behavior during resync and delayed reconnect flows beyond small semantic fixtures
+* extended watermark-pressure coverage from correctness-only toward sustained operational pressure
+* strengthened bounded-memory demonstrations and backpressure guidance with more explicit heavy-pressure cases
+* decided which additional streaming stress profiles were stable enough to enforce in perf checks
+* kept optimization discipline evidence-driven:
   * retain optimizations that measurably improve guarded or stressed workloads
   * revert micro-optimizations that preserve correctness but do not produce meaningful wins
   * let CPU profiles, GC behavior, and guarded stress runs decide the next hotspot
 
-Why this should follow `0.3.2`:
+Why this followed `0.3.2`:
 
-* `0.3.2` should answer whether the current contract is already credible enough to defend
-* `0.3.3` can then safely widen the pressure work without blurring the release story
+* `0.3.2` answered whether the current contract was already credible enough to defend
+* `0.3.3` could then safely widen the pressure work without blurring the release story
 * this keeps the sequencing honest:
   * first prove the current claims
   * then keep hardening the pressure envelope around those claims
@@ -633,6 +635,44 @@ Exit criteria:
 * the most important remaining streaming hotspots have fresh profile-backed evidence
 * bounded-memory and backpressure behavior are not only documented, but exercised under stronger pressure conditions
 * maintainers have clearer evidence for which streaming stress cases should become future enforced guards
+
+## `0.3.4` Sustained Operational Stability Under Prolonged And Constrained Runtime Conditions
+
+Goal:
+Prove that the current streaming contract remains operationally stable not only under broader pressure, but also under prolonged runtime and constrained-memory conditions.
+
+This milestone should follow `0.3.3`.
+`0.3.3` widens pressure visibility and hotspot evidence.
+`0.3.4` should turn the most important runtime questions from that work into stronger stability proof.
+
+Focus:
+
+* long-running multi-hour stability
+* repeated stream cycles without process restart
+* anomaly-heavy streaming stability under sustained pressure
+* reconnect correction churn under sustained load
+* stability under smaller Node heap limits
+* stability when GC triggers during the run
+
+Why this should be a separate milestone:
+
+* this is a stronger claim than broader pressure visibility
+* it moves from exploratory hardening evidence toward sustained runtime proof
+* it requires longer-running and more operationally constrained evidence than the earlier `0.3.3` pressure work
+
+Why this should happen before ecosystem expansion:
+
+* the core library is the trust boundary
+* ecosystem packages should not solidify around a core runtime contract that still feels operationally unsettled
+* the safer sequence is to settle the core contract first, prove it under sustained runtime pressure, and expand into higher-level ecosystem work later
+
+Exit criteria:
+
+* the repo has explicit endurance-oriented evidence for multi-hour stream stability rather than only shorter pressure snapshots
+* repeated benchmark or stress cycles can run in one process without obvious retained-heap drift or instability
+* anomaly-heavy and reconnect-correction-heavy workloads remain operationally credible under sustained load
+* smaller-heap runs produce honest and documented behavior rather than only best-case default-runtime behavior
+* GC-triggered runs are observed directly enough that maintainers can reason about the current streaming contract under real collection pressure
 
 ## `0.4.x` Developer Experience
 
@@ -879,6 +919,61 @@ The package should not drift into becoming a database, queue, tracing platform, 
 
 These are not assigned to a release line yet.
 They are here to capture potentially important directions without implying commitment, sequencing, or near-term scope.
+
+### Future Ecosystem Packages
+
+Once the core contract feels settled, one likely direction is to add ecosystem packages on top of the core runtime rather than folding those concerns into the core package itself.
+
+That could include:
+
+* `@causal-order/production`
+* `@causal-order/kafka`
+* `@causal-order/postgres`
+* `@causal-order/replay-tools`
+* `@causal-order/metrics`
+
+These should stay tentative until the core runtime is stable enough that downstream packages are not forced to absorb semantic or operational churn from the center of the project.
+
+### Confidence-Aware Operational Glue
+
+Another tentative direction is to add confidence-aware operational glue on top of the core runtime rather than pushing it directly into the core package by default.
+
+This could include things such as:
+
+* confidence-grouped result helpers
+* sink-policy helpers that reject or warn on `fallback` or `unknown`
+* stricter operational wrappers for audit, replay, or projection workflows
+* confidence-aware metrics or reporting helpers
+
+The motivation is real:
+
+* the core library can preserve uncertainty correctly
+* downstream systems can still flatten that uncertainty away if they ignore confidence and anomaly semantics
+
+But the right implementation shape is still open.
+This may never belong in the core package itself.
+It may fit better as higher-level glue or ecosystem packages once the core runtime is stable enough to build around safely.
+
+### Public Docs Website
+
+Another tentative direction is to keep building a public documentation site for `causal-order` ahead of `1.0.0`, without turning it into a release-track promise too early.
+
+The main value would be:
+
+* a friendlier public reading surface for the README, guides, and wiki
+* a clearer conceptual entry point for developers who are new to the library
+* a long-term home for examples, mental-model pages, and operational write-ups
+
+The important constraint is that the website should not create a second duplicated docs tree inside the repo.
+The source of truth should remain the existing documentation set, especially:
+
+* `/guides`
+* `/wiki`
+
+The site layer can evolve as a separate app or publishing surface, but the content should continue to be authored once and rendered from that shared source.
+
+This is a directional docs effort, not a core milestone promise.
+It should become more serious closer to `1.0.0`, once the package contract and the documentation surface both feel settled enough to present publicly with confidence.
 
 ### Causal Timestamp API
 

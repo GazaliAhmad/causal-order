@@ -34,6 +34,14 @@ const policies = [
     expectedOrderedEvents: 100_000,
     expectedAnomalyCount: 0,
   },
+  {
+    profileName: "streaming-150k-watermark-lag",
+    description: "stable 0.3.3 stream guardrail for sustained watermark-lag pressure beyond the routine 100k stream band",
+    maxOrderingMs: 2_000,
+    maxHeapDeltaBytes: 192 * 1024 * 1024,
+    expectedOrderedEvents: 150_000,
+    expectedAnomalyCount: 0,
+  },
 ]
 
 function assertPolicy(run, policy) {

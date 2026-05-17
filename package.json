@@ -1,6 +1,6 @@
 {
   "name": "causal-order",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "An event integrity library for ordering and analyzing distributed events without false certainty.",
   "keywords": [
     "distributed-systems",
@@ -44,6 +44,9 @@
     "build": "tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node test/run.mjs",
+    "site:dev": "npm --prefix website run dev",
+    "site:build": "npm --prefix website run build",
+    "site:preview": "npm --prefix website run preview",
     "release:check": "npm run check && npm test && npm run bench:check",
     "demo": "npm run build && node examples/smoke-demo.mjs",
     "examples": "npm run build && node examples/index.mjs",

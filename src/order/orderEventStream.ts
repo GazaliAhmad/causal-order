@@ -9,7 +9,7 @@ import type {
   ValidatedEventEnvelope,
   WatermarkFunction,
 } from "../types.js"
-import { detectAnomalies } from "../anomalies/detectAnomalies.js"
+import { detectSingleEventAnomalies } from "../anomalies/detectAnomalies.js"
 import { getValidatedEventTime } from "../internal/utils.js"
 import { orderValidatedEvents } from "./orderEvents.js"
 import { eventTimeWatermark } from "./watermarkStrategies.js"
@@ -112,6 +112,22 @@ function resolveWatermarkSignal<T>(
   return value
 }
 
+function mergePendingAnomalies<T>(
+  orderedAnomalies: EventAnomaly<T>[],
+  pendingAnomalies: EventAnomaly<T>[],
+): EventAnomaly<T>[] {
+  if (orderedAnomalies.length === 0) {
+    return pendingAnomalies
+  }
+
+  if (pendingAnomalies.length === 0) {
+    return orderedAnomalies
+  }
+
+  orderedAnomalies.push(...pendingAnomalies)
+  return orderedAnomalies
+}
+
 export async function* orderEventStream<T>(
   source: AsyncIterable<EventEnvelope<T>>,
   options?: StreamOrderOptions<T>,
@@ -129,10 +145,56 @@ export async function* orderEventStream<T>(
     validationOptions.maxClockDriftMs = options.maxClockDriftMs
   }
 
-  const buffer: BufferedEvent<T>[] = []
+  const readyBuffer: BufferedEvent<T>[] = []
+  const pendingBuffer: BufferedEvent<T>[] = []
   let maxObservedWatermarkSignal = 0n
   let pendingAnomalies: EventAnomaly<T>[] = []
   let lastFlushedWatermark = -1n
+  let lastPendingPromotionWatermark = -1n
+
+  const getBufferedEventCount = (): number =>
+    readyBuffer.length + pendingBuffer.length
+
+  const promotePendingEntriesForWatermark = (
+    flushAll: boolean,
+    watermark: bigint,
+  ): void => {
+    if (pendingBuffer.length === 0) {
+      return
+    }
+
+    if (flushAll) {
+      for (const entry of pendingBuffer) {
+        readyBuffer.push(entry)
+      }
+      pendingBuffer.length = 0
+      lastPendingPromotionWatermark = watermark
+      return
+    }
+
+    if (watermark === lastPendingPromotionWatermark) {
+      return
+    }
+
+    let writeIndex = 0
+    for (let readIndex = 0; readIndex < pendingBuffer.length; readIndex += 1) {
+      const entry = pendingBuffer[readIndex]
+      if (entry === undefined) {
+        continue
+      }
+
+      if (isEventReadyForWatermark(entry.eventTime, watermark)) {
+        readyBuffer.push(entry)
+        continue
+      }
+
+      pendingBuffer[writeIndex] = entry
+      writeIndex += 1
+    }
+
+    pendingBuffer.length = writeIndex
+    lastPendingPromotionWatermark = watermark
+  }
 
   const flushReady = (
     flushAll: boolean,
@@ -144,33 +206,27 @@ export async function* orderEventStream<T>(
       maxLateArrivalMs,
     )
     lastFlushedWatermark = watermark
+    promotePendingEntriesForWatermark(flushAll, watermark)
     const ready: ValidatedEventEnvelope<T>[] = []
     const readyValidations: Array<{
       event: ValidatedEventEnvelope<T>
       validation: ValidationResult<ValidatedEventEnvelope<T>>
     }> = []
-    let writeIndex = 0
 
-    for (let readIndex = 0; readIndex < buffer.length; readIndex += 1) {
-      const entry = buffer[readIndex]
+    for (let index = 0; index < readyBuffer.length; index += 1) {
+      const entry = readyBuffer[index]
       if (entry === undefined) {
         continue
       }
 
-      if (flushAll || isEventReadyForWatermark(entry.eventTime, watermark)) {
-        ready.push(entry.event)
-        readyValidations.push({
-          event: entry.event,
-          validation: entry.validation,
-        })
-        continue
-      }
-
-      buffer[writeIndex] = entry
-      writeIndex += 1
+      ready.push(entry.event)
+      readyValidations.push({
+        event: entry.event,
+        validation: entry.validation,
+      })
     }
 
-    buffer.length = writeIndex
+    readyBuffer.length = 0
 
     if (ready.length === 0 && pendingAnomalies.length === 0 && !isTerminal) {
       return undefined
@@ -185,9 +241,7 @@ export async function* orderEventStream<T>(
           ordered: [],
           anomalies: [],
         }
-    const anomalies = result.anomalies.length > 0
-      ? [...result.anomalies, ...pendingAnomalies]
-      : pendingAnomalies
+    const anomalies = mergePendingAnomalies(result.anomalies, pendingAnomalies)
     pendingAnomalies = []
 
     const batch: OrderBatch<T> = {
@@ -195,7 +249,7 @@ export async function* orderEventStream<T>(
       anomalies,
       watermark,
       anomalyHorizon: STREAM_ANOMALY_HORIZON,
-      isFinal: isTerminal && buffer.length === 0,
+      isFinal: isTerminal && getBufferedEventCount() === 0,
     }
 
     if (correction !== undefined) {
@@ -219,10 +273,9 @@ export async function* orderEventStream<T>(
     }
 
     if (!validation.valid) {
-      pendingAnomalies.push(...detectAnomalies([event], {
-        ...validationOptions,
-        validations: [{ event, validation }],
-      }))
+      pendingAnomalies.push(
+        ...detectSingleEventAnomalies(event, validation),
+      )
     } else {
       const watermarkSignal = resolveWatermarkSignal(event, getWatermark)
       if (
@@ -273,11 +326,16 @@ export async function* orderEventStream<T>(
         throw new Error("Validated event is missing event time")
       }
 
-      buffer.push({
+      const entry: BufferedEvent<T> = {
         event: validation.value,
         eventTime,
         validation,
-      })
+      }
+      if (isEventReadyForWatermark(eventTime, currentWatermark)) {
+        readyBuffer.push(entry)
+      } else {
+        pendingBuffer.push(entry)
+      }
     }
 
     const shouldForceCorrectionFlush =
@@ -300,7 +358,7 @@ export async function* orderEventStream<T>(
       if (correctionBatch !== undefined) {
         yield correctionBatch
       }
-    } else if (buffer.length >= batchSize) {
+    } else if (getBufferedEventCount() >= batchSize) {
       const maybeBatch = flushReady(
         false,
         false,

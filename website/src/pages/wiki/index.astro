@@ -1,0 +1,9 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import { getDoc, getNavigation } from "../../lib/docs.js";
+
+const doc = getDoc("wiki", "/wiki/");
+const navigation = getNavigation("wiki");
+---
+
+<DocsLayout doc={doc} navigation={navigation} sectionLabel="Wiki" />

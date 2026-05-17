@@ -1,10 +1,13 @@
 # causal-order
 
-An event integrity library for distributed systems that cannot rely on a globally synchronized clock.
+An event integrity library for distributed systems that still use clocks, but cannot rely on one globally synchronized clock as the truth model.
 
-`causal-order` helps developers design and run event processing, replay, and recovery flows without pretending the system has one perfect global time source.
+`causal-order` helps developers design and run event processing, replay, and recovery flows without assuming the system has one perfect global time source.
 
-Instead of only sorting by timestamp, it helps you:
+It does not replace clocks or timestamps.
+It helps when timestamp order alone is not enough to explain what happened.
+
+It helps you:
 
 * order what can be ordered
 * preserve concurrency only when it can be justified honestly
@@ -13,7 +16,7 @@ Instead of only sorting by timestamp, it helps you:
 
 ## Why This Exists
 
-Distributed systems produce misleading timelines all the time:
+Distributed systems often produce misleading timelines:
 
 * clocks drift across regions
 * replayed events can look newer than original events
@@ -21,8 +24,8 @@ Distributed systems produce misleading timelines all the time:
 * ingestion order differs from creation order
 * some events are truly concurrent
 
-A naive timestamp sort produces a clean-looking answer.
-That answer is often false.
+A timestamp-only sort produces a clean-looking answer.
+In distributed systems, clean-looking timestamp order is often not the same as causal truth.
 
 `causal-order` exists to make that uncertainty visible instead of hiding it.
 
@@ -141,7 +144,7 @@ It is the explanation of why that order exists and how trustworthy it is.
 
 ## Streaming Overview
 
-For large or unbounded event flows, use `orderEventStream()` instead of pretending everything belongs in one in-memory batch.
+For large or unbounded event flows, use `orderEventStream()` instead of assuming everything belongs in one in-memory batch.
 
 That includes both:
 
@@ -234,6 +237,8 @@ Workloads and hardening:
 * [Production Gate `0.3.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/production-gate-0.3.2.md)
 * [Anomaly Surface Audit `0.3.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/anomaly-surface-0.3.2.md)
 * [Fuzz Testing `0.3.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/fuzz-testing-0.3.2.md)
+* [Streaming Hardening And Pressure `0.3.3`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/streaming-hardening-0.3.3.md)
+* [Implementation Guide `0.3.3`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/implementation-guide-0.3.3.md)
 * [Stress Hardening](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stress-hardening.md)
 * [After-Hours Batch Processing](https://github.com/GazaliAhmad/causal-order/blob/main/guides/after-hours-batch-processing.md)
 * [Realistic Workloads](https://github.com/GazaliAhmad/causal-order/wiki/Realistic-Workloads)
@@ -243,6 +248,8 @@ The `0.3.2` hardening story is now explicit:
 * production-gate criteria define what the current contract must prove
 * anomaly-surface notes explain what the runtime can and cannot currently signal
 * seeded fuzz coverage pressure-tests outage, replay, reconnect, duplicate, and clock-noise cases reproducibly
+* bounded batch recovery, replay, and audit-style workloads are the stronger current deployment story within the existing contract
+* the larger remaining proof bar is on long-running streaming behavior rather than on bounded batch ordering
 
 Runnable examples:
 
@@ -255,15 +262,20 @@ Runnable examples:
 
 Current release shape:
 
-* `0.3.2` is the current production-gate hardening release
-* `0.3.3` is the next broader streaming hardening and pressure follow-up after that production-gate milestone
+* `0.3.2` established the current production-gate hardening baseline
+* `0.3.3` is the current broader streaming hardening and pressure release after that production-gate milestone
 
-Current `0.3.2` repo work is centered on:
+The current `0.3.3` release is centered on:
 
-* explicit production gates
-* current-core release-blocking coverage
-* anomaly-surface clarity
-* seeded batch and streaming fuzz coverage for realistic outage and reconnect noise
+* explicit `0.3.2` production-gate proof
+* broader `0.3.3` streaming pressure profiles and higher-scale visibility bands
+* seeded batch and streaming fuzz coverage for realistic outage, reconnect, correction, watermark-lag, and bounded-memory pressure
+* stream-path hardening, anomaly-path tightening, and follow-up optimization under heavier pressure
+
+Current deployment posture:
+
+* bounded batch recovery, replay, reconciliation, and audit-style workloads are the stronger production-credible side of the current contract
+* the main remaining operational hardening work is on prolonged and constrained-runtime streaming behavior
 
 That means:
 
@@ -297,15 +309,20 @@ Useful local commands:
 Current test posture:
 
 * `npm test` includes the direct release-gate suites plus seeded `0.3.2` fuzz coverage
-* the fuzz layer currently covers batch outage/replay noise and streaming reconnect noise
-* broader exploratory fuzz campaigns remain part of the planned `0.3.3` pressure expansion
+* the fuzz layer currently covers batch outage/replay noise plus streaming reconnect, fragmented watermark-lag, correction-burst, sustained correction-churn, reconnect-burst, bounded-window lagging-watermark, and bounded-memory cross-window replay pressure
+* broader exploratory fuzz campaigns are now part of the shipped `0.3.3` pressure expansion
 
 Current benchmark posture:
 
 * `10k` and `100k` are the main enforced guardrail bands
 * `150k` corrupted-dataset profiles are available for stress visibility, but are not currently enforced in `npm run bench:check`
+* for the current `0.3.3` streaming pressure work, `150k` is now the enforced sustained watermark-lag stream guard band while `250k` remains exploratory stretch visibility rather than a routine guard target
 * `npm run bench:profile` is available when you need CPU profiles for the slowest stress cases
 
 ## License
 
 MIT. See [LICENSE](https://github.com/GazaliAhmad/causal-order/blob/main/LICENSE).
+
+## Security
+
+See [SECURITY.md](https://github.com/GazaliAhmad/causal-order/blob/main/SECURITY.md) for supported versions and private vulnerability reporting guidance.

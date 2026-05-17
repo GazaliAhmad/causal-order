@@ -1,8 +1,9 @@
 import { mkdir, writeFile } from "node:fs/promises"
 import { dirname } from "node:path"
-import { performance } from "node:perf_hooks"
+import { PerformanceObserver, performance } from "node:perf_hooks"
 import { orderEventStream, orderEvents } from "../dist/index.js"
 import { stressBenchmarkProfiles } from "./stress-profiles.mjs"
+import { streamStressBenchmarkProfiles } from "./stream-stress-profiles.mjs"
 
 function createGenerator({
   nodeCount,
@@ -132,6 +133,67 @@ function formatMemory(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MiB`
 }
 
+function createResourceObserver() {
+  let peakHeapUsedBytes = 0
+  let peakRssBytes = 0
+  let gcCount = 0
+  let gcDurationMs = 0
+  let maxGcDurationMs = 0
+  let gcObservationSupported = false
+  let observer
+
+  function recordMemorySample() {
+    const usage = process.memoryUsage()
+    if (usage.heapUsed > peakHeapUsedBytes) {
+      peakHeapUsedBytes = usage.heapUsed
+    }
+    if (usage.rss > peakRssBytes) {
+      peakRssBytes = usage.rss
+    }
+  }
+
+  function collectGcEntries(entries) {
+    for (const entry of entries) {
+      gcCount += 1
+      gcDurationMs += entry.duration
+      if (entry.duration > maxGcDurationMs) {
+        maxGcDurationMs = entry.duration
+      }
+    }
+  }
+
+  try {
+    observer = new PerformanceObserver((list) => {
+      collectGcEntries(list.getEntries())
+    })
+    observer.observe({ entryTypes: ["gc"] })
+    gcObservationSupported = true
+  } catch {
+    observer = undefined
+  }
+
+  recordMemorySample()
+
+  return {
+    recordMemorySample,
+    stop() {
+      if (observer !== undefined) {
+        collectGcEntries(observer.takeRecords())
+        observer.disconnect()
+      }
+
+      return {
+        gcObservationSupported,
+        gcCount,
+        gcDurationMs,
+        maxGcDurationMs,
+        peakHeapUsedBytes,
+        peakRssBytes,
+      }
+    },
+  }
+}
+
 function summarizeConfidence(result) {
   const counts = {
     proven: 0,
@@ -212,6 +274,7 @@ async function* createAsyncEventSource(events) {
 
 async function runStreamingBenchmarkCase(profile, events, generationMs) {
   const memoryBefore = process.memoryUsage().heapUsed
+  const resourceObserver = createResourceObserver()
   const orderingStart = performance.now()
 
   const confidenceCounts = createConfidenceCounts()
@@ -223,18 +286,32 @@ async function runStreamingBenchmarkCase(profile, events, generationMs) {
   let batchCount = 0
   let finalBatchCount = 0
   let maxBatchEventCount = 0
+  let correctionBatchCount = 0
+  let lateArrivalCount = 0
+  let emptyEventBatchCount = 0
+  let maxAnomaliesPerBatch = 0
   let lastWatermark = 0n
 
   for await (const batch of orderEventStream(
     createAsyncEventSource(events),
     profile.streamOptions,
   )) {
+    resourceObserver.recordMemorySample()
     batchCount += 1
     if (batch.isFinal) {
       finalBatchCount += 1
     }
+    if (batch.correction !== undefined) {
+      correctionBatchCount += 1
+    }
     if (batch.events.length > maxBatchEventCount) {
       maxBatchEventCount = batch.events.length
+    }
+    if (batch.events.length === 0) {
+      emptyEventBatchCount += 1
+    }
+    if (batch.anomalies.length > maxAnomaliesPerBatch) {
+      maxAnomaliesPerBatch = batch.anomalies.length
     }
     lastWatermark = batch.watermark
 
@@ -249,6 +326,9 @@ async function runStreamingBenchmarkCase(profile, events, generationMs) {
 
     for (const anomaly of batch.anomalies) {
       anomalyCount += 1
+      if (anomaly.type === "late_arrival") {
+        lateArrivalCount += 1
+      }
       anomalyBreakdown.set(
         anomaly.type,
         (anomalyBreakdown.get(anomaly.type) ?? 0) + 1,
@@ -258,6 +338,8 @@ async function runStreamingBenchmarkCase(profile, events, generationMs) {
 
   const orderingMs = performance.now() - orderingStart
   const memoryAfter = process.memoryUsage().heapUsed
+  resourceObserver.recordMemorySample()
+  const resourceMetrics = resourceObserver.stop()
 
   return {
     profile,
@@ -272,6 +354,14 @@ async function runStreamingBenchmarkCase(profile, events, generationMs) {
       generationMs,
       orderingMs,
       heapDeltaBytes: memoryAfter - memoryBefore,
+      startHeapUsedBytes: memoryBefore,
+      endHeapUsedBytes: memoryAfter,
+      peakHeapUsedBytes: Math.max(resourceMetrics.peakHeapUsedBytes, memoryBefore, memoryAfter),
+      peakRssBytes: resourceMetrics.peakRssBytes,
+      gcObservationSupported: resourceMetrics.gcObservationSupported,
+      gcCount: resourceMetrics.gcCount,
+      gcDurationMs: resourceMetrics.gcDurationMs,
+      maxGcDurationMs: resourceMetrics.maxGcDurationMs,
       validEvents: orderedEvents,
       invalidEvents: 0,
       orderedEvents,
@@ -284,6 +374,10 @@ async function runStreamingBenchmarkCase(profile, events, generationMs) {
       batchCount,
       finalBatchCount,
       maxBatchEventCount,
+      correctionBatchCount,
+      lateArrivalCount,
+      emptyEventBatchCount,
+      maxAnomaliesPerBatch,
       lastWatermark: lastWatermark.toString(),
     },
     sample,
@@ -330,6 +424,15 @@ export const benchmarkProfiles = {
   "baseline-150k-shuffled": {
     description: "150k events, 32 nodes, anomalies on, shuffled input, intended as a stretch visibility profile beyond the current 100k baseline promise",
     totalEvents: 150_000,
+    nodeCount: 32,
+    detectAnomalies: true,
+    shuffle: true,
+    crossDependencyEvery: 25,
+    dependencyFanIn: 1,
+  },
+  "baseline-250k-shuffled": {
+    description: "250k events, 32 nodes, anomalies on, shuffled input, intended as an exploratory batch stretch profile beyond the current 150k visibility band",
+    totalEvents: 250_000,
     nodeCount: 32,
     detectAnomalies: true,
     shuffle: true,
@@ -383,6 +486,7 @@ export const benchmarkProfiles = {
       detectAnomalies: false,
     },
   },
+  ...streamStressBenchmarkProfiles,
   ...stressBenchmarkProfiles,
 }
 
@@ -416,6 +520,7 @@ export function runBenchmarkCase(inputProfile) {
   const generationMs = performance.now() - generationStart
 
   const memoryBefore = process.memoryUsage().heapUsed
+  const resourceObserver = createResourceObserver()
   const orderingStart = performance.now()
   const result = orderEvents(events, {
     strict: false,
@@ -423,6 +528,8 @@ export function runBenchmarkCase(inputProfile) {
   })
   const orderingMs = performance.now() - orderingStart
   const memoryAfter = process.memoryUsage().heapUsed
+  resourceObserver.recordMemorySample()
+  const resourceMetrics = resourceObserver.stop()
 
   return {
     profile,
@@ -436,6 +543,14 @@ export function runBenchmarkCase(inputProfile) {
       generationMs,
       orderingMs,
       heapDeltaBytes: memoryAfter - memoryBefore,
+      startHeapUsedBytes: memoryBefore,
+      endHeapUsedBytes: memoryAfter,
+      peakHeapUsedBytes: Math.max(resourceMetrics.peakHeapUsedBytes, memoryBefore, memoryAfter),
+      peakRssBytes: resourceMetrics.peakRssBytes,
+      gcObservationSupported: resourceMetrics.gcObservationSupported,
+      gcCount: resourceMetrics.gcCount,
+      gcDurationMs: resourceMetrics.gcDurationMs,
+      maxGcDurationMs: resourceMetrics.maxGcDurationMs,
       validEvents: result.stats.validEvents,
       invalidEvents: result.stats.invalidEvents,
       orderedEvents: result.ordered.length,
@@ -468,6 +583,7 @@ export async function runBenchmarkCaseAsync(inputProfile) {
   }
 
   const memoryBefore = process.memoryUsage().heapUsed
+  const resourceObserver = createResourceObserver()
   const orderingStart = performance.now()
   const result = orderEvents(events, {
     strict: false,
@@ -475,6 +591,8 @@ export async function runBenchmarkCaseAsync(inputProfile) {
   })
   const orderingMs = performance.now() - orderingStart
   const memoryAfter = process.memoryUsage().heapUsed
+  resourceObserver.recordMemorySample()
+  const resourceMetrics = resourceObserver.stop()
 
   return {
     profile,
@@ -489,6 +607,14 @@ export async function runBenchmarkCaseAsync(inputProfile) {
       generationMs,
       orderingMs,
       heapDeltaBytes: memoryAfter - memoryBefore,
+      startHeapUsedBytes: memoryBefore,
+      endHeapUsedBytes: memoryAfter,
+      peakHeapUsedBytes: Math.max(resourceMetrics.peakHeapUsedBytes, memoryBefore, memoryAfter),
+      peakRssBytes: resourceMetrics.peakRssBytes,
+      gcObservationSupported: resourceMetrics.gcObservationSupported,
+      gcCount: resourceMetrics.gcCount,
+      gcDurationMs: resourceMetrics.gcDurationMs,
+      maxGcDurationMs: resourceMetrics.maxGcDurationMs,
       validEvents: result.stats.validEvents,
       invalidEvents: result.stats.invalidEvents,
       orderedEvents: result.ordered.length,
@@ -511,6 +637,15 @@ export function printBenchmarkSummary(run) {
   console.log(`Generation + shuffle: ${formatMs(metrics.generationMs)}`)
   console.log(`Ordering: ${formatMs(metrics.orderingMs)}`)
   console.log(`Heap delta: ${formatMemory(metrics.heapDeltaBytes)}`)
+  console.log(`Start heap: ${formatMemory(metrics.startHeapUsedBytes)}`)
+  console.log(`End heap: ${formatMemory(metrics.endHeapUsedBytes)}`)
+  console.log(`Peak heap: ${formatMemory(metrics.peakHeapUsedBytes)}`)
+  console.log(`Peak RSS: ${formatMemory(metrics.peakRssBytes)}`)
+  if (metrics.gcObservationSupported) {
+    console.log(`GC events: ${metrics.gcCount.toLocaleString()}`)
+    console.log(`GC total: ${formatMs(metrics.gcDurationMs)}`)
+    console.log(`Max GC pause: ${formatMs(metrics.maxGcDurationMs)}`)
+  }
   console.log(`Valid events: ${metrics.validEvents.toLocaleString()}`)
   console.log(`Invalid events: ${metrics.invalidEvents.toLocaleString()}`)
   console.log(`Ordered events: ${metrics.orderedEvents.toLocaleString()}`)
@@ -519,6 +654,10 @@ export function printBenchmarkSummary(run) {
     console.log(`Batches emitted: ${metrics.batchCount.toLocaleString()}`)
     console.log(`Final batches: ${metrics.finalBatchCount.toLocaleString()}`)
     console.log(`Max batch events: ${metrics.maxBatchEventCount.toLocaleString()}`)
+    console.log(`Correction batches: ${metrics.correctionBatchCount.toLocaleString()}`)
+    console.log(`Late-arrival anomalies: ${metrics.lateArrivalCount.toLocaleString()}`)
+    console.log(`Empty event batches: ${metrics.emptyEventBatchCount.toLocaleString()}`)
+    console.log(`Max anomalies in one batch: ${metrics.maxAnomaliesPerBatch.toLocaleString()}`)
     console.log(`Last watermark: ${metrics.lastWatermark}`)
   }
   if (metrics.anomalyCount > 0) {
@@ -553,6 +692,14 @@ export function toCsv(runs) {
       "generation_ms",
       "ordering_ms",
       "heap_delta_bytes",
+      "start_heap_used_bytes",
+      "end_heap_used_bytes",
+      "peak_heap_used_bytes",
+      "peak_rss_bytes",
+      "gc_observation_supported",
+      "gc_count",
+      "gc_duration_ms",
+      "max_gc_duration_ms",
       "valid_events",
       "invalid_events",
       "ordered_events",
@@ -560,6 +707,14 @@ export function toCsv(runs) {
       "anomaly_breakdown",
       "confidence_counts",
       "order_basis_counts",
+      "batch_count",
+      "final_batch_count",
+      "max_batch_event_count",
+      "correction_batch_count",
+      "late_arrival_count",
+      "empty_event_batch_count",
+      "max_anomalies_per_batch",
+      "last_watermark",
     ],
   ]
 
@@ -576,6 +731,14 @@ export function toCsv(runs) {
       run.metrics.generationMs.toFixed(2),
       run.metrics.orderingMs.toFixed(2),
       run.metrics.heapDeltaBytes,
+      run.metrics.startHeapUsedBytes,
+      run.metrics.endHeapUsedBytes,
+      run.metrics.peakHeapUsedBytes,
+      run.metrics.peakRssBytes,
+      run.metrics.gcObservationSupported,
+      run.metrics.gcCount,
+      run.metrics.gcDurationMs.toFixed(2),
+      run.metrics.maxGcDurationMs.toFixed(2),
       run.metrics.validEvents,
       run.metrics.invalidEvents,
       run.metrics.orderedEvents,
@@ -583,6 +746,14 @@ export function toCsv(runs) {
       JSON.stringify(run.metrics.anomalyBreakdown),
       JSON.stringify(run.metrics.confidenceCounts),
       JSON.stringify(run.metrics.orderBasisCounts),
+      run.metrics.batchCount ?? "",
+      run.metrics.finalBatchCount ?? "",
+      run.metrics.maxBatchEventCount ?? "",
+      run.metrics.correctionBatchCount ?? "",
+      run.metrics.lateArrivalCount ?? "",
+      run.metrics.emptyEventBatchCount ?? "",
+      run.metrics.maxAnomaliesPerBatch ?? "",
+      run.metrics.lastWatermark ?? "",
     ])
   }
 

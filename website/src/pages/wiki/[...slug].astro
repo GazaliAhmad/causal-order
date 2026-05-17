@@ -1,0 +1,22 @@
+---
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import { getDocsByCollection, getNavigation } from "../../lib/docs.js";
+
+export function getStaticPaths() {
+  return getDocsByCollection("wiki")
+    .filter((doc) => !doc.isLanding)
+    .map((doc) => ({
+      params: {
+        slug: doc.routePath.replace(/^\/wiki\/|\/$/g, ""),
+      },
+      props: {
+        doc,
+      },
+    }));
+}
+
+const { doc } = Astro.props;
+const navigation = getNavigation("wiki");
+---
+
+<DocsLayout doc={doc} navigation={navigation} sectionLabel="Wiki" />

@@ -1,0 +1,63 @@
+---
+import ApiLayout from "../../layouts/ApiLayout.astro";
+import { apiNavigation, apiSourceUrls } from "../../lib/api.js";
+
+const toc = [
+  { id: "entry-points", text: "Primary entry points", depth: 2 },
+  { id: "shape-of-the-library", text: "Shape of the library", depth: 2 },
+  { id: "where-to-start", text: "Where to start", depth: 2 },
+];
+---
+
+<ApiLayout
+  title="API Overview"
+  description="The public API surface exported by causal-order today."
+  sourceUrl={apiSourceUrls.overview}
+  toc={toc}
+  navigation={apiNavigation}
+>
+  <p>
+    The package currently exports one public surface from <code>src/index.ts</code>. The API is
+    grouped around event ordering, streaming, validation, causality comparison, clocks, anomalies,
+    and types.
+  </p>
+
+  <h2 id="entry-points">Primary entry points</h2>
+  <ul>
+    <li><a href="/api/order-events/"><code>orderEvents()</code></a> for bounded batch ordering.</li>
+    <li><a href="/api/order-event-stream/"><code>orderEventStream()</code></a> for async streaming output.</li>
+    <li><a href="/api/validate-event/"><code>validateEvent()</code></a> for event-envelope validation.</li>
+    <li><a href="/api/compare-by-causality/"><code>compareByCausality()</code></a> for pairwise causal comparison.</li>
+  </ul>
+
+  <h2 id="shape-of-the-library">Shape of the library</h2>
+  <ul>
+    <li>
+      <strong>Types</strong>: event envelopes, ordered events, confidence, anomalies, stream batches,
+      and options.
+    </li>
+    <li>
+      <strong>Clock helpers</strong>: HLC creation, parse, and serialize functions.
+    </li>
+    <li>
+      <strong>Comparison helpers</strong>: HLC comparison, causality comparison, and deterministic tie breaking.
+    </li>
+    <li>
+      <strong>Ordering</strong>: batch ordering, streaming ordering, tie breakers, and watermark strategies.
+    </li>
+  </ul>
+
+  <pre><code>{`import {
+  orderEvents,
+  orderEventStream,
+  validateEvent,
+  compareByCausality,
+} from "causal-order"`}</code></pre>
+
+  <h2 id="where-to-start">Where to start</h2>
+  <p>
+    If you are using the package for the first time, start with <code>orderEvents()</code> for
+    bounded replay or audit slices. Move to <code>orderEventStream()</code> when you need watermark,
+    late-arrival, and correction-capable behavior.
+  </p>
+</ApiLayout>

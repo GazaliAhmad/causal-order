@@ -1,0 +1,50 @@
+---
+import ApiLayout from "../../layouts/ApiLayout.astro";
+import { apiNavigation, apiSourceUrls } from "../../lib/api.js";
+
+const toc = [
+  { id: "core-event-types", text: "Core event types", depth: 2 },
+  { id: "ordering-result-types", text: "Ordering result types", depth: 2 },
+  { id: "streaming-types", text: "Streaming types", depth: 2 },
+];
+---
+
+<ApiLayout
+  title="Types"
+  description="The main public types exported by causal-order."
+  sourceUrl={apiSourceUrls.types}
+  toc={toc}
+  navigation={apiNavigation}
+>
+  <h2 id="core-event-types">Core event types</h2>
+  <ul>
+    <li><code>HlcTimestamp</code></li>
+    <li><code>EventEnvelope&lt;T&gt;</code></li>
+    <li><code>ValidatedEventEnvelope&lt;T&gt;</code></li>
+    <li><code>CausalOrdering</code></li>
+    <li><code>CausalEvidence</code></li>
+  </ul>
+
+  <h2 id="ordering-result-types">Ordering result types</h2>
+  <ul>
+    <li><code>OrderedEvent&lt;T&gt;</code></li>
+    <li><code>OrderResult&lt;T&gt;</code></li>
+    <li><code>OrderStats</code></li>
+    <li><code>OrderOptions&lt;T&gt;</code></li>
+    <li><code>TieBreaker&lt;T&gt;</code></li>
+  </ul>
+
+  <h2 id="streaming-types">Streaming types</h2>
+  <ul>
+    <li><code>StreamOrderOptions&lt;T&gt;</code></li>
+    <li><code>OrderBatch&lt;T&gt;</code></li>
+    <li><code>CorrectionNotice</code></li>
+    <li><code>LateArrivalPolicy</code></li>
+    <li><code>WatermarkFunction&lt;T&gt;</code></li>
+  </ul>
+
+  <p>
+    The confidence model used in ordered output is currently:
+    <code>proven</code>, <code>derived</code>, <code>fallback</code>, and <code>unknown</code>.
+  </p>
+</ApiLayout>
