@@ -1,9 +1,9 @@
 # `0.3.3` Implementation Guide
 
-This note keeps `0.3.3` implementation work scoped and commit-friendly.
+This note records the `0.3.3` implementation work in a scoped, commit-friendly shape.
 
 It does not prescribe code structure in advance.
-It keeps the sequencing clear:
+It keeps the shipped sequencing clear:
 
 * add pressure visibility first
 * change runtime behavior second
@@ -15,7 +15,7 @@ For the broader milestone intent, see:
 
 ## Working Rule
 
-`0.3.3` should be implemented in small chunks that separate:
+`0.3.3` was implemented in small chunks that separate:
 
 * new pressure profiles
 * new benchmark visibility
@@ -28,7 +28,7 @@ The repo should avoid mixing those together unless there is a strong reason.
 
 ## Sub-Goal
 
-`0.3.3` should make stream memory pressure observable before making it enforceable.
+`0.3.3` makes stream memory pressure observable before making it enforceable.
 
 That means:
 
@@ -36,7 +36,7 @@ That means:
 * do not start by inventing hard memory thresholds
 * do start by making pressure easier to see in the current runtime
 
-For stream stress scale, the intended working posture is:
+For stream stress scale, the released working posture is:
 
 * keep `100k` as the routine stream comparison band
 * treat `150k` as the main `0.3.3` stream stress-visibility band
@@ -44,7 +44,7 @@ For stream stress scale, the intended working posture is:
 
 ## Chunk Order
 
-The intended order is:
+The landed order was:
 
 1. stream pressure profile scaffolding
 2. richer stream benchmark visibility
@@ -56,8 +56,8 @@ The intended order is:
 8. stable stream guard promotion
 9. docs and changelog cleanup
 
-The early chunks are still pressure-evidence work, not runtime redesign work.
-They should widen the pressure story around:
+The early chunks were still pressure-evidence work, not runtime redesign work.
+They widened the pressure story around:
 
 * reconnect churn
 * correction churn
@@ -65,16 +65,18 @@ They should widen the pressure story around:
 * partial ready subsets
 * bounded-memory pressure
 
-Only after that pressure surface is clearer should the repo change the runtime.
-That later work should stay split between:
+Only after that pressure surface was clearer did the repo change the runtime.
+That later work stayed split between:
 
 * stream buffer and flush-path changes
 * anomaly-path allocation tightening
 
-New stream guards should come only after the profile shape is stable and the numbers are repeatable enough to trust.
+New stream guards came only after the profile shape was stable and the numbers were repeatable enough to trust.
 
-Docs should be updated after the implementation story is real.
-The wording should stay disciplined:
+At the released stage, that means the `150k` sustained watermark-lag profile is the enforced guard, while `250k` remains exploratory and correction-heavy profiles remain visibility-first unless their variance settles further.
+
+Docs were updated after the implementation story became real.
+The wording stays disciplined:
 
 * `0.3.2` is the production-credibility gate
 * `0.3.3` is the broader streaming pressure and hardening follow-up

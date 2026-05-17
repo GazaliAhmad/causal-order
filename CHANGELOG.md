@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.3.3]
 
 ### Added
 
@@ -40,6 +40,8 @@ All notable changes to this project will be documented in this file.
 * extended benchmark visibility with start, end, and peak heap sampling, peak RSS, and best-effort GC metrics so `0.3.3` memory-pressure work is observable before it becomes enforceable
 * documented current `0.3.3` forced-GC evidence for the `150k` and `250k` watermark-lag stream profiles as descriptive hardening evidence rather than as a hard guard
 * optimized the `orderEventStream()` flush path so ready events are buffered separately from pending events, reducing repeated full-backlog rescans and compaction work under watermark-lag pressure
+* reduced anomaly-heavy stream overhead by using a cheaper single-event anomaly path for invalid stream records and a lighter pending-anomaly merge path in `orderEventStream()`
+* promoted `streaming-150k-watermark-lag` into the enforced perf guard set as the current stable `0.3.3` stream-pressure guard
 * clarified the docs so bounded batch recovery, replay, reconciliation, and audit-style workloads are described as the stronger current deployment story, while the larger remaining proof bar stays on streaming
 
 ## [0.3.2]

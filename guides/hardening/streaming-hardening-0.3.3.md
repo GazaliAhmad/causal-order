@@ -1,13 +1,13 @@
 # `0.3.3` Streaming Hardening And Pressure
 
-`0.3.3` is the milestone where `causal-order` widens the streaming pressure envelope after the current `0.3.2` contract has already been defended as production-credible.
+`0.3.3` is the release where `causal-order` widens the streaming pressure envelope after the current `0.3.2` contract has already been defended as production-credible.
 
-This guide scopes the next hardening step.
+This guide records the shipped `0.3.3` hardening step.
 It does not define a new semantic contract.
 
 ## Goal
 
-Before `0.3.3` is called complete, the repository should be able to defend a simple claim:
+`0.3.3` defends a simple claim:
 
 > the current streaming contract is not only semantically credible, but also pressure-tested more deeply under sustained reconnect, watermark, correction, and bounded-memory stress
 
@@ -29,9 +29,9 @@ It means the current streaming model has been exercised under heavier pressure a
 
 ## Sub-Goal: Memory Pressure Visibility
 
-`0.3.3` should make stream memory pressure observable before making it enforceable.
+`0.3.3` makes stream memory pressure observable before making it enforceable.
 
-This does not mean `0.3.3` must begin with a stream-architecture redesign.
+This does not mean `0.3.3` begins with a stream-architecture redesign.
 
 It means the repository should expose clearer memory-pressure truth for the current contract before it tries to:
 
@@ -48,20 +48,20 @@ This matters when:
 
 If that pressure is operationally important, it should be visible even before it becomes a guarded benchmark surface.
 
-So `0.3.3` should treat memory in two layers:
+So `0.3.3` treats memory in two layers:
 
 * optimization evidence
 * operational contract visibility
 
-The current milestone should strengthen the second layer without pretending it already has stable enough numbers to enforce broadly in CI.
+The release strengthens the second layer without pretending it already has stable enough numbers to enforce broadly in CI.
 
-For the current benchmark tooling, that visibility should include simple observable signals such as:
+For the current benchmark tooling, that visibility includes simple observable signals such as:
 
 * start, end, and peak heap
 * peak RSS
 * best-effort GC event counts and durations
 
-Those numbers should remain descriptive for now rather than treated as hard release thresholds.
+Those numbers remain descriptive for now rather than treated as hard release thresholds.
 
 Current local evidence for this sub-goal is encouraging but still observational.
 Using `--expose-gc` with the `streaming-150k-watermark-lag` and `streaming-250k-watermark-lag` profiles, the measured heap growth during the run was reclaimed cleanly after an explicit forced GC.
@@ -89,7 +89,7 @@ For the current release gate, see:
 
 ## Pressure Areas
 
-The current `0.3.3` pressure scope is:
+The shipped `0.3.3` pressure scope is:
 
 * `flushReady()` follow-up optimization
 * anomaly-heavy batch and stream hotspot tightening
@@ -100,18 +100,18 @@ The current `0.3.3` pressure scope is:
 * bounded-memory and backpressure hardening under heavier stress
 * deciding which additional stream stress profiles should become future perf guards
 
-Each area should produce either:
+Each area produces either:
 
 * stronger guarded coverage
 * clearer profile-backed evidence
 * or a more honest documented limit
 
-The same principle should apply to memory pressure:
+The same principle applies to memory pressure:
 
 * first make it observable
 * then decide later which parts are stable enough to guard
 
-For stream stress scale, the current intended `0.3.3` posture should stay explicit:
+For stream stress scale, the released `0.3.3` posture stays explicit:
 
 * `100k` remains the routine comparison band
 * `150k` is the main stream stress-visibility band for broader `0.3.3` pressure work
@@ -119,7 +119,7 @@ For stream stress scale, the current intended `0.3.3` posture should stay explic
 
 ## `flushReady()` Follow-Up Work
 
-`0.3.3` should continue the follow-up work on the `flushReady()` path so that:
+`0.3.3` continued the follow-up work on the `flushReady()` path so that:
 
 * repeated scans do not become the next throughput cliff
 * buffer compaction cost stays visible and controlled
@@ -130,7 +130,7 @@ The goal is to keep a known hotspot visible and measurable under heavier pressur
 
 ## Anomaly-Heavy Path Work
 
-`0.3.3` should continue profiling and tightening anomaly-heavy paths where:
+`0.3.3` continued profiling and tightening anomaly-heavy paths where:
 
 * repeated anomaly allocation creates GC pressure
 * large invalid-event or duplicate-event volume reduces throughput sharply
@@ -141,11 +141,13 @@ This includes both:
 * stream-focused hotspots
 * anomaly-heavy batch paths that still feed the same operational story
 
+The current hardening pass now includes a lighter single-event anomaly path for invalid stream records and a cheaper pending-anomaly merge path in `orderEventStream()`, so anomaly-heavy stream pressure is paying less overhead for obviously local anomaly cases.
+
 ## Exploratory Fuzz Expansion
 
 The `0.3.2` fuzz layer is the bounded, reproducible release-gate suite.
 
-`0.3.3` should extend that into broader exploratory campaigns such as:
+`0.3.3` extends that into broader exploratory campaigns such as:
 
 * longer-running seeded runs
 * higher-cardinality workloads
@@ -162,6 +164,8 @@ The current exploratory layer now includes seeded stream fuzz coverage for:
 * correction-burst pressure
 * sustained correction-churn pressure
 * fragmented reconnect-burst pressure
+* bounded-window lagging-watermark pressure
+* bounded-memory cross-window replay pressure
 
 They should not replace the named `0.3.2` release-gate suite as the primary correctness gate for the current contract.
 
@@ -169,7 +173,7 @@ They should not replace the named `0.3.2` release-gate suite as the primary corr
 
 Small semantic fixtures already show that delayed reconnect and `emit_correction` work.
 
-`0.3.3` should push further by testing:
+`0.3.3` pushes further by testing:
 
 * repeated correction-trigger batches in one stream instance
 * reconnect bursts that fragment output into many batches
@@ -182,7 +186,7 @@ The goal is to show that the current correction model stays usable under heavier
 
 `0.3.2` covers watermark correctness and minimum bounded-memory credibility.
 
-`0.3.3` should extend that into heavier pressure cases such as:
+`0.3.3` extends that into heavier pressure cases such as:
 
 * sustained watermark lag
 * repeated lagging-watermark flush attempts
@@ -197,7 +201,7 @@ But it should make the memory consequences of stalled or fragmented streaming be
 
 ## Perf-Guard Decision Work
 
-`0.3.3` should decide which additional stream stress cases are mature enough to move from:
+`0.3.3` decides which additional stream stress cases are mature enough to move from:
 
 * exploratory visibility
 
@@ -205,17 +209,20 @@ to:
 
 * enforced perf-check expectation
 
-That decision should be evidence-driven.
+That decision is evidence-driven.
 
-Profiles should become guarded only when:
+Profiles become guarded only when:
 
 * they are reproducible
 * they reflect a meaningful operational risk
 * their variability is low enough to make a guard useful rather than noisy
 
+At the released stage, `streaming-150k-watermark-lag` is strong enough to serve as the enforced `0.3.3` stream-pressure guard.
+The `250k` watermark-lag profile remains exploratory, and the correction-churn profile remains evidence-oriented until it proves stable enough for routine CI use.
+
 ## Optimization Discipline
 
-`0.3.3` should keep optimization decisions evidence-driven.
+`0.3.3` keeps optimization decisions evidence-driven.
 
 That means:
 
@@ -223,13 +230,13 @@ That means:
 * avoid keeping micro-optimizations that add code complexity without meaningful wins
 * let CPU profiles, GC behavior, and repeated stress runs choose the next hotspot
 
-The milestone should prefer measured evidence over assumptions.
+The milestone prefers measured evidence over assumptions.
 
 ## Verification Commands
 
-The `0.3.3` work should still map back to repository commands rather than only to prose.
+The `0.3.3` work still maps back to repository commands rather than only to prose.
 
-Current commands that should carry this work are:
+Current commands that carry this work are:
 
 ```bash
 npm test
@@ -240,13 +247,13 @@ npm run bench:profile
 npm run release:check
 ```
 
-As the scoped work lands, the repository should make it easier to tell which of these commands provide:
+With the scoped work landed, the repository now makes it easier to tell which of these commands provide:
 
 * current release-gate proof
 * exploratory pressure evidence
 * guarded performance regression detection
 
-And where practical, those commands should expose memory-pressure evidence clearly enough that maintainers can answer:
+And where practical, those commands expose memory-pressure evidence clearly enough that maintainers can answer:
 
 * which profiles keep pending state small?
 * which profiles allow large buffered accumulation?
@@ -262,7 +269,7 @@ That is useful `0.3.3` evidence even before the repo decides whether any part of
 
 ## Docs And Release Wording
 
-By the end of `0.3.3`, the repository should make one consistent claim about what this release means.
+By the end of `0.3.3`, the repository makes one consistent claim about what this release means.
 
 That includes:
 
@@ -272,12 +279,12 @@ That includes:
 * changelog and release notes
 * perf-check expectations
 
-The wording should stay disciplined:
+The wording stays disciplined:
 
 * `0.3.2` is the production-credibility gate
 * `0.3.3` is the broader streaming hardening and pressure follow-up
 
-If the heavier pressure evidence is still incomplete, the wording should reflect that rather than implying a closed hotspot story.
+Where heavier pressure evidence remains exploratory, the wording reflects that rather than implying a closed hotspot story.
 
 ## Not In Scope Yet
 
@@ -293,7 +300,7 @@ Those belong to later contract and extension-point design work, not to this pres
 
 ## Exit Criteria
 
-`0.3.3` is complete when:
+`0.3.3` is complete because:
 
 * broader streaming pressure coverage exists beyond the minimum `0.3.2` release-gate set
 * the most important remaining streaming hotspots have fresh profile-backed evidence
@@ -301,3 +308,5 @@ Those belong to later contract and extension-point design work, not to this pres
 * maintainers have clearer evidence for which streaming stress cases should become future enforced guards
 * stream memory pressure is more observable in the pressure tooling, even where it is not yet stable enough to enforce as a hard guard
 * docs and release wording keep the distinction clear between production-gate proof and broader pressure-follow-up hardening
+
+That now includes at least one explicit stream-pressure guard beyond the older `100k` streaming plateau case, rather than leaving all broader `0.3.3` stream pressure work in visibility-only status.

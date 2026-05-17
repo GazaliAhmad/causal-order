@@ -599,32 +599,32 @@ Exit criteria:
 ## `0.3.3` Streaming Hardening And Pressure
 
 Goal:
-Continue the broader streaming hardening and pressure work after the current semantics have passed the first production gate milestone.
+Broaden the streaming hardening and pressure work after the current semantics passed the first production gate milestone.
 
-This release should build on the credibility established in `0.3.2` rather than trying to establish that credibility and broaden the pressure scope at the same time.
+This release builds on the credibility established in `0.3.2` rather than trying to establish that credibility and broaden the pressure scope at the same time.
 
 Focus:
 
-* continue optimizing the `flushReady()` path so remaining repeated scans, compaction, and pressure behavior do not become the next streaming performance cliff
-* continue profiling and tightening anomaly-heavy batch and stream paths, especially where large anomaly volumes create GC pressure or throughput cliffs
-* extend streaming stress coverage beyond the minimum release-gate set once the baseline production gates are already in place
-* add longer-running exploratory seeded fuzz campaigns beyond the `0.3.2` release-gate suite:
+* continued optimizing the `flushReady()` path so repeated scans, compaction, and pressure behavior did not remain the next streaming performance cliff
+* continued profiling and tightening anomaly-heavy batch and stream paths, especially where large anomaly volumes create GC pressure or throughput cliffs
+* extended streaming stress coverage beyond the minimum release-gate set once the baseline production gates were in place
+* added longer-running exploratory seeded fuzz campaigns beyond the `0.3.2` release-gate suite:
   * use higher-cardinality randomized outage, recovery, replay, and concurrency runs to expose sustained pressure behavior
   * use these campaigns to discover correction-window churn, watermark-lag, memory-growth, and throughput cliffs that smaller release-gate fuzzing is not designed to exhaust
   * treat these campaigns as hotspot-discovery and pressure-evidence tooling rather than as the primary correctness gate for the current contract
-* pressure-test correction-window behavior during resync and delayed reconnect flows beyond small semantic fixtures
-* extend watermark-pressure coverage from correctness-only toward sustained operational pressure
-* strengthen bounded-memory demonstrations and backpressure guidance with more explicit heavy-pressure cases
-* decide which additional streaming stress profiles are stable enough to enforce in perf checks
-* keep optimization discipline evidence-driven:
+* pressure-tested correction-window behavior during resync and delayed reconnect flows beyond small semantic fixtures
+* extended watermark-pressure coverage from correctness-only toward sustained operational pressure
+* strengthened bounded-memory demonstrations and backpressure guidance with more explicit heavy-pressure cases
+* decided which additional streaming stress profiles were stable enough to enforce in perf checks
+* kept optimization discipline evidence-driven:
   * retain optimizations that measurably improve guarded or stressed workloads
   * revert micro-optimizations that preserve correctness but do not produce meaningful wins
   * let CPU profiles, GC behavior, and guarded stress runs decide the next hotspot
 
-Why this should follow `0.3.2`:
+Why this followed `0.3.2`:
 
-* `0.3.2` should answer whether the current contract is already credible enough to defend
-* `0.3.3` can then safely widen the pressure work without blurring the release story
+* `0.3.2` answered whether the current contract was already credible enough to defend
+* `0.3.3` could then safely widen the pressure work without blurring the release story
 * this keeps the sequencing honest:
   * first prove the current claims
   * then keep hardening the pressure envelope around those claims

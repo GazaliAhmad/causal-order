@@ -1,6 +1,6 @@
 {
   "name": "causal-order",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "An event integrity library for ordering and analyzing distributed events without false certainty.",
   "keywords": [
     "distributed-systems",

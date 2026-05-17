@@ -262,15 +262,15 @@ Runnable examples:
 
 Current release shape:
 
-* `0.3.2` is the current production-gate hardening release
-* `0.3.3` is the current broader streaming hardening and pressure follow-up after that production-gate milestone
+* `0.3.2` established the current production-gate hardening baseline
+* `0.3.3` is the current broader streaming hardening and pressure release after that production-gate milestone
 
-Current `0.3.3` repo work is centered on:
+The current `0.3.3` release is centered on:
 
 * explicit `0.3.2` production-gate proof
 * broader `0.3.3` streaming pressure profiles and higher-scale visibility bands
 * seeded batch and streaming fuzz coverage for realistic outage, reconnect, correction, watermark-lag, and bounded-memory pressure
-* stream-path hardening and follow-up optimization under heavier pressure
+* stream-path hardening, anomaly-path tightening, and follow-up optimization under heavier pressure
 
 Current deployment posture:
 
@@ -310,13 +310,13 @@ Current test posture:
 
 * `npm test` includes the direct release-gate suites plus seeded `0.3.2` fuzz coverage
 * the fuzz layer currently covers batch outage/replay noise plus streaming reconnect, fragmented watermark-lag, correction-burst, sustained correction-churn, reconnect-burst, bounded-window lagging-watermark, and bounded-memory cross-window replay pressure
-* broader exploratory fuzz campaigns are now underway as part of the `0.3.3` pressure expansion
+* broader exploratory fuzz campaigns are now part of the shipped `0.3.3` pressure expansion
 
 Current benchmark posture:
 
 * `10k` and `100k` are the main enforced guardrail bands
 * `150k` corrupted-dataset profiles are available for stress visibility, but are not currently enforced in `npm run bench:check`
-* for the current `0.3.3` streaming pressure work, `150k` is the main stream stress-visibility band while `250k` remains exploratory stretch visibility rather than a routine guard target
+* for the current `0.3.3` streaming pressure work, `150k` is now the enforced sustained watermark-lag stream guard band while `250k` remains exploratory stretch visibility rather than a routine guard target
 * `npm run bench:profile` is available when you need CPU profiles for the slowest stress cases
 
 ## License
