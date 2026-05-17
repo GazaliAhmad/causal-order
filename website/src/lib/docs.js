@@ -4,15 +4,15 @@ import { fileURLToPath } from "node:url";
 import matter from "gray-matter";
 import { marked } from "marked";
 
-const repoRoot = fileURLToPath(new URL("../../../", import.meta.url));
+const repoRoot = findRepoRoot();
 const guidesRoot = path.join(repoRoot, "guides");
 const wikiRoot = path.join(repoRoot, "wiki");
 const repoPackage = JSON.parse(
   fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"),
 );
-const repoUrl = repoPackage.repository.url
-  .replace(/^git\+/, "")
-  .replace(/\.git$/, "");
+const repoUrl = normalizeRepoUrl(
+  repoPackage.repository?.url ?? repoPackage.repository,
+);
 
 const docsRoots = {
   guides: guidesRoot,
@@ -91,6 +91,34 @@ function buildDocsCache() {
   };
 
   return { byCollection, byRoute, navigation };
+}
+
+function findRepoRoot() {
+  const candidates = [
+    fileURLToPath(new URL("../../../", import.meta.url)),
+    path.resolve(process.cwd(), ".."),
+    process.cwd(),
+  ];
+
+  for (const candidate of candidates) {
+    if (
+      fs.existsSync(path.join(candidate, "guides")) &&
+      fs.existsSync(path.join(candidate, "wiki")) &&
+      fs.existsSync(path.join(candidate, "package.json"))
+    ) {
+      return candidate;
+    }
+  }
+
+  throw new Error("Unable to resolve repository root for website docs");
+}
+
+function normalizeRepoUrl(value) {
+  if (typeof value === "string" && value.length > 0) {
+    return value.replace(/^git\+/, "").replace(/\.git$/, "");
+  }
+
+  return "https://github.com/GazaliAhmad/causal-order";
 }
 
 function createDocRecord(collection, rootDir, absolutePath, relativePath) {
