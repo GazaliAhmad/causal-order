@@ -1,8 +1,7 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 
-const { doc, navigation, sectionLabel } = Astro.props;
-const currentPath = Astro.url.pathname;
+const { doc, navigation, sectionLabel, currentPath = doc.routePath } = Astro.props;
 ---
 
 <BaseLayout title={`${doc.title} | causal-order`} description={doc.description}>

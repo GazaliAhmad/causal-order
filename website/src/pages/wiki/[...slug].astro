@@ -19,4 +19,4 @@ const { doc } = Astro.props;
 const navigation = getNavigation("wiki");
 ---
 
-<DocsLayout doc={doc} navigation={navigation} sectionLabel="Wiki" />
+<DocsLayout doc={doc} navigation={navigation} sectionLabel="Wiki" currentPath={doc.routePath} />

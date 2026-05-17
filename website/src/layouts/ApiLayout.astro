@@ -1,8 +1,14 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 
-const { title, description, sourceUrl, toc = [], navigation = [] } = Astro.props;
-const currentPath = Astro.url.pathname;
+const {
+  title,
+  description,
+  sourceUrl,
+  toc = [],
+  navigation = [],
+  currentPath = "/api/",
+} = Astro.props;
 ---
 
 <BaseLayout title={`${title} | causal-order API`} description={description}>
