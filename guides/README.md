@@ -16,14 +16,6 @@ Start here:
 * [After-Hours Batch Processing](./after-hours-batch-processing.md)
 * [Streaming Recovery And Resync](./streaming-recovery-resync.md)
 
-Release-specific hardening:
-
-* [Production Gate `0.3.2`](./hardening/production-gate-0.3.2.md)
-* [Anomaly Surface Audit `0.3.2`](./hardening/anomaly-surface-0.3.2.md)
-* [Fuzz Testing `0.3.2`](./hardening/fuzz-testing-0.3.2.md)
-* [Streaming Hardening And Pressure `0.3.3`](./hardening/streaming-hardening-0.3.3.md)
-* [Implementation Guide `0.3.3`](./hardening/implementation-guide-0.3.3.md)
-
 Failure-mode guides:
 
 * [Replay Corruption](./replay-corruption.md)

@@ -65,6 +65,50 @@ function* iterateValidationRecords<T>(
   }
 }
 
+function pushSingleEventValidationAnomalies<T>(
+  anomalies: EventAnomaly<T>[],
+  event: EventEnvelope<T>,
+  validation: ValidationResult<ValidatedEventEnvelope<T>>,
+): void {
+  if (!validation.valid) {
+    anomalies.push({
+      type: "invalid_clock",
+      severity: "error",
+      event,
+      message: joinValidationMessages(validation.errors),
+    })
+  }
+
+  for (const warning of validation.warnings) {
+    if (warning.code === "future_timestamp") {
+      anomalies.push({
+        type: "future_timestamp",
+        severity: "warning",
+        event,
+        message: FUTURE_TIMESTAMP_MESSAGE,
+      })
+    }
+  }
+
+  if (event.sequence === undefined) {
+    anomalies.push({
+      type: "missing_sequence",
+      severity: "info",
+      event,
+      message: MISSING_SEQUENCE_MESSAGE,
+    })
+  }
+}
+
+export function detectSingleEventAnomalies<T>(
+  event: EventEnvelope<T>,
+  validation: ValidationResult<ValidatedEventEnvelope<T>>,
+): EventAnomaly<T>[] {
+  const anomalies: EventAnomaly<T>[] = []
+  pushSingleEventValidationAnomalies(anomalies, event, validation)
+  return anomalies
+}
+
 export function detectAnomalies<T>(
   events: EventEnvelope<T>[],
   options?: Pick<OrderOptions<T>, "maxClockDriftMs"> & {
@@ -102,35 +146,7 @@ export function detectAnomalies<T>(
   }
 
   for (const { event, validation } of validations) {
-    if (!validation.valid) {
-      anomalies.push({
-        type: "invalid_clock",
-        severity: "error",
-        event,
-        message: joinValidationMessages(validation.errors),
-      })
-    }
-
-    for (const warning of validation.warnings) {
-      if (warning.code === "future_timestamp") {
-        anomalies.push({
-          type: "future_timestamp",
-          severity: "warning",
-          event,
-          message: FUTURE_TIMESTAMP_MESSAGE,
-        })
-      }
-
-    }
-
-    if (event.sequence === undefined) {
-      anomalies.push({
-        type: "missing_sequence",
-        severity: "info",
-        event,
-        message: MISSING_SEQUENCE_MESSAGE,
-      })
-    }
+    pushSingleEventValidationAnomalies(anomalies, event, validation)
 
     const currentRecord: EventValidationRecord<T> = {
       event,

@@ -263,14 +263,14 @@ Runnable examples:
 Current release shape:
 
 * `0.3.2` is the current production-gate hardening release
-* `0.3.3` is the next broader streaming hardening and pressure follow-up after that production-gate milestone
+* `0.3.3` is the current broader streaming hardening and pressure follow-up after that production-gate milestone
 
-Current `0.3.2` repo work is centered on:
+Current `0.3.3` repo work is centered on:
 
-* explicit production gates
-* current-core release-blocking coverage
-* anomaly-surface clarity
-* seeded batch and streaming fuzz coverage for realistic outage and reconnect noise
+* explicit `0.3.2` production-gate proof
+* broader `0.3.3` streaming pressure profiles and higher-scale visibility bands
+* seeded batch and streaming fuzz coverage for realistic outage, reconnect, correction, watermark-lag, and bounded-memory pressure
+* stream-path hardening and follow-up optimization under heavier pressure
 
 Current deployment posture:
 

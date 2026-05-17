@@ -9,7 +9,7 @@ import type {
   ValidatedEventEnvelope,
   WatermarkFunction,
 } from "../types.js"
-import { detectAnomalies } from "../anomalies/detectAnomalies.js"
+import { detectSingleEventAnomalies } from "../anomalies/detectAnomalies.js"
 import { getValidatedEventTime } from "../internal/utils.js"
 import { orderValidatedEvents } from "./orderEvents.js"
 import { eventTimeWatermark } from "./watermarkStrategies.js"
@@ -110,6 +110,22 @@ function resolveWatermarkSignal<T>(
   }
 
   return value
+}
+
+function mergePendingAnomalies<T>(
+  orderedAnomalies: EventAnomaly<T>[],
+  pendingAnomalies: EventAnomaly<T>[],
+): EventAnomaly<T>[] {
+  if (orderedAnomalies.length === 0) {
+    return pendingAnomalies
+  }
+
+  if (pendingAnomalies.length === 0) {
+    return orderedAnomalies
+  }
+
+  orderedAnomalies.push(...pendingAnomalies)
+  return orderedAnomalies
 }
 
 export async function* orderEventStream<T>(
@@ -225,9 +241,7 @@ export async function* orderEventStream<T>(
           ordered: [],
           anomalies: [],
         }
-    const anomalies = result.anomalies.length > 0
-      ? [...result.anomalies, ...pendingAnomalies]
-      : pendingAnomalies
+    const anomalies = mergePendingAnomalies(result.anomalies, pendingAnomalies)
     pendingAnomalies = []
 
     const batch: OrderBatch<T> = {
@@ -259,10 +273,9 @@ export async function* orderEventStream<T>(
     }
 
     if (!validation.valid) {
-      pendingAnomalies.push(...detectAnomalies([event], {
-        ...validationOptions,
-        validations: [{ event, validation }],
-      }))
+      pendingAnomalies.push(
+        ...detectSingleEventAnomalies(event, validation),
+      )
     } else {
       const watermarkSignal = resolveWatermarkSignal(event, getWatermark)
       if (
