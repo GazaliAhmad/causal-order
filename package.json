@@ -55,6 +55,8 @@
     "bench:all": "npm run build && node perf/run.mjs --all",
     "bench:csv": "npm run build && node perf/run.mjs --all --out perf/results/latest.csv",
     "bench:profile": "npm run build && node perf/profile.mjs",
+    "bench:stream:cycles": "npm run build && node perf/endurance.mjs --profile streaming-150k-watermark-lag --repeat 12",
+    "bench:stream:long": "npm run build && node perf/endurance.mjs --profile streaming-150k-watermark-lag --duration-ms 60000",
     "bench:check": "npm run build && node perf/check.mjs",
     "prepack": "npm run build"
   },
