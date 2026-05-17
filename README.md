@@ -326,3 +326,7 @@ MIT. See [LICENSE](https://github.com/GazaliAhmad/causal-order/blob/main/LICENSE
 ## Security
 
 See [SECURITY.md](https://github.com/GazaliAhmad/causal-order/blob/main/SECURITY.md) for supported versions and private vulnerability reporting guidance.
+
+## Contributing
+
+See [CONTRIBUTING.md](https://github.com/GazaliAhmad/causal-order/blob/main/CONTRIBUTING.md) for repository workflow, verification expectations, and documentation update guidance.
