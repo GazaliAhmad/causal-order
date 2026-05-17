@@ -19,4 +19,4 @@ const { doc } = Astro.props;
 const navigation = getNavigation("guides");
 ---
 
-<DocsLayout doc={doc} navigation={navigation} sectionLabel="Guides" />
+<DocsLayout doc={doc} navigation={navigation} sectionLabel="Guides" currentPath={doc.routePath} />
