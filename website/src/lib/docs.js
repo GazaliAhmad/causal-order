@@ -25,6 +25,18 @@ const landingFiles = {
 };
 
 const hiddenFiles = new Set(["_Sidebar.md", "PUBLISH-ORDER.md"]);
+const includedGuidesHardeningFiles = new Set([
+  "hardening/anomaly-surface-0.3.2.md",
+  "hardening/fuzz-testing-0.3.2.md",
+  "hardening/runtime-stability-0.3.4.md",
+  "hardening/streaming-hardening-0.3.3.md",
+]);
+const hardeningTitleOverrides = new Map([
+  ["hardening/anomaly-surface-0.3.2.md", "Anomaly Surface Audit"],
+  ["hardening/fuzz-testing-0.3.2.md", "Fuzz Testing"],
+  ["hardening/runtime-stability-0.3.4.md", "Runtime Stability"],
+  ["hardening/streaming-hardening-0.3.3.md", "Streaming Hardening And Pressure"],
+]);
 
 const docsCache = buildDocsCache();
 
@@ -55,6 +67,10 @@ function buildDocsCache() {
     for (const absolutePath of walkMarkdownFiles(rootDir)) {
       const relativePath = path.relative(rootDir, absolutePath);
       if (hiddenFiles.has(path.basename(relativePath))) {
+        continue;
+      }
+
+      if (shouldExcludeDoc(collection, relativePath)) {
         continue;
       }
 
@@ -125,8 +141,14 @@ function createDocRecord(collection, rootDir, absolutePath, relativePath) {
   const raw = fs.readFileSync(absolutePath, "utf8");
   const parsed = matter(raw);
   const tokens = marked.lexer(parsed.content, { gfm: true });
-  const title =
+  const normalizedRelativePath = relativePath.replace(/\\/g, "/");
+  const fallbackTitle =
     parsed.data.title ?? extractTitle(tokens) ?? humanizeTitle(relativePath);
+  const title = resolveDisplayTitle(
+    collection,
+    normalizedRelativePath,
+    fallbackTitle,
+  );
   const description =
     parsed.data.description ?? cleanInlineText(extractDescription(tokens) ?? "");
   const sitePath = buildSitePath(collection, relativePath);
@@ -135,7 +157,7 @@ function createDocRecord(collection, rootDir, absolutePath, relativePath) {
   return {
     collection,
     absolutePath,
-    relativePath: relativePath.replace(/\\/g, "/"),
+    relativePath: normalizedRelativePath,
     routePath: normalizeRoutePath(sitePath),
     sitePath,
     sourcePath,
@@ -191,24 +213,22 @@ function parseGuidesNavigation(bySource) {
 
   const sections = [];
   let currentSection = createSection("Start Here");
-  let skipCurrentSectionLinks = false;
+  let currentSectionKey = "start";
 
   for (const line of readme.body.split(/\r?\n/)) {
     const trimmed = line.trim();
 
-    if (trimmed === "Release-specific hardening:") {
+    if (trimmed === "Failure-mode guides:") {
       sections.push(currentSection);
-      currentSection = createSection("Release Hardening");
-      skipCurrentSectionLinks = true;
+      currentSection = createSection("Failure Modes");
+      currentSectionKey = "failures";
       continue;
     }
 
-    if (trimmed === "Failure-mode guides:") {
-      if (!skipCurrentSectionLinks) {
-        sections.push(currentSection);
-      }
-      currentSection = createSection("Failure Modes");
-      skipCurrentSectionLinks = false;
+    if (trimmed === "Workloads and hardening:") {
+      sections.push(currentSection);
+      currentSection = createSection("Hardening");
+      currentSectionKey = "hardening";
       continue;
     }
 
@@ -217,13 +237,27 @@ function parseGuidesNavigation(bySource) {
       continue;
     }
 
-    if (skipCurrentSectionLinks) {
-      continue;
-    }
-
     const [, label, href] = match;
     const target = resolveMarkdownHref(readme.absolutePath, href, bySource);
     if (!target?.doc) {
+      continue;
+    }
+
+    const isHardeningDoc = target.doc.relativePath.startsWith("hardening/");
+
+    if (currentSectionKey === "hardening") {
+      if (!isHardeningDoc || shouldExcludeDoc("guides", target.doc.relativePath)) {
+        continue;
+      }
+
+      currentSection.items.push({
+        title: target.doc.title,
+        href: target.doc.sitePath,
+      });
+      continue;
+    }
+
+    if (isHardeningDoc) {
       continue;
     }
 
@@ -399,6 +433,28 @@ function humanizeTitle(relativePath) {
     ?.split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+function shouldExcludeDoc(collection, relativePath) {
+  const normalizedRelativePath = relativePath.replace(/\\/g, "/");
+
+  if (
+    collection === "guides" &&
+    normalizedRelativePath.startsWith("hardening/") &&
+    !includedGuidesHardeningFiles.has(normalizedRelativePath)
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function resolveDisplayTitle(collection, relativePath, fallbackTitle) {
+  if (collection === "guides") {
+    return hardeningTitleOverrides.get(relativePath) ?? fallbackTitle;
+  }
+
+  return fallbackTitle;
 }
 
 function slugifySegment(value) {

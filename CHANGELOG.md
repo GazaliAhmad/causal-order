@@ -2,6 +2,47 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.4]
+
+### Added
+
+* explicit `0.3.4` stream runtime-stability documentation in:
+  * `guides/hardening/runtime-stability-0.3.4.md`
+  * `guides/hardening/implementation-guide-0.3.4.md`
+* dedicated stream endurance runner support for:
+  * repeated in-process cycles
+  * time-boxed duration runs
+  * warmup control
+  * pause control between cycles
+* constrained-heap stream endurance wrapper and scripts
+* GC-observed stream endurance wrapper and scripts
+* sustained `150k` endurance profiles for:
+  * correction churn
+  * anomaly-heavy reconnect backlog
+* docs-site surfacing in the README for:
+  * the public website
+  * the released `0.3.4` runtime-stability line
+* generated API reference metadata for the docs site via:
+  * source-code export inspection
+  * build-time JSON generation
+  * Astro rendering from generated API data
+* fuller API index coverage on the docs site, including:
+  * all public runtime exports grouped by category
+  * public type-group pages
+  * brief one-line descriptions for exported functions and types
+
+### Changed
+
+* the README now treats `0.3.4` as the current released runtime-stability line instead of as in-repo follow-up work
+* the `0.3.4` implementation guide and runtime-stability note now read in completed release terms rather than as an unfinished milestone pass
+* the docs-site API section now uses generated metadata instead of a hand-maintained API map for the current public surface
+* the `/api/` overview page now acts as a true all-exports reference index rather than only a partial overview
+* the docs-site hardening sidebar now surfaces only the intended release-hardening documents with cleaner display labels
+* website build compatibility was hardened for newer Astro / Cloudflare prerendering by:
+  * removing layout-time runtime assumptions
+  * hardening docs root and repository URL resolution
+  * resolving generated API metadata more defensively during prerender
+
 ## [0.3.3]
 
 ### Added

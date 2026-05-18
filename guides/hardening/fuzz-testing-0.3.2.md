@@ -1,4 +1,4 @@
-# `0.3.2` Fuzz Testing
+# Fuzz Testing
 
 `0.3.2` adds a seeded fuzz layer to the production gate.
 

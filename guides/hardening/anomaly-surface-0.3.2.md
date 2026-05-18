@@ -1,4 +1,4 @@
-# `0.3.2` Anomaly Surface Audit
+# Anomaly Surface Audit
 
 This guide explains how the current anomaly surface maps to the `0.3.2` production-gate categories.
 

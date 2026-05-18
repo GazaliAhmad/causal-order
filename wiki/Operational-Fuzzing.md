@@ -30,16 +30,18 @@ The current fuzz layer is focused and release-gated:
 
 It is there to defend the current batch and streaming semantics, not to invent new domain-aware behavior.
 
-## What It Is Not Yet
+## What It Expanded Into
 
-The current fuzz layer is not the broader `0.3.3` exploratory pressure campaign.
+The original `0.3.2` fuzz layer was not the broader `0.3.3` exploratory pressure campaign.
 
-That later work should widen into:
+That later work widened into:
 
 * longer-running runs
 * heavier concurrency and backlog pressure
 * hotspot and memory-growth discovery
 * stronger sustained stress evidence
+
+The current `0.3.4` line builds on that by focusing on runtime-stability evidence for repeated cycles, constrained heaps, GC-observed runs, and sustained correction/reconnect endurance.
 
 ## Practical Layer
 
