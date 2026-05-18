@@ -1,5 +1,5 @@
-name: Bug report
-description: Report a concrete runtime, API, docs, perf, or website problem.
+name: Library Bug Report
+description: Report a concrete runtime, API, docs, perf, or website problem in the library.
 title: "[Bug]: "
 labels:
   - bug

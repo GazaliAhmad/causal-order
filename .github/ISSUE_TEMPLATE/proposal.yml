@@ -1,6 +1,6 @@
-name: Proposal or scoped work item
-description: Suggest a roadmap-aligned improvement, chunk, or docs/perf follow-up.
-title: "[Proposal]: "
+name: Feature request
+description: Suggest an idea for this project.
+title: "[Feature]: "
 labels:
   - enhancement
 body:
