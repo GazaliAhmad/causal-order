@@ -641,9 +641,9 @@ Exit criteria:
 Goal:
 Prove that the current streaming contract remains operationally stable not only under broader pressure, but also under prolonged runtime and constrained-memory conditions.
 
-This milestone should follow `0.3.3`.
-`0.3.3` widens pressure visibility and hotspot evidence.
-`0.3.4` should turn the most important runtime questions from that work into stronger stability proof.
+This milestone followed `0.3.3`.
+`0.3.3` widened pressure visibility and hotspot evidence.
+`0.3.4` turns the most important runtime questions from that work into stronger stability proof.
 
 Focus:
 
@@ -653,6 +653,16 @@ Focus:
 * reconnect correction churn under sustained load
 * stability under smaller Node heap limits
 * stability when GC triggers during the run
+
+Current repo progress:
+
+* repeated-cycle and time-boxed stream endurance harness support is in the repo
+* constrained-heap stream endurance support is in the repo
+* GC-observed stream endurance support is in the repo
+* sustained correction-churn and anomaly-heavy reconnect endurance profiles are in the repo
+
+The current `0.3.4` posture is therefore no longer only a plan.
+The line now has explicit runtime-stability evidence for repeated cycles, constrained heaps, GC-observed runs, and sustained correction/reconnect endurance cases.
 
 Why this should be a separate milestone:
 
@@ -673,6 +683,11 @@ Exit criteria:
 * anomaly-heavy and reconnect-correction-heavy workloads remain operationally credible under sustained load
 * smaller-heap runs produce honest and documented behavior rather than only best-case default-runtime behavior
 * GC-triggered runs are observed directly enough that maintainers can reason about the current streaming contract under real collection pressure
+
+Current outcome:
+
+* `0.3.4` has established the runtime-stability evidence line that follows the broader `0.3.3` pressure release
+* the next meaningful maturity step is no longer basic runtime-stability scaffolding, but the later API, tooling, and adoption milestones that follow it
 
 ## `0.4.x` Developer Experience
 

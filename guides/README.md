@@ -16,6 +16,13 @@ Start here:
 * [After-Hours Batch Processing](./after-hours-batch-processing.md)
 * [Streaming Recovery And Resync](./streaming-recovery-resync.md)
 
+Workloads and hardening:
+
+* [Anomaly Surface Audit](./hardening/anomaly-surface-0.3.2.md)
+* [Fuzz Testing](./hardening/fuzz-testing-0.3.2.md)
+* [Streaming Hardening And Pressure](./hardening/streaming-hardening-0.3.3.md)
+* [Runtime Stability](./hardening/runtime-stability-0.3.4.md)
+
 Failure-mode guides:
 
 * [Replay Corruption](./replay-corruption.md)

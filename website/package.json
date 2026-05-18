@@ -3,7 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "docs:api": "node ./scripts/generate-api.mjs",
+    "predev": "npm run docs:api",
     "dev": "astro dev",
+    "prebuild": "npm run docs:api",
     "build": "astro build",
     "preview": "astro preview"
   },

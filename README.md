@@ -7,6 +7,10 @@ An event integrity library for distributed systems that still use clocks, but ca
 It does not replace clocks or timestamps.
 It helps when timestamp order alone is not enough to explain what happened.
 
+Website:
+
+* [https://causal-order.gazali.one](https://causal-order.gazali.one)
+
 It helps you:
 
 * order what can be ordered
@@ -239,6 +243,8 @@ Workloads and hardening:
 * [Fuzz Testing `0.3.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/fuzz-testing-0.3.2.md)
 * [Streaming Hardening And Pressure `0.3.3`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/streaming-hardening-0.3.3.md)
 * [Implementation Guide `0.3.3`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/implementation-guide-0.3.3.md)
+* [Runtime Stability 0.3.4](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/runtime-stability-0.3.4.md)
+* [Implementation Guide 0.3.4](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/implementation-guide-0.3.4.md)
 * [Stress Hardening](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stress-hardening.md)
 * [After-Hours Batch Processing](https://github.com/GazaliAhmad/causal-order/blob/main/guides/after-hours-batch-processing.md)
 * [Realistic Workloads](https://github.com/GazaliAhmad/causal-order/wiki/Realistic-Workloads)
@@ -263,14 +269,17 @@ Runnable examples:
 Current release shape:
 
 * `0.3.2` established the current production-gate hardening baseline
-* `0.3.3` is the current broader streaming hardening and pressure release after that production-gate milestone
+* `0.3.3` broadened the streaming hardening and pressure release story after that production-gate milestone
+* `0.3.4` is the current runtime-stability release for prolonged and constrained-runtime streaming proof
 
-The current `0.3.3` release is centered on:
+The current `0.3.4` release is centered on:
 
 * explicit `0.3.2` production-gate proof
-* broader `0.3.3` streaming pressure profiles and higher-scale visibility bands
-* seeded batch and streaming fuzz coverage for realistic outage, reconnect, correction, watermark-lag, and bounded-memory pressure
-* stream-path hardening, anomaly-path tightening, and follow-up optimization under heavier pressure
+* the broader `0.3.3` streaming pressure profiles and higher-scale visibility bands that established the current pressure surface
+* repeated-cycle stream endurance runs
+* constrained-heap stream endurance runs
+* GC-observed stream runs
+* sustained correction-churn and anomaly-heavy reconnect endurance profiles
 
 Current deployment posture:
 
@@ -316,7 +325,8 @@ Current benchmark posture:
 
 * `10k` and `100k` are the main enforced guardrail bands
 * `150k` corrupted-dataset profiles are available for stress visibility, but are not currently enforced in `npm run bench:check`
-* for the current `0.3.3` streaming pressure work, `150k` is now the enforced sustained watermark-lag stream guard band while `250k` remains exploratory stretch visibility rather than a routine guard target
+* `150k` remains the enforced sustained watermark-lag stream guard band while `250k` remains exploratory stretch visibility rather than a routine guard target
+* repeated-cycle, constrained-heap, GC-observed, and sustained correction/reconnect endurance runs are now available as explicit runtime-stability evidence commands
 * `npm run bench:profile` is available when you need CPU profiles for the slowest stress cases
 
 ## License
@@ -326,3 +336,7 @@ MIT. See [LICENSE](https://github.com/GazaliAhmad/causal-order/blob/main/LICENSE
 ## Security
 
 See [SECURITY.md](https://github.com/GazaliAhmad/causal-order/blob/main/SECURITY.md) for supported versions and private vulnerability reporting guidance.
+
+## Contributing
+
+See [CONTRIBUTING.md](https://github.com/GazaliAhmad/causal-order/blob/main/CONTRIBUTING.md) for repository workflow, verification expectations, and documentation update guidance.

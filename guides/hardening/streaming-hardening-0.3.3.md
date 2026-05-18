@@ -1,4 +1,4 @@
-# `0.3.3` Streaming Hardening And Pressure
+# Streaming Hardening And Pressure
 
 `0.3.3` is the release where `causal-order` widens the streaming pressure envelope after the current `0.3.2` contract has already been defended as production-credible.
 

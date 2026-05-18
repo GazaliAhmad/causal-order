@@ -1,18 +1,32 @@
 ---
 import ApiLayout from "../../layouts/ApiLayout.astro";
-import { apiNavigation, apiSourceUrls } from "../../lib/api.js";
+import {
+  apiExportsByGroup,
+  apiNavigation,
+  apiOverview,
+  apiPages,
+  apiTypes,
+} from "../../lib/api.js";
+
+const functionPageByName = new Map([
+  ["orderEvents", apiPages.orderEvents.href],
+  ["orderEventStream", apiPages.orderEventStream.href],
+  ["validateEvent", apiPages.validateEvent.href],
+  ["compareByCausality", apiPages.compareByCausality.href],
+]);
 
 const toc = [
   { id: "entry-points", text: "Primary entry points", depth: 2 },
-  { id: "shape-of-the-library", text: "Shape of the library", depth: 2 },
+  { id: "all-exports", text: "All exports", depth: 2 },
+  { id: "public-types", text: "Public types", depth: 2 },
   { id: "where-to-start", text: "Where to start", depth: 2 },
 ];
 ---
 
 <ApiLayout
-  title="API Overview"
-  description="The public API surface exported by causal-order today."
-  sourceUrl={apiSourceUrls.overview}
+  title={apiOverview.title}
+  description={apiOverview.description}
+  sourceUrl={apiOverview.sourceUrl}
   toc={toc}
   navigation={apiNavigation}
   currentPath="/api/"
@@ -25,28 +39,49 @@ const toc = [
 
   <h2 id="entry-points">Primary entry points</h2>
   <ul>
-    <li><a href="/api/order-events/"><code>orderEvents()</code></a> for bounded batch ordering.</li>
-    <li><a href="/api/order-event-stream/"><code>orderEventStream()</code></a> for async streaming output.</li>
-    <li><a href="/api/validate-event/"><code>validateEvent()</code></a> for event-envelope validation.</li>
-    <li><a href="/api/compare-by-causality/"><code>compareByCausality()</code></a> for pairwise causal comparison.</li>
+    <li><a href={apiPages.orderEvents.href}><code>{apiPages.orderEvents.title}</code></a> for bounded batch ordering.</li>
+    <li><a href={apiPages.orderEventStream.href}><code>{apiPages.orderEventStream.title}</code></a> for async streaming output.</li>
+    <li><a href={apiPages.validateEvent.href}><code>{apiPages.validateEvent.title}</code></a> for event-envelope validation.</li>
+    <li><a href={apiPages.compareByCausality.href}><code>{apiPages.compareByCausality.title}</code></a> for pairwise causal comparison.</li>
   </ul>
 
-  <h2 id="shape-of-the-library">Shape of the library</h2>
-  <ul>
-    <li>
-      <strong>Types</strong>: event envelopes, ordered events, confidence, anomalies, stream batches,
-      and options.
-    </li>
-    <li>
-      <strong>Clock helpers</strong>: HLC creation, parse, and serialize functions.
-    </li>
-    <li>
-      <strong>Comparison helpers</strong>: HLC comparison, causality comparison, and deterministic tie breaking.
-    </li>
-    <li>
-      <strong>Ordering</strong>: batch ordering, streaming ordering, tie breakers, and watermark strategies.
-    </li>
-  </ul>
+  <h2 id="all-exports">All exports</h2>
+  {apiExportsByGroup.map((group) => (
+    <>
+      <p><strong>{group.title}</strong></p>
+      <ul>
+        {group.items.map((item) => (
+          <li>
+            {functionPageByName.has(item.name) ? (
+              <a href={functionPageByName.get(item.name)}><code>{item.label}</code></a>
+            ) : (
+              <code>{item.label}</code>
+            )}
+            {item.description ? ` - ${item.description}` : ""}
+          </li>
+        ))}
+      </ul>
+    </>
+  ))}
+
+  <h2 id="public-types">Public types</h2>
+  <p>
+    The exported type surface is grouped separately from the runtime entry points so you can scan
+    the contract shape without mixing it into the function list.
+  </p>
+  {apiTypes.groups.map((group) => (
+    <>
+      <p><strong>{group.title}</strong></p>
+      <ul>
+        {group.items.map((item) => (
+          <li>
+            <code>{item.label}</code>
+            {item.description ? ` - ${item.description}` : ""}
+          </li>
+        ))}
+      </ul>
+    </>
+  ))}
 
   <pre><code>{`import {
   orderEvents,

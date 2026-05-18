@@ -1,24 +1,30 @@
-const REPO_URL = "https://github.com/GazaliAhmad/causal-order/blob/main";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-export const apiNavigation = [
-  {
-    title: "Reference",
-    items: [
-      { title: "Overview", href: "/api/" },
-      { title: "orderEvents()", href: "/api/order-events/" },
-      { title: "orderEventStream()", href: "/api/order-event-stream/" },
-      { title: "validateEvent()", href: "/api/validate-event/" },
-      { title: "compareByCausality()", href: "/api/compare-by-causality/" },
-      { title: "Types", href: "/api/types/" },
-    ],
-  },
-];
+const apiData = JSON.parse(fs.readFileSync(resolveApiDataPath(), "utf8"));
 
-export const apiSourceUrls = {
-  overview: `${REPO_URL}/src/index.ts`,
-  orderEvents: `${REPO_URL}/src/order/orderEvents.ts`,
-  orderEventStream: `${REPO_URL}/src/order/orderEventStream.ts`,
-  validateEvent: `${REPO_URL}/src/validate/validateEvent.ts`,
-  compareByCausality: `${REPO_URL}/src/compare/causalCompare.ts`,
-  types: `${REPO_URL}/src/types.ts`,
-};
+export const apiNavigation = apiData.navigation;
+export const apiOverview = apiData.overview;
+export const apiPages = apiData.pages;
+export const apiTypes = apiData.types;
+export const apiExportsByGroup = apiData.exportsByGroup;
+
+function resolveApiDataPath() {
+  const moduleDir = path.dirname(fileURLToPath(import.meta.url));
+  const candidates = [
+    path.join(process.cwd(), "src", "generated", "api.json"),
+    path.join(process.cwd(), "website", "src", "generated", "api.json"),
+    path.join(moduleDir, "..", "generated", "api.json"),
+  ];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+
+  throw new Error(
+    `Unable to locate generated API metadata. Checked: ${candidates.join(", ")}`,
+  );
+}

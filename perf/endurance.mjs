@@ -1,4 +1,4 @@
-import { performance } from "node:perf_hooks"
+import { PerformanceObserver, performance } from "node:perf_hooks"
 import {
   getProfile,
   listProfileNames,
@@ -24,6 +24,8 @@ function parseArgs(argv) {
     durationMs: undefined,
     pauseMs: 0,
     warmup: 1,
+    forceGcBeforeCycle: false,
+    forceGcAfterCycle: false,
   }
 
   while (args.length > 0) {
@@ -79,6 +81,16 @@ function parseArgs(argv) {
       continue
     }
 
+    if (current === "--force-gc-before-cycle") {
+      options.forceGcBeforeCycle = true
+      continue
+    }
+
+    if (current === "--force-gc-after-cycle") {
+      options.forceGcAfterCycle = true
+      continue
+    }
+
     throw new Error(`Unknown argument: ${current}`)
   }
 
@@ -119,6 +131,87 @@ function sleep(ms) {
   })
 }
 
+function runForcedGc(label) {
+  if (typeof global.gc !== "function") {
+    throw new Error(
+      `Cannot run forced GC ${label} because global.gc is unavailable. Launch Node with --expose-gc.`,
+    )
+  }
+
+  global.gc()
+}
+
+function createGcObserver() {
+  let gcCount = 0
+  let gcDurationMs = 0
+  let maxGcDurationMs = 0
+  let observer
+  let gcObservationSupported = false
+
+  function collectGcEntries(entries) {
+    for (const entry of entries) {
+      gcCount += 1
+      gcDurationMs += entry.duration
+      if (entry.duration > maxGcDurationMs) {
+        maxGcDurationMs = entry.duration
+      }
+    }
+  }
+
+  try {
+    observer = new PerformanceObserver((list) => {
+      collectGcEntries(list.getEntries())
+    })
+    observer.observe({ entryTypes: ["gc"] })
+    gcObservationSupported = true
+  } catch {
+    observer = undefined
+  }
+
+  return {
+    async stop() {
+      await new Promise((resolve) => setImmediate(resolve))
+
+      if (observer !== undefined) {
+        collectGcEntries(observer.takeRecords())
+        observer.disconnect()
+      }
+
+      return {
+        gcObservationSupported,
+        gcCount,
+        gcDurationMs,
+        maxGcDurationMs,
+      }
+    },
+  }
+}
+
+async function runObservedCycle(profile, options, phaseLabel) {
+  const gcObserver = createGcObserver()
+  let forcedGcCalls = 0
+
+  if (options.forceGcBeforeCycle) {
+    runForcedGc(`before ${phaseLabel}`)
+    forcedGcCalls += 1
+  }
+
+  const run = await runOne(profile)
+
+  if (options.forceGcAfterCycle) {
+    runForcedGc(`after ${phaseLabel}`)
+    forcedGcCalls += 1
+  }
+
+  return {
+    ...run,
+    enduranceGc: {
+      ...(await gcObserver.stop()),
+      forcedGcCalls,
+    },
+  }
+}
+
 async function runOne(profile) {
   if (profile.mode === "stream") {
     return runBenchmarkCaseAsync(profile)
@@ -128,13 +221,14 @@ async function runOne(profile) {
 }
 
 function printCycleSummary(index, run) {
+  const cycleGcCount = run.enduranceGc?.gcCount ?? run.metrics.gcCount
   const parts = [
     `cycle ${String(index).padStart(2, "0")}`,
     `ordering ${formatMs(run.metrics.orderingMs)}`,
     `heap delta ${formatMemory(run.metrics.heapDeltaBytes)}`,
     `peak heap ${formatMemory(run.metrics.peakHeapUsedBytes)}`,
     `peak RSS ${formatMemory(run.metrics.peakRssBytes)}`,
-    `GC ${run.metrics.gcCount}`,
+    `GC ${cycleGcCount}`,
     `anomalies ${run.metrics.anomalyCount}`,
   ]
 
@@ -148,8 +242,9 @@ function printAggregateSummary(profile, runs, wallTimeMs, options) {
   const peakRssBytes = runs.map((run) => run.metrics.peakRssBytes)
   const startHeapBytes = runs.map((run) => run.metrics.startHeapUsedBytes)
   const endHeapBytes = runs.map((run) => run.metrics.endHeapUsedBytes)
-  const gcCounts = runs.map((run) => run.metrics.gcCount)
-  const gcDurationMs = runs.map((run) => run.metrics.gcDurationMs)
+  const gcCounts = runs.map((run) => run.enduranceGc?.gcCount ?? run.metrics.gcCount)
+  const gcDurationMs = runs.map((run) => run.enduranceGc?.gcDurationMs ?? run.metrics.gcDurationMs)
+  const forcedGcCalls = runs.map((run) => run.enduranceGc?.forcedGcCalls ?? 0)
   const anomalyCounts = runs.map((run) => run.metrics.anomalyCount)
 
   console.log(`\n=== ${profile.name} endurance ===`)
@@ -159,6 +254,11 @@ function printAggregateSummary(profile, runs, wallTimeMs, options) {
   }
   console.log(`Warmup cycles: ${options.warmup}`)
   console.log(`Measured cycles: ${runs.length}`)
+  if (options.forceGcBeforeCycle || options.forceGcAfterCycle) {
+    console.log(
+      `Forced GC hooks: before=${options.forceGcBeforeCycle ? "on" : "off"}, after=${options.forceGcAfterCycle ? "on" : "off"}`,
+    )
+  }
   if (options.repeat !== undefined) {
     console.log(`Repeat target: ${options.repeat}`)
   }
@@ -175,6 +275,9 @@ function printAggregateSummary(profile, runs, wallTimeMs, options) {
   console.log(`Peak RSS max: ${formatMemory(max(peakRssBytes))}`)
   console.log(`Start heap first/last: ${formatMemory(startHeapBytes[0])} / ${formatMemory(startHeapBytes.at(-1))}`)
   console.log(`End heap first/last: ${formatMemory(endHeapBytes[0])} / ${formatMemory(endHeapBytes.at(-1))}`)
+  if (options.forceGcBeforeCycle || options.forceGcAfterCycle) {
+    console.log(`Forced GC calls total/max per cycle: ${forcedGcCalls.reduce((sum, value) => sum + value, 0)} / ${max(forcedGcCalls)}`)
+  }
   console.log(`GC total/max per cycle: ${gcCounts.reduce((sum, value) => sum + value, 0)} / ${max(gcCounts)}`)
   console.log(`GC duration total/max per cycle: ${formatMs(gcDurationMs.reduce((sum, value) => sum + value, 0))} / ${formatMs(max(gcDurationMs))}`)
   console.log(`Anomalies total/max per cycle: ${anomalyCounts.reduce((sum, value) => sum + value, 0)} / ${max(anomalyCounts)}`)
@@ -182,7 +285,7 @@ function printAggregateSummary(profile, runs, wallTimeMs, options) {
 
 async function runEnduranceProfile(profile, options) {
   for (let index = 0; index < options.warmup; index += 1) {
-    await runOne(profile)
+    await runObservedCycle(profile, options, "warmup cycle")
   }
 
   const runs = []
@@ -196,7 +299,7 @@ async function runEnduranceProfile(profile, options) {
       break
     }
 
-    const run = await runOne(profile)
+    const run = await runObservedCycle(profile, options, "measured cycle")
     runs.push(run)
     printCycleSummary(runs.length, run)
 

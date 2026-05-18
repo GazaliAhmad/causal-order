@@ -1,6 +1,8 @@
 ---
 import ApiLayout from "../../layouts/ApiLayout.astro";
-import { apiNavigation, apiSourceUrls } from "../../lib/api.js";
+import { apiNavigation, apiPages } from "../../lib/api.js";
+
+const page = apiPages.orderEventStream;
 
 const toc = [
   { id: "signature", text: "Signature", depth: 2 },
@@ -11,18 +13,17 @@ const toc = [
 ---
 
 <ApiLayout
-  title="orderEventStream()"
-  description="Consumes an async iterable of events and emits ordered stream batches with watermark-aware behavior."
-  sourceUrl={apiSourceUrls.orderEventStream}
+  title={page.title}
+  description={page.description}
+  sourceUrl={page.sourceUrl}
   toc={toc}
   navigation={apiNavigation}
-  currentPath="/api/order-event-stream/"
+  currentPath={page.href}
 >
   <h2 id="signature">Signature</h2>
-  <pre><code>{`async function* orderEventStream<T>(
-  source: AsyncIterable&lt;EventEnvelope&lt;T&gt;&gt;,
-  options?: StreamOrderOptions&lt;T&gt;,
-): AsyncIterable<OrderBatch<T>>`}</code></pre>
+  {page.signatures.map((signature) => (
+    <pre><code>{signature}</code></pre>
+  ))}
 
   <p>
     This is the streaming entry point for live feeds, reconnect-heavy flows, and delayed arrival

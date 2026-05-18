@@ -1,6 +1,6 @@
 {
   "name": "causal-order",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "An event integrity library for ordering and analyzing distributed events without false certainty.",
   "keywords": [
     "distributed-systems",
@@ -57,8 +57,12 @@
     "bench:profile": "npm run build && node perf/profile.mjs",
     "bench:stream:cycles": "npm run build && node perf/endurance.mjs --profile streaming-150k-watermark-lag --repeat 12",
     "bench:stream:long": "npm run build && node perf/endurance.mjs --profile streaming-150k-watermark-lag --duration-ms 60000",
+    "bench:stream:correction:cycles": "npm run build && node perf/endurance.mjs --profile streaming-150k-correction-churn --repeat 6 --warmup 0",
+    "bench:stream:reconnect:cycles": "npm run build && node perf/endurance.mjs --profile streaming-150k-anomaly-heavy-reconnect --repeat 6 --warmup 0",
     "bench:stream:heap": "npm run build && node perf/constrained-heap.mjs --heap-mb 256 --profile streaming-150k-watermark-lag --repeat 6",
     "bench:stream:heap:small": "npm run build && node perf/constrained-heap.mjs --heap-mb 128 --profile streaming-150k-watermark-lag --repeat 3 --warmup 0",
+    "bench:stream:gc": "npm run build && node perf/gc-observed.mjs --heap-mb 256 --profile streaming-150k-watermark-lag --repeat 6",
+    "bench:stream:gc:small": "npm run build && node perf/gc-observed.mjs --heap-mb 128 --profile streaming-150k-watermark-lag --repeat 3 --warmup 0",
     "bench:check": "npm run build && node perf/check.mjs",
     "prepack": "npm run build"
   },

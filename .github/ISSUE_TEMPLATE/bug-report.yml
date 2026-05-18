@@ -1,0 +1,89 @@
+name: Bug report
+description: Report a concrete runtime, API, docs, perf, or website problem.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Where does the problem appear?
+      options:
+        - Core ordering
+        - Streaming behavior
+        - Validation
+        - Anomaly detection
+        - Performance or benchmarks
+        - Documentation
+        - Website
+        - CI or release workflow
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Released package version, branch, or commit.
+      placeholder: "Example: 0.3.3, main, a0ea94f"
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include Node version, OS, browser, or deployment environment when relevant.
+      placeholder: |
+        Node 24
+        Windows 11
+        Cloudflare Pages
+    validations:
+      required: false
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Smallest input, command, or route that shows the problem.
+      placeholder: |
+        1. Run:
+           npm run bench:stream
+        2. Observe:
+           ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: Describe what should have happened.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      placeholder: Describe what actually happened, including errors, regressions, or misleading output.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs, stack traces, or screenshots
+      description: Paste only the relevant part.
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Extra context
+      description: Include related milestone, guide, or workload notes if useful.
+    validations:
+      required: false
+

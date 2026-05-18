@@ -1,0 +1,83 @@
+name: Proposal or scoped work item
+description: Suggest a roadmap-aligned improvement, chunk, or docs/perf follow-up.
+title: "[Proposal]: "
+labels:
+  - enhancement
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: What kind of work is this?
+      options:
+        - Core ordering
+        - Streaming hardening
+        - Batch hardening
+        - Performance or runtime stability
+        - Documentation
+        - Website
+        - CI or release workflow
+        - API or developer experience
+    validations:
+      required: true
+
+  - type: input
+    id: milestone
+    attributes:
+      label: Milestone or release line
+      description: If this clearly belongs to a current or future milestone, say which one.
+      placeholder: "Example: 0.3.4 chunk 4, 0.5.x, tentative"
+    validations:
+      required: false
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What gap, friction, or risk does this address?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Keep it concrete. A good proposal should be understandable without guessing.
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope boundaries
+      description: What should be included, and what should stay out of this change?
+      placeholder: |
+        Include:
+        - ...
+
+        Do not mix in:
+        - ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification idea
+      description: How would we know this is done or working?
+      placeholder: |
+        Example:
+        - npm test
+        - benchmark profile X
+        - docs page Y updated
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Extra context
+      description: Related guides, roadmap notes, screenshots, or prior discussion.
+    validations:
+      required: false
+

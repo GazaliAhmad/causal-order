@@ -1,0 +1,552 @@
+{
+  "generatedAt": "2026-05-18T13:29:31.191Z",
+  "repoUrl": "https://github.com/GazaliAhmad/causal-order",
+  "sourceBaseUrl": "https://github.com/GazaliAhmad/causal-order/blob/main",
+  "navigation": [
+    {
+      "title": "Reference",
+      "items": [
+        {
+          "title": "Overview",
+          "href": "/api/"
+        },
+        {
+          "title": "orderEvents()",
+          "href": "/api/order-events/"
+        },
+        {
+          "title": "orderEventStream()",
+          "href": "/api/order-event-stream/"
+        },
+        {
+          "title": "validateEvent()",
+          "href": "/api/validate-event/"
+        },
+        {
+          "title": "compareByCausality()",
+          "href": "/api/compare-by-causality/"
+        },
+        {
+          "title": "Types",
+          "href": "/api/types/"
+        }
+      ]
+    }
+  ],
+  "overview": {
+    "title": "API Overview",
+    "description": "The public API surface exported by causal-order today.",
+    "sourcePath": "src/index.ts",
+    "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/index.ts"
+  },
+  "exportsByGroup": [
+    {
+      "title": "Clocks",
+      "items": [
+        {
+          "name": "HlcClock",
+          "kind": "type",
+          "label": "HlcClock",
+          "description": "Monotonic hybrid logical clock interface for local send and remote merge operations.",
+          "sourcePath": "src/clock/hlc.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/clock/hlc.ts"
+        },
+        {
+          "name": "createHlcClock",
+          "kind": "function",
+          "label": "createHlcClock()",
+          "description": "Creates a monotonic hybrid logical clock for a single node.",
+          "sourcePath": "src/clock/hlc.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/clock/hlc.ts"
+        },
+        {
+          "name": "parseHlc",
+          "kind": "function",
+          "label": "parseHlc()",
+          "description": "Parses a serialized HLC string into its structured parts.",
+          "sourcePath": "src/clock/parse.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/clock/parse.ts"
+        },
+        {
+          "name": "serializeHlc",
+          "kind": "function",
+          "label": "serializeHlc()",
+          "description": "Serializes an HLC value into the canonical string form.",
+          "sourcePath": "src/clock/serialize.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/clock/serialize.ts"
+        }
+      ]
+    },
+    {
+      "title": "Comparison",
+      "items": [
+        {
+          "name": "compareByHlc",
+          "kind": "function",
+          "label": "compareByHlc()",
+          "description": "Compares two events by their HLC values only.",
+          "sourcePath": "src/compare/hlcCompare.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/hlcCompare.ts"
+        },
+        {
+          "name": "compareClocks",
+          "kind": "function",
+          "label": "compareClocks()",
+          "description": "Compares two validated HLC timestamps directly.",
+          "sourcePath": "src/compare/hlcCompare.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/hlcCompare.ts"
+        },
+        {
+          "name": "compareByCausality",
+          "kind": "function",
+          "label": "compareByCausality()",
+          "description": "Performs pairwise causal comparison without inventing evidence.",
+          "sourcePath": "src/compare/causalCompare.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/causalCompare.ts"
+        },
+        {
+          "name": "compareValidatedByCausality",
+          "kind": "function",
+          "label": "compareValidatedByCausality()",
+          "description": "Performs pairwise causal comparison on already validated events.",
+          "sourcePath": "src/compare/causalCompare.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/causalCompare.ts"
+        },
+        {
+          "name": "applyTieBreaker",
+          "kind": "function",
+          "label": "applyTieBreaker()",
+          "description": "Applies the active deterministic tie-breaker when stronger ordering is absent.",
+          "sourcePath": "src/compare/deterministicCompare.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/deterministicCompare.ts"
+        },
+        {
+          "name": "compareDeterministically",
+          "kind": "function",
+          "label": "compareDeterministically()",
+          "description": "Deterministically compares two events when causal proof is insufficient.",
+          "sourcePath": "src/compare/deterministicCompare.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/deterministicCompare.ts"
+        },
+        {
+          "name": "compareValidatedDeterministically",
+          "kind": "function",
+          "label": "compareValidatedDeterministically()",
+          "description": "Deterministically compares two already validated events using the current tie-breaker.",
+          "sourcePath": "src/compare/deterministicCompare.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/deterministicCompare.ts"
+        }
+      ]
+    },
+    {
+      "title": "Validation",
+      "items": [
+        {
+          "name": "validateClock",
+          "kind": "function",
+          "label": "validateClock()",
+          "description": "Validates an HLC clock value and reports structured failures or warnings.",
+          "sourcePath": "src/validate/validateClock.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/validate/validateClock.ts"
+        },
+        {
+          "name": "validateEvent",
+          "kind": "function",
+          "label": "validateEvent()",
+          "description": "Validates an event envelope and returns a branded validated value on success.",
+          "sourcePath": "src/validate/validateEvent.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/validate/validateEvent.ts"
+        }
+      ]
+    },
+    {
+      "title": "Anomalies",
+      "items": [
+        {
+          "name": "detectSingleEventAnomalies",
+          "kind": "function",
+          "label": "detectSingleEventAnomalies()",
+          "description": "Detects anomalies that can be inferred from one event in isolation.",
+          "sourcePath": "src/anomalies/detectAnomalies.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/anomalies/detectAnomalies.ts"
+        },
+        {
+          "name": "detectAnomalies",
+          "kind": "function",
+          "label": "detectAnomalies()",
+          "description": "Detects structured anomalies across a bounded event set.",
+          "sourcePath": "src/anomalies/detectAnomalies.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/anomalies/detectAnomalies.ts"
+        }
+      ]
+    },
+    {
+      "title": "Ordering",
+      "items": [
+        {
+          "name": "DEFAULT_TIE_BREAKER",
+          "kind": "const",
+          "label": "DEFAULT_TIE_BREAKER",
+          "description": "Default deterministic tie-breaker used when stronger ordering is unavailable.",
+          "sourcePath": "src/order/tieBreakers.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/tieBreakers.ts"
+        },
+        {
+          "name": "getTieBreaker",
+          "kind": "function",
+          "label": "getTieBreaker()",
+          "description": "Resolves the tie-breaker function from the current ordering options.",
+          "sourcePath": "src/order/tieBreakers.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/tieBreakers.ts"
+        },
+        {
+          "name": "compareWithTieBreaker",
+          "kind": "function",
+          "label": "compareWithTieBreaker()",
+          "description": "Compares two events with the configured deterministic tie-breaker.",
+          "sourcePath": "src/order/tieBreakers.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/tieBreakers.ts"
+        },
+        {
+          "name": "orderValidatedEvents",
+          "kind": "function",
+          "label": "orderValidatedEvents()",
+          "description": "Orders already validated events without re-running validation.",
+          "sourcePath": "src/order/orderEvents.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/orderEvents.ts"
+        },
+        {
+          "name": "orderEvents",
+          "kind": "function",
+          "label": "orderEvents()",
+          "description": "Orders a bounded event set and returns ordered output, anomalies, and stats.",
+          "sourcePath": "src/order/orderEvents.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/orderEvents.ts"
+        },
+        {
+          "name": "orderEventStream",
+          "kind": "function",
+          "label": "orderEventStream()",
+          "description": "Consumes an async event source and emits watermark-aware ordered batches.",
+          "sourcePath": "src/order/orderEventStream.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/orderEventStream.ts"
+        },
+        {
+          "name": "eventTimeWatermark",
+          "kind": "function",
+          "label": "eventTimeWatermark()",
+          "description": "Advances stream readiness from event-time timestamps.",
+          "sourcePath": "src/order/watermarkStrategies.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/watermarkStrategies.ts"
+        },
+        {
+          "name": "ingestedAtWatermark",
+          "kind": "function",
+          "label": "ingestedAtWatermark()",
+          "description": "Advances stream readiness from ingestion-time metadata.",
+          "sourcePath": "src/order/watermarkStrategies.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/watermarkStrategies.ts"
+        },
+        {
+          "name": "createProcessingTimeWatermark",
+          "kind": "function",
+          "label": "createProcessingTimeWatermark()",
+          "description": "Builds a processing-time watermark helper for more aggressive stream progress.",
+          "sourcePath": "src/order/watermarkStrategies.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/watermarkStrategies.ts"
+        }
+      ]
+    }
+  ],
+  "pages": {
+    "orderEvents": {
+      "title": "orderEvents()",
+      "description": "Orders a bounded set of distributed events and returns ordered output, anomalies, and summary stats.",
+      "sourcePath": "src/order/orderEvents.ts",
+      "signatures": [
+        "function orderEvents<T>(\n  events: EventEnvelope<T>[],\n  options?: OrderOptions<T>,\n): OrderResult<T>"
+      ],
+      "href": "/api/order-events/",
+      "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/orderEvents.ts"
+    },
+    "orderEventStream": {
+      "title": "orderEventStream()",
+      "description": "Consumes an async iterable of events and emits ordered stream batches with watermark-aware behavior.",
+      "sourcePath": "src/order/orderEventStream.ts",
+      "signatures": [
+        "async function* orderEventStream<T>(\n  source: AsyncIterable<EventEnvelope<T>>,\n  options?: StreamOrderOptions<T>,\n): AsyncIterable<OrderBatch<T>>"
+      ],
+      "href": "/api/order-event-stream/",
+      "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/orderEventStream.ts"
+    },
+    "validateEvent": {
+      "title": "validateEvent()",
+      "description": "Validates an event envelope and returns either a branded validated value or structured errors and warnings.",
+      "sourcePath": "src/validate/validateEvent.ts",
+      "signatures": [
+        "function validateEvent<T>(\n  event: EventEnvelope<T>,\n  options?: { maxClockDriftMs?: bigint; now?: () => bigint; includeWarnings?: boolean },\n): ValidationResult<ValidatedEventEnvelope<T>>",
+        "function validateEvent(\n  event: unknown,\n  options?: { maxClockDriftMs?: bigint; now?: () => bigint; includeWarnings?: boolean },\n): ValidationResult<ValidatedEventEnvelope<unknown>>"
+      ],
+      "href": "/api/validate-event/",
+      "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/validate/validateEvent.ts"
+    },
+    "compareByCausality": {
+      "title": "compareByCausality()",
+      "description": "Performs a pairwise causality comparison without pretending weak metadata is causal proof.",
+      "sourcePath": "src/compare/causalCompare.ts",
+      "signatures": [
+        "function compareByCausality<T>(\n  a: EventEnvelope<T>,\n  b: EventEnvelope<T>,\n): CausalOrdering"
+      ],
+      "href": "/api/compare-by-causality/",
+      "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/causalCompare.ts"
+    },
+    "types": {
+      "title": "Types",
+      "description": "The main public types exported by causal-order.",
+      "sourcePath": "src/types.ts",
+      "signatures": [],
+      "href": "/api/types/",
+      "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+    }
+  },
+  "types": {
+    "groups": [
+      {
+        "title": "Core event types",
+        "items": [
+          {
+            "name": "NodeId",
+            "label": "NodeId",
+            "description": "Branded node identifier used to separate same-node and cross-node reasoning.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "EventId",
+            "label": "EventId",
+            "description": "Branded event identifier used for duplicate and reference checks.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "HlcTimestamp",
+            "label": "HlcTimestamp",
+            "description": "Serialized hybrid logical clock string.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "ValidatedHlcTimestamp",
+            "label": "ValidatedHlcTimestamp",
+            "description": "Branded HLC timestamp that has passed validation.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "EventEnvelope",
+            "label": "EventEnvelope<T = unknown>",
+            "description": "Public shape for an input event and its ordering metadata.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "ValidatedEventEnvelope",
+            "label": "ValidatedEventEnvelope<T = unknown>",
+            "description": "Validated event envelope safe for downstream ordering logic.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "CausalOrdering",
+            "label": "CausalOrdering",
+            "description": "Pairwise ordering result such as before, after, equal, or unknown.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "CausalEvidence",
+            "label": "CausalEvidence",
+            "description": "Machine-readable evidence explaining why one event was ordered relative to another.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          }
+        ]
+      },
+      {
+        "title": "Validation and anomaly types",
+        "items": [
+          {
+            "name": "ValidationErrorCode",
+            "label": "ValidationErrorCode",
+            "description": "Stable code describing a validation failure category.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "ValidationWarningCode",
+            "label": "ValidationWarningCode",
+            "description": "Stable code describing a non-fatal validation warning.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "ValidationError",
+            "label": "ValidationError",
+            "description": "Structured validation failure entry.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "ValidationWarning",
+            "label": "ValidationWarning",
+            "description": "Structured non-fatal validation warning entry.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "ValidationSuccess",
+            "label": "ValidationSuccess<TValue>",
+            "description": "Successful validation wrapper carrying the validated value.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "ValidationFailure",
+            "label": "ValidationFailure",
+            "description": "Failed validation wrapper carrying errors and warnings.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "ValidationResult",
+            "label": "ValidationResult<TValue = never>",
+            "description": "Discriminated union returned by validation helpers.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "AnomalyType",
+            "label": "AnomalyType",
+            "description": "Stable anomaly category emitted by ordering and analysis helpers.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "EventAnomaly",
+            "label": "EventAnomaly<T = unknown>",
+            "description": "Structured anomaly record tied to one or more events.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          }
+        ]
+      },
+      {
+        "title": "Ordering result types",
+        "items": [
+          {
+            "name": "OrderedEvent",
+            "label": "OrderedEvent<T = unknown>",
+            "description": "Ordered event entry with confidence, basis, and optional causal evidence.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "OrderStats",
+            "label": "OrderStats",
+            "description": "Summary counts describing the outcome of a bounded ordering run.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "OrderResult",
+            "label": "OrderResult<T = unknown>",
+            "description": "Top-level bounded ordering result containing ordered events, anomalies, and stats.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TieBreaker",
+            "label": "TieBreaker<T>",
+            "description": "Deterministic comparison function used when stronger ordering is absent.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "OrderOptions",
+            "label": "OrderOptions<T>",
+            "description": "Options controlling bounded ordering behavior and anomaly handling.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          }
+        ]
+      },
+      {
+        "title": "Streaming types",
+        "items": [
+          {
+            "name": "CorrectionScope",
+            "label": "CorrectionScope",
+            "description": "Indicates whether a stream correction is local to a batch or broader in scope.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "CorrectionNotice",
+            "label": "CorrectionNotice",
+            "description": "Structured notice attached to correction-capable stream batches.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "StreamAnomalyHorizon",
+            "label": "StreamAnomalyHorizon",
+            "description": "Anomaly carry model for stream windows and emitted history.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "LateArrivalPolicy",
+            "label": "LateArrivalPolicy",
+            "description": "Policy controlling how late stream events are surfaced or rejected.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "WatermarkSignal",
+            "label": "WatermarkSignal",
+            "description": "Structured watermark progress signal returned by watermark helpers.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "WatermarkFunction",
+            "label": "WatermarkFunction<T>",
+            "description": "Function shape used to derive stream watermark progress.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "StreamOrderOptions",
+            "label": "StreamOrderOptions<T>",
+            "description": "Options controlling streaming ordering, watermarking, and correction behavior.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "OrderBatch",
+            "label": "OrderBatch<T = unknown>",
+            "description": "Structured batch emitted by streaming ordering.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          }
+        ]
+      }
+    ],
+    "confidenceModel": [
+      "proven",
+      "derived",
+      "fallback",
+      "unknown"
+    ]
+  }
+}

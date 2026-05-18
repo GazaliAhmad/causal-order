@@ -1,6 +1,8 @@
 ---
 import ApiLayout from "../../layouts/ApiLayout.astro";
-import { apiNavigation, apiSourceUrls } from "../../lib/api.js";
+import { apiNavigation, apiPages } from "../../lib/api.js";
+
+const page = apiPages.compareByCausality;
 
 const toc = [
   { id: "signature", text: "Signature", depth: 2 },
@@ -11,18 +13,17 @@ const toc = [
 ---
 
 <ApiLayout
-  title="compareByCausality()"
-  description="Performs a pairwise causality comparison without pretending weak metadata is causal proof."
-  sourceUrl={apiSourceUrls.compareByCausality}
+  title={page.title}
+  description={page.description}
+  sourceUrl={page.sourceUrl}
   toc={toc}
   navigation={apiNavigation}
-  currentPath="/api/compare-by-causality/"
+  currentPath={page.href}
 >
   <h2 id="signature">Signature</h2>
-  <pre><code>{`function compareByCausality<T>(
-  a: EventEnvelope<T>,
-  b: EventEnvelope<T>,
-): CausalOrdering`}</code></pre>
+  {page.signatures.map((signature) => (
+    <pre><code>{signature}</code></pre>
+  ))}
 
   <h2 id="usage">Usage</h2>
   <pre><code>{`import { compareByCausality } from "causal-order"

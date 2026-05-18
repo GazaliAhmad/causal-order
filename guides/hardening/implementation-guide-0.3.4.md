@@ -1,6 +1,6 @@
-# `0.3.4` Implementation Guide
+# 0.3.4 Implementation Guide
 
-This note keeps `0.3.4` implementation work scoped and commit-friendly.
+This note kept `0.3.4` implementation work scoped and commit-friendly.
 
 It does not prescribe code structure in advance.
 It keeps the sequencing clear:
@@ -11,11 +11,12 @@ It keeps the sequencing clear:
 
 For the broader milestone intent, see:
 
-* [ROADMAP `0.3.4`](../../ROADMAP.md)
+* [ROADMAP 0.3.4](../../ROADMAP.md)
+* [Runtime Stability 0.3.4](./runtime-stability-0.3.4.md)
 
 ## Working Rule
 
-`0.3.4` should be implemented in small chunks that separate:
+`0.3.4` was implemented in small chunks that separated:
 
 * long-run harness work
 * repeated-cycle verification
@@ -28,7 +29,7 @@ The repo should avoid mixing those together unless there is a strong reason.
 
 ## Sub-Goal
 
-`0.3.4` should turn the `0.3.3` pressure evidence into stronger runtime-stability proof.
+`0.3.4` turns the `0.3.3` pressure evidence into stronger runtime-stability proof.
 
 That means:
 
@@ -40,13 +41,18 @@ This milestone is about endurance, not scope expansion.
 
 ## Chunk Order
 
-The intended order is:
+The implemented order was:
 
 1. long-run benchmark harness and repeated-cycle commands
 2. constrained-heap run support
 3. GC-observed pressure runs
 4. sustained correction and reconnect endurance cases
 5. docs and release wording
+
+Current repo status:
+
+* chunks 1 through 5 are now in the repo
+* the current `0.3.4` posture now reads as a released runtime-stability line rather than an unfinished in-repo hardening pass
 
 The early chunks should answer basic runtime questions first:
 
@@ -60,7 +66,7 @@ Only after that evidence is clear should the repo strengthen the release wording
 At the `0.3.4` stage, the important distinction is:
 
 * `0.3.3` widened pressure visibility and hotspot evidence
-* `0.3.4` should turn the most important of those cases into stronger sustained-runtime proof
+* `0.3.4` turns the most important of those cases into stronger sustained-runtime proof
 
 ## Things To Avoid
 
