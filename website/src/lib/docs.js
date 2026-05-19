@@ -326,6 +326,34 @@ function renderMarkdown(doc, bySource) {
     return `<img src="${escapeAttribute(href)}" alt="${escapeAttribute(token.text)}"${title} />`;
   };
 
+  renderer.table = function table(token) {
+    let header = "";
+    let cell = "";
+
+    for (let j = 0; j < token.header.length; j += 1) {
+      cell += this.tablecell(token.header[j]);
+    }
+
+    header += this.tablerow({ text: cell });
+
+    let body = "";
+    for (let j = 0; j < token.rows.length; j += 1) {
+      const row = token.rows[j];
+      cell = "";
+
+      for (let k = 0; k < row.length; k += 1) {
+        cell += this.tablecell(row[k]);
+      }
+
+      body += this.tablerow({ text: cell });
+    }
+
+    const tbody = body ? `<tbody>${body}</tbody>` : "";
+    const tableHtml = `<table>\n<thead>\n${header}</thead>\n${tbody}</table>\n`;
+
+    return `<div class="markdown-table-scroll">${tableHtml}</div>`;
+  };
+
   const html = marked.parse(doc.body, {
     gfm: true,
     renderer,
