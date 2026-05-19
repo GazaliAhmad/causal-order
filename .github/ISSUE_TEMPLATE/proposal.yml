@@ -4,80 +4,62 @@ title: "[Feature]: "
 labels:
   - enhancement
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to suggest an improvement.
+
+        Please describe the problem first, then the change you want to see.
+
   - type: dropdown
     id: area
     attributes:
       label: Area
-      description: What kind of work is this?
+      description: What part of the project does this request affect?
       options:
         - Core ordering
-        - Streaming hardening
-        - Batch hardening
-        - Performance or runtime stability
+        - Streaming behavior
+        - Batch behavior
+        - Performance
         - Documentation
         - Website
         - CI or release workflow
-        - API or developer experience
+        - Developer experience
     validations:
       required: true
-
-  - type: input
-    id: milestone
-    attributes:
-      label: Milestone or release line
-      description: If this clearly belongs to a current or future milestone, say which one.
-      placeholder: "Example: 0.3.4 chunk 4, 0.5.x, tentative"
-    validations:
-      required: false
 
   - type: textarea
     id: problem
     attributes:
-      label: Problem
-      description: What gap, friction, or risk does this address?
+      label: Problem to solve
+      description: What gap, frustration, or risk are you trying to address?
+      placeholder: Describe the current problem clearly.
     validations:
       required: true
 
   - type: textarea
-    id: proposal
+    id: suggestion
     attributes:
-      label: Proposed change
-      description: Keep it concrete. A good proposal should be understandable without guessing.
+      label: Suggested change
+      description: What would you like to happen instead?
+      placeholder: Describe the change as concretely as you can.
     validations:
       required: true
 
   - type: textarea
-    id: scope
+    id: impact
     attributes:
-      label: Scope boundaries
-      description: What should be included, and what should stay out of this change?
-      placeholder: |
-        Include:
-        - ...
-
-        Do not mix in:
-        - ...
+      label: Expected impact
+      description: How would this help users, maintainers, or the project?
+      placeholder: Explain the outcome you expect if this is implemented.
     validations:
       required: true
-
-  - type: textarea
-    id: verification
-    attributes:
-      label: Verification idea
-      description: How would we know this is done or working?
-      placeholder: |
-        Example:
-        - npm test
-        - benchmark profile X
-        - docs page Y updated
-    validations:
-      required: false
 
   - type: textarea
     id: context
     attributes:
       label: Extra context
-      description: Related guides, roadmap notes, screenshots, or prior discussion.
+      description: Add links, screenshots, prior discussion, or related roadmap notes if helpful.
     validations:
       required: false
 
