@@ -9,6 +9,7 @@ const {
   navigation = [],
   currentPath = "/api/",
 } = Astro.props;
+const articleAnchor = "docs-content";
 ---
 
 <BaseLayout title={`${title} | causal-order API`} description={description}>
@@ -23,7 +24,7 @@ const {
             {section.items.map((item) => (
               <li>
                 <a
-                  href={item.href}
+                  href={`${item.href}#${articleAnchor}`}
                   class:list={{
                     active: currentPath === item.href,
                   }}
@@ -37,7 +38,7 @@ const {
       ))}
     </aside>
 
-    <article class="docs-article">
+    <article id={articleAnchor} class="docs-article">
       <div class="docs-eyebrow">
         <span>API</span>
         <a href={sourceUrl} target="_blank" rel="noreferrer">View source</a>
