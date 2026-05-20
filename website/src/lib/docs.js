@@ -141,6 +141,9 @@ function createDocRecord(collection, rootDir, absolutePath, relativePath) {
   const raw = fs.readFileSync(absolutePath, "utf8");
   const parsed = matter(raw);
   const tokens = marked.lexer(parsed.content, { gfm: true });
+  const hasExplicitDescription =
+    typeof parsed.data.description === "string" &&
+    parsed.data.description.trim().length > 0;
   const normalizedRelativePath = relativePath.replace(/\\/g, "/");
   const fallbackTitle =
     parsed.data.title ?? extractTitle(tokens) ?? humanizeTitle(relativePath);
@@ -165,6 +168,8 @@ function createDocRecord(collection, rootDir, absolutePath, relativePath) {
     title,
     description,
     body: parsed.content,
+    tokens,
+    hasExplicitDescription,
     headings: extractHeadings(tokens),
     isLanding: path.basename(relativePath) === landingFiles[collection],
   };
@@ -300,6 +305,7 @@ function parseWikiNavigation(bySource) {
 
 function renderMarkdown(doc, bySource) {
   const headingQueue = [...doc.headings];
+  const tokens = getRenderableTokens(doc);
   const renderer = new marked.Renderer();
 
   renderer.heading = function heading(token) {
@@ -354,7 +360,7 @@ function renderMarkdown(doc, bySource) {
     return `<div class="markdown-table-scroll">${tableHtml}</div>`;
   };
 
-  const html = marked.parse(doc.body, {
+  const html = marked.parser(tokens, {
     gfm: true,
     renderer,
   });
@@ -369,6 +375,36 @@ function renderMarkdown(doc, bySource) {
         text: heading.text,
       })),
   };
+}
+
+function getRenderableTokens(doc) {
+  const tokens = [...doc.tokens];
+
+  if (doc.hasExplicitDescription || !doc.description) {
+    return tokens;
+  }
+
+  const firstHeadingIndex = tokens.findIndex(
+    (token) => token.type === "heading" && token.depth === 1,
+  );
+  const searchStartIndex = firstHeadingIndex >= 0 ? firstHeadingIndex + 1 : 0;
+  const firstParagraphIndex = tokens.findIndex(
+    (token, index) => index >= searchStartIndex && token.type === "paragraph",
+  );
+
+  if (firstParagraphIndex === -1) {
+    return tokens;
+  }
+
+  const firstParagraph = tokens[firstParagraphIndex];
+  const firstParagraphText = cleanInlineText(firstParagraph.text ?? "");
+
+  if (firstParagraphText !== doc.description) {
+    return tokens;
+  }
+
+  tokens.splice(firstParagraphIndex, 1);
+  return tokens;
 }
 
 function resolveMarkdownHref(currentFile, href, bySource) {
