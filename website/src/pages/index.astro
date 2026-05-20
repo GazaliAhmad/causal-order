@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getFeaturedDocs } from "../lib/docs.js";
+import "../styles/home.css";
 
 const featured = getFeaturedDocs();
 ---
@@ -64,7 +65,7 @@ const featured = getFeaturedDocs();
   <section class="home-grid">
     <article class="home-card">
       <span class="card-kicker">Practical layer</span>
-      <h2>Guides</h2>
+      <h2><a href="/guides/">Guides</a></h2>
       <p>
         Deployment patterns, operational walkthroughs, failure modes, and the current runtime
         contract.
@@ -78,7 +79,7 @@ const featured = getFeaturedDocs();
 
     <article class="home-card">
       <span class="card-kicker">Conceptual layer</span>
-      <h2>Wiki</h2>
+      <h2><a href="/wiki/">Wiki</a></h2>
       <p>
         Mental models, design philosophy, and the deeper reasoning behind the library’s ordering
         choices.
@@ -96,7 +97,7 @@ const featured = getFeaturedDocs();
       <div class="split-card">
         <div>
           <span class="card-kicker">Reference layer</span>
-          <h2>API</h2>
+          <h2><a href="/api/">API</a></h2>
           <p>
             Public entry points, result types, ordering options, streaming batches, and the current
             exported contract.

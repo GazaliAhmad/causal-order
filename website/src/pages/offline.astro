@@ -1,0 +1,29 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import "../styles/status.css";
+---
+
+<BaseLayout
+  title="Offline | causal-order"
+  description="Offline fallback for the causal-order documentation site."
+  noindex={true}
+>
+  <section class="not-found">
+    <div class="not-found-copy signal-card">
+      <p class="card-kicker">Offline mode</p>
+      <h1>You're offline right now</h1>
+      <p>
+        The site shell is installed, but this page is not cached yet. Reconnect to keep exploring
+        guides, wiki notes, and API docs.
+      </p>
+      <p>
+        Once you revisit a page while online, the service worker will keep a cached copy available
+        for the next offline visit.
+      </p>
+      <div class="not-found-actions hero-actions">
+        <a class="button button-primary" href="/">Go home</a>
+        <a class="button button-secondary" href="/guides/">Browse guides</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

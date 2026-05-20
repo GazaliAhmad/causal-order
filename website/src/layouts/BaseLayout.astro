@@ -1,14 +1,27 @@
 ---
 import packageMeta from "../../../package.json";
-import "../styles/global.css";
+import "../styles/foundation.css";
+import "../styles/layout.css";
+import "../styles/ui.css";
 
 const {
   title = "causal-order",
   description = "Event integrity for distributed systems that cannot treat timestamp order alone as the truth model.",
+  imagePath = "/pwa-icon-512.png",
+  noindex = false,
+  pathname = Astro.url.pathname,
+  type = "website",
 } = Astro.props;
 
 const packageVersion = packageMeta.version;
 const currentYear = new Date().getFullYear();
+const siteOrigin = Astro.site?.toString().replace(/\/$/, "") ?? "";
+const canonicalUrl = siteOrigin ? new URL(pathname, `${siteOrigin}/`).toString() : "";
+const imageUrl = siteOrigin && imagePath
+  ? new URL(imagePath, `${siteOrigin}/`).toString()
+  : "";
+const robotsContent = noindex ? "noindex, nofollow" : "index, follow";
+const twitterCard = imageUrl ? "summary" : "summary";
 
 const themeBootScript = `
   (() => {
@@ -45,6 +58,67 @@ const themeToggleScript = `
     applyTheme(root.dataset.theme === "dark" ? "dark" : "light");
   })();
 `;
+
+const registerServiceWorkerScript = `
+  (() => {
+    if (!("serviceWorker" in navigator)) {
+      return;
+    }
+
+    const getSameOriginAssetUrls = () => {
+      const urls = new Set([window.location.pathname + window.location.search]);
+      const selectors = [
+        'link[rel="stylesheet"]',
+        'link[rel="modulepreload"]',
+        'script[src]',
+      ];
+
+      for (const selector of selectors) {
+        for (const element of document.querySelectorAll(selector)) {
+          const rawUrl = element.href || element.src;
+          if (!rawUrl) {
+            continue;
+          }
+
+          const url = new URL(rawUrl, window.location.origin);
+          if (url.origin !== window.location.origin) {
+            continue;
+          }
+
+          urls.add(url.pathname + url.search);
+        }
+      }
+
+      return [...urls];
+    };
+
+    const cacheCurrentPageShell = (registration) => {
+      if (!registration?.active) {
+        return;
+      }
+
+      registration.active.postMessage({
+        type: "CACHE_URLS",
+        urls: getSameOriginAssetUrls(),
+      });
+    };
+
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((registration) => {
+          cacheCurrentPageShell(registration);
+          return navigator.serviceWorker.ready;
+        })
+        .then((registration) => {
+          cacheCurrentPageShell(registration);
+        })
+        .catch((error) => {
+          console.warn("Service worker registration failed", error);
+        });
+    });
+  })();
+`;
 ---
 
 <!doctype html>
@@ -54,7 +128,28 @@ const themeToggleScript = `
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="robots" content={robotsContent} />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <meta property="og:site_name" content="causal-order" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={type} />
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+    {imageUrl && <meta property="og:image" content={imageUrl} />}
+    <meta name="twitter:card" content={twitterCard} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {imageUrl && <meta name="twitter:image" content={imageUrl} />}
+    <meta name="application-name" content="causal-order" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="causal-order" />
+    <meta name="theme-color" content="#f6f4ec" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#081311" media="(prefers-color-scheme: dark)" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180.png" />
+    <link rel="mask-icon" href="/pwa-maskable.svg" color="#0f766e" />
     <script is:inline set:html={themeBootScript}></script>
   </head>
   <body>
@@ -160,5 +255,6 @@ const themeToggleScript = `
       </div>
     </footer>
     <script is:inline set:html={themeToggleScript}></script>
+    {import.meta.env.PROD && <script is:inline set:html={registerServiceWorkerScript}></script>}
   </body>
 </html>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="causal-order app icon">
+  <defs>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f766e" />
+      <stop offset="100%" stop-color="#2a9d8f" />
+    </linearGradient>
+  </defs>
+  <rect x="48" y="48" width="416" height="416" rx="132" fill="url(#iconGradient)" />
+  <path
+    d="M126 292C184 292 206 244 270 244C330 244 358 197 414 197"
+    fill="none"
+    stroke="#effcf8"
+    stroke-width="34"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <circle cx="126" cy="292" r="44" fill="#f8fafc" />
+  <circle cx="270" cy="244" r="37" fill="#fbbf24" />
+  <circle cx="414" cy="197" r="44" fill="#fb7185" />
+</svg>

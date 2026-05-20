@@ -1,0 +1,172 @@
+.hero,
+.home-grid,
+.api-strip,
+.why-strip {
+  width: var(--shell);
+  margin: 0 auto;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: 28px;
+  padding: 72px 0 36px;
+  align-items: center;
+}
+
+.hero-copy h1 {
+  margin: 0 0 18px;
+  max-width: 15ch;
+  font-size: clamp(2.8rem, 4vw, 5.2rem);
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+
+.hero-copy p {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.08rem;
+}
+
+.hero-install {
+  margin-top: 24px;
+  max-width: 760px;
+}
+
+.install-kicker {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+.install-command {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.install-command code {
+  padding: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.install-link {
+  flex: 0 0 auto;
+  color: var(--accent-strong);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  padding: 18px 0 24px;
+}
+
+.api-strip {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  padding: 0 0 28px;
+}
+
+.split-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(240px, 0.8fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.home-card {
+  padding: 28px;
+}
+
+.home-card h2,
+.why-strip h2 {
+  margin: 10px 0 10px;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.home-card h2 a {
+  color: inherit;
+}
+
+.home-card h2 a:hover {
+  text-decoration: none;
+}
+
+.home-card p,
+.why-strip p {
+  color: var(--muted);
+}
+
+.home-links {
+  margin: 18px 0 0;
+  padding-left: 18px;
+}
+
+.home-links li + li {
+  margin-top: 8px;
+}
+
+.home-links-compact {
+  margin-top: 44px;
+}
+
+.why-strip {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 26px;
+  align-items: center;
+  padding: 28px;
+  margin-bottom: 56px;
+}
+
+@media (max-width: 860px) {
+  .hero,
+  .home-grid,
+  .api-strip,
+  .why-strip {
+    width: min(calc(100vw - 28px), 100%);
+  }
+
+  .hero,
+  .home-grid,
+  .api-strip,
+  .why-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .split-card {
+    grid-template-columns: 1fr;
+  }
+
+  .home-links-compact {
+    margin-top: 8px;
+  }
+
+  .hero {
+    padding-top: 42px;
+  }
+
+  .install-command {
+    align-items: start;
+    flex-direction: column;
+  }
+}

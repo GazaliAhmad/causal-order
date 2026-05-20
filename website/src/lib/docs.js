@@ -141,6 +141,9 @@ function createDocRecord(collection, rootDir, absolutePath, relativePath) {
   const raw = fs.readFileSync(absolutePath, "utf8");
   const parsed = matter(raw);
   const tokens = marked.lexer(parsed.content, { gfm: true });
+  const hasExplicitDescription =
+    typeof parsed.data.description === "string" &&
+    parsed.data.description.trim().length > 0;
   const normalizedRelativePath = relativePath.replace(/\\/g, "/");
   const fallbackTitle =
     parsed.data.title ?? extractTitle(tokens) ?? humanizeTitle(relativePath);
@@ -165,6 +168,8 @@ function createDocRecord(collection, rootDir, absolutePath, relativePath) {
     title,
     description,
     body: parsed.content,
+    tokens,
+    hasExplicitDescription,
     headings: extractHeadings(tokens),
     isLanding: path.basename(relativePath) === landingFiles[collection],
   };
@@ -300,6 +305,7 @@ function parseWikiNavigation(bySource) {
 
 function renderMarkdown(doc, bySource) {
   const headingQueue = [...doc.headings];
+  const tokens = getRenderableTokens(doc);
   const renderer = new marked.Renderer();
 
   renderer.heading = function heading(token) {
@@ -354,21 +360,68 @@ function renderMarkdown(doc, bySource) {
     return `<div class="markdown-table-scroll">${tableHtml}</div>`;
   };
 
-  const html = marked.parse(doc.body, {
+  const html = marked.parser(tokens, {
     gfm: true,
     renderer,
   });
 
   return {
     html,
-    toc: doc.headings
-      .filter((heading) => heading.depth >= 2 && heading.depth <= 3)
-      .map((heading) => ({
-        depth: heading.depth,
-        id: heading.id,
-        text: heading.text,
-      })),
+    toc: buildTableOfContents(doc.headings),
   };
+}
+
+function buildTableOfContents(headings) {
+  const tocHeadings = headings.filter(
+    (heading) => heading.depth >= 2 && heading.depth <= 3,
+  );
+  const repeatedDepth3Texts = new Set(
+    tocHeadings
+      .filter((heading) => heading.depth === 3)
+      .map((heading) => heading.text)
+      .filter((text, index, values) => values.indexOf(text) !== index),
+  );
+
+  return tocHeadings
+    .filter(
+      (heading) =>
+        heading.depth !== 3 || !repeatedDepth3Texts.has(heading.text),
+    )
+    .map((heading) => ({
+      depth: heading.depth,
+      id: heading.id,
+      text: heading.text.replace(/`/g, ""),
+    }));
+}
+
+function getRenderableTokens(doc) {
+  const tokens = [...doc.tokens];
+
+  if (doc.hasExplicitDescription || !doc.description) {
+    return tokens;
+  }
+
+  const firstHeadingIndex = tokens.findIndex(
+    (token) => token.type === "heading" && token.depth === 1,
+  );
+  const searchStartIndex = firstHeadingIndex >= 0 ? firstHeadingIndex + 1 : 0;
+  const firstParagraphIndex = tokens.findIndex(
+    (token, index) => index >= searchStartIndex && token.type === "paragraph",
+  );
+
+  if (firstParagraphIndex === -1) {
+    return tokens;
+  }
+
+  const firstParagraph = tokens[firstParagraphIndex];
+  const firstParagraphText = cleanInlineText(firstParagraph.text ?? "");
+
+  if (firstParagraphText !== doc.description) {
+    return tokens;
+  }
+
+  tokens.splice(firstParagraphIndex, 1);
+  return tokens;
 }
 
 function resolveMarkdownHref(currentFile, href, bySource) {
@@ -419,7 +472,10 @@ function resolveMarkdownHref(currentFile, href, bySource) {
 }
 
 function extractTitle(tokens) {
-  return tokens.find((token) => token.type === "heading" && token.depth === 1)?.text;
+  const title = tokens.find(
+    (token) => token.type === "heading" && token.depth === 1,
+  )?.text;
+  return title ? cleanInlineText(title) : undefined;
 }
 
 function extractDescription(tokens) {
@@ -436,13 +492,14 @@ function extractHeadings(tokens) {
       continue;
     }
 
+    const text = cleanInlineText(token.text);
     const baseSlug = slugifySegment(token.text);
     const count = slugCounts.get(baseSlug) ?? 0;
     slugCounts.set(baseSlug, count + 1);
 
     headings.push({
       depth: token.depth,
-      text: token.text,
+      text,
       id: count === 0 ? baseSlug : `${baseSlug}-${count + 1}`,
     });
   }

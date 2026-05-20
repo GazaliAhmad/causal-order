@@ -1,0 +1,272 @@
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  backdrop-filter: blur(16px);
+  background: var(--header-surface), var(--header-bg);
+  border-bottom: 1px solid var(--header-border-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    var(--header-shadow);
+}
+
+.site-header .site-shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 82px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  flex: 0 1 auto;
+}
+
+.brand-mark-link:hover,
+.brand-title-link:hover {
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.36);
+}
+
+.brand-mark-svg {
+  display: block;
+  width: 42px;
+  height: 42px;
+}
+
+.brand-text {
+  display: grid;
+  gap: 3px;
+}
+
+.brand-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-title-link {
+  color: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.brand-meta {
+  display: grid;
+  gap: 2px;
+}
+
+.brand-text small {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.npm-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  align-self: center;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.npm-badge:hover {
+  text-decoration: none;
+}
+
+.npm-badge-label,
+.npm-badge-version {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 8px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.npm-badge-label {
+  background: #24303a;
+  color: #f5f7fa;
+}
+
+.npm-badge-version {
+  background: linear-gradient(135deg, #db6b2b 0%, #ef8f43 100%);
+  color: #fffaf3;
+}
+
+.top-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.top-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: var(--ink-soft);
+  font-weight: 700;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    border-color 140ms ease;
+}
+
+.top-nav a:hover {
+  color: var(--ink);
+  text-decoration: none;
+  background: var(--nav-hover-bg);
+}
+
+.top-nav .nav-icon-link {
+  justify-content: center;
+  width: 48px;
+  min-height: 48px;
+  padding: 0;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  width: 48px;
+  padding: 0;
+  border: 1px solid var(--utility-border);
+  border-radius: 999px;
+  background: var(--utility-bg);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease;
+}
+
+.theme-toggle:hover {
+  color: var(--accent-strong);
+  background: var(--nav-hover-bg);
+  border-color: var(--accent);
+}
+
+.theme-toggle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.nav-icon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+}
+
+.theme-toggle .nav-icon {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-toggle .theme-icon-moon {
+  display: block;
+}
+
+:root[data-theme="light"] .theme-toggle .theme-icon-sun {
+  display: block;
+}
+
+.top-nav .nav-icon {
+  opacity: 0.88;
+}
+
+.top-nav .nav-icon-link .nav-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.site-footer {
+  padding: 22px 0 42px;
+}
+
+.site-footer .site-shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.site-footer p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.site-footer > .site-shell > a {
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.site-footer > .site-shell > a:hover {
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+
+.site-footer a {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+@media (max-width: 860px) {
+  .top-nav {
+    gap: 12px;
+    font-size: 0.94rem;
+    flex-wrap: wrap;
+  }
+
+  .site-header .site-shell {
+    min-height: auto;
+    padding: 14px 0;
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .site-footer .site-shell {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .brand-text small {
+    display: none;
+  }
+
+  .brand-meta {
+    gap: 4px;
+  }
+
+  .brand-title-row {
+    flex-wrap: wrap;
+  }
+}
