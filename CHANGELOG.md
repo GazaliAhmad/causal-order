@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
   * added shared SEO metadata, including canonical, robots, Open Graph, and Twitter tags
   * added `robots.txt` and `sitemap.xml` routes for the docs site
   * added PWA install metadata improvements, offline asset caching support, and raster icon fallbacks
+  * removed timestamp-only churn from the generated API docs snapshot so routine site builds do not dirty the worktree
   * updated the privacy page to mention Cloudflare-based site delivery
 
 ## [0.3.4]
