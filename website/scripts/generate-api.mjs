@@ -258,7 +258,6 @@ const types = {
 };
 
 const apiData = {
-  generatedAt: new Date().toISOString(),
   repoUrl,
   sourceBaseUrl,
   navigation: [
