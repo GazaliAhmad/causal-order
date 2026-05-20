@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="causal-order maskable app icon">
+  <defs>
+    <linearGradient id="maskableGradient" x1="8%" y1="4%" x2="92%" y2="96%">
+      <stop offset="0%" stop-color="#0f766e" />
+      <stop offset="100%" stop-color="#2a9d8f" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="156" fill="url(#maskableGradient)" />
+  <path
+    d="M132 292C187 292 211 246 272 246C334 246 363 198 408 198"
+    fill="none"
+    stroke="#effcf8"
+    stroke-width="30"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <circle cx="132" cy="292" r="40" fill="#f8fafc" />
+  <circle cx="272" cy="246" r="34" fill="#fbbf24" />
+  <circle cx="408" cy="198" r="40" fill="#fb7185" />
+</svg>

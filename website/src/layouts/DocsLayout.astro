@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
+import "../styles/docs.css";
+import "../styles/prose.css";
 
 const { doc, navigation, sectionLabel, currentPath = doc.routePath } = Astro.props;
 const articleAnchor = "docs-content";

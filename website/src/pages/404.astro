@@ -1,8 +1,9 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import "../styles/status.css";
 ---
 
-<BaseLayout title="Not Found | causal-order">
+<BaseLayout title="Not Found | causal-order" noindex={true}>
   <section class="not-found">
     <div class="not-found-visual">
       <img src="/404-broken-doc.svg" alt="Broken document illustration for a page that could not be found." />

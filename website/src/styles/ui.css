@@ -1,0 +1,102 @@
+.hero-badge,
+.card-kicker,
+.sidebar-label,
+.docs-eyebrow span,
+.toc-label,
+.signal-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.button:hover {
+  text-decoration: none;
+}
+
+.button-primary {
+  background: linear-gradient(135deg, #0f766e 0%, #148981 100%);
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+.button-secondary {
+  border: 1px solid var(--line);
+  background: var(--button-secondary-bg);
+  color: var(--ink);
+}
+
+.hero-panel,
+.home-card,
+.why-strip,
+.docs-sidebar,
+.docs-article,
+.docs-toc,
+.signal-card {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+}
+
+.hero-panel,
+.signal-card,
+.home-card,
+.why-strip,
+.docs-sidebar,
+.docs-article,
+.docs-toc {
+  border-radius: var(--radius);
+}
+
+.hero-panel {
+  padding: 10px;
+}
+
+.signal-card {
+  padding: 28px;
+  border-color: var(--signal-border);
+  background: var(--signal-surface);
+  color: var(--signal-ink);
+}
+
+.signal-card ul {
+  margin: 16px 0 0;
+  padding-left: 1.25rem;
+}
+
+.signal-card li {
+  color: var(--signal-muted);
+}
+
+.signal-card li + li {
+  margin-top: 10px;
+}
+
+.signal-card code {
+  background: var(--signal-code-bg);
+  color: var(--signal-ink);
+  font-weight: 700;
+}

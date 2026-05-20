@@ -1,0 +1,30 @@
+.privacy-page {
+  padding-top: 72px;
+}
+
+.privacy-copy {
+  max-width: 64ch;
+}
+
+.privacy-shell {
+  width: var(--shell);
+  margin: 0 auto;
+  padding: 72px 0 40px;
+}
+
+.privacy-article {
+  max-width: 1280px;
+}
+
+.privacy-article h1 {
+  margin: 10px 0 18px;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.privacy-article p {
+  max-width: 128ch;
+  color: var(--ink-soft);
+  font-size: 1.04rem;
+  text-wrap: pretty;
+}

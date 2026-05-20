@@ -1,0 +1,50 @@
+.not-found {
+  width: var(--shell);
+  margin: 0 auto;
+  padding: 56px 0 72px;
+}
+
+.not-found-copy {
+  max-width: 760px;
+  margin: 20px auto 0;
+  text-align: left;
+}
+
+.not-found h1 {
+  margin: 10px 0 10px;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.not-found p {
+  color: var(--muted);
+}
+
+.not-found-visual {
+  width: 100%;
+}
+
+.not-found-visual img {
+  width: min(100%, 980px);
+  max-height: 46vh;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  object-fit: contain;
+  filter: drop-shadow(0 24px 70px rgba(0, 0, 0, 0.28));
+}
+
+.not-found-actions {
+  justify-content: flex-start;
+  margin-top: 18px;
+  width: 100%;
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 860px) {
+  .not-found {
+    width: min(calc(100vw - 28px), 100%);
+  }
+}

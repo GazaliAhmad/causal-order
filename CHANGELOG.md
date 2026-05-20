@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+* website refinements without a package version bump, including:
+  * deduplicated repeated intro paragraphs on rendered docs pages
+  * cleaned docs and wiki TOC/sidebar labels by removing markdown backticks
+  * reduced noisy repeated TOC entries on long guide pages
+  * made homepage section titles for Guides, Wiki, and API clickable
+  * moved the API overview "Where to start" section higher in the page and TOC
+  * added shared SEO metadata, including canonical, robots, Open Graph, and Twitter tags
+  * added `robots.txt` and `sitemap.xml` routes for the docs site
+  * added PWA install metadata improvements, offline asset caching support, and raster icon fallbacks
+  * updated the privacy page to mention Cloudflare-based site delivery
+
 ## [0.3.4]
 
 ### Added

@@ -367,14 +367,31 @@ function renderMarkdown(doc, bySource) {
 
   return {
     html,
-    toc: doc.headings
-      .filter((heading) => heading.depth >= 2 && heading.depth <= 3)
-      .map((heading) => ({
-        depth: heading.depth,
-        id: heading.id,
-        text: heading.text,
-      })),
+    toc: buildTableOfContents(doc.headings),
   };
+}
+
+function buildTableOfContents(headings) {
+  const tocHeadings = headings.filter(
+    (heading) => heading.depth >= 2 && heading.depth <= 3,
+  );
+  const repeatedDepth3Texts = new Set(
+    tocHeadings
+      .filter((heading) => heading.depth === 3)
+      .map((heading) => heading.text)
+      .filter((text, index, values) => values.indexOf(text) !== index),
+  );
+
+  return tocHeadings
+    .filter(
+      (heading) =>
+        heading.depth !== 3 || !repeatedDepth3Texts.has(heading.text),
+    )
+    .map((heading) => ({
+      depth: heading.depth,
+      id: heading.id,
+      text: heading.text.replace(/`/g, ""),
+    }));
 }
 
 function getRenderableTokens(doc) {
@@ -455,7 +472,10 @@ function resolveMarkdownHref(currentFile, href, bySource) {
 }
 
 function extractTitle(tokens) {
-  return tokens.find((token) => token.type === "heading" && token.depth === 1)?.text;
+  const title = tokens.find(
+    (token) => token.type === "heading" && token.depth === 1,
+  )?.text;
+  return title ? cleanInlineText(title) : undefined;
 }
 
 function extractDescription(tokens) {
@@ -472,13 +492,14 @@ function extractHeadings(tokens) {
       continue;
     }
 
+    const text = cleanInlineText(token.text);
     const baseSlug = slugifySegment(token.text);
     const count = slugCounts.get(baseSlug) ?? 0;
     slugCounts.set(baseSlug, count + 1);
 
     headings.push({
       depth: token.depth,
-      text: token.text,
+      text,
       id: count === 0 ? baseSlug : `${baseSlug}-${count + 1}`,
     });
   }
