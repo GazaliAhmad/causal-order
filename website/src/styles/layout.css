@@ -217,19 +217,31 @@
   gap: 16px;
 }
 
+.footer-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .site-footer p {
   margin: 0;
   color: var(--muted);
   font-size: 0.92rem;
 }
 
-.site-footer > .site-shell > a {
+.site-footer > .site-shell > a,
+.footer-meta > a {
   color: var(--muted);
   font-size: 0.92rem;
   font-weight: 700;
 }
 
-.site-footer > .site-shell > a:hover {
+.mobile-return-top {
+  display: none;
+}
+
+.site-footer > .site-shell > a:hover,
+.footer-meta > a:hover {
   color: var(--accent-strong);
   text-decoration: none;
 }
@@ -256,6 +268,38 @@
   .site-footer .site-shell {
     align-items: start;
     flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer-meta {
+    align-items: start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mobile-return-top {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--utility-border);
+    border-radius: 999px;
+    background: var(--utility-bg);
+    color: var(--ink);
+    font-size: 0.92rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .mobile-return-top:hover {
+    color: var(--accent-strong);
+    background: var(--nav-hover-bg);
+  }
+
+  .footer-meta > a {
+    font-size: 0.88rem;
+    font-weight: 600;
+    opacity: 0.88;
   }
 
   .brand-text small {

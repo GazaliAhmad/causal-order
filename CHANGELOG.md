@@ -9,6 +9,11 @@ All notable changes to this project will be documented in this file.
 * lightweight repository Node-version pinning via:
   * `.nvmrc` targeting Node.js `24`
   * `.node-version` targeting Node.js `24`
+* dedicated `0.4.x` developer-experience planning docs in:
+  * `guides/dx/developer-experience-0.4.x.md`
+  * `guides/dx/implementation-guide-0.4.0.md`
+  * `guides/dx/implementation-guide-0.4.1.md`
+  * `guides/dx/implementation-guide-0.4.2.md`
 
 ### Changed
 
@@ -17,6 +22,10 @@ All notable changes to this project will be documented in this file.
   * documenting Node.js `20+` as the published package support floor
   * documenting Node.js `18` CI coverage as best-effort regression validation rather than a formal long-term support contract
   * aligning the README, contributing guide, and roadmap around that same runtime policy
+* refined the `0.4.x` roadmap so core DX work stays inside the zero-dependency package boundary instead of implying CLI or JSONL glue in the core repo
+* organized the new `0.4.x` planning notes under `guides/dx/` as a separate developer-experience docs track instead of mixing them into `guides/hardening/`
+* surfaced only the `0.4.x` developer-experience overview in the website guides navigation while keeping the `0.4.0` through `0.4.2` implementation guides as repo-only planning notes
+* tightened the `0.4.0` planning language so the translation layer is framed as a future public ingress contract with explicit coercion, anomaly, mapper, and ownership obligations rather than as a lightweight convenience helper
 
 ## [Website]
 
@@ -26,6 +35,11 @@ All notable changes to this project will be documented in this file.
   * deduplicated repeated intro paragraphs on rendered docs pages
   * cleaned docs and wiki TOC/sidebar labels by removing markdown backticks
   * reduced noisy repeated TOC entries on long guide pages
+  * made sticky docs sidebars scroll independently on smaller desktop heights instead of waiting for the main article scroll to reach the end
+  * added a mobile-only footer "Return to top" control for long docs pages
+  * switched the mobile "Return to top" control from a sticky-header anchor target to an explicit smooth scroll-to-top action so it works reliably on narrow mobile layouts
+  * tightened mobile footer spacing and grouping so the "Return to top" control sits closer to the end of docs content while copyright and privacy stay grouped underneath
+  * softened the mobile footer privacy link styling so it reads as secondary metadata instead of competing with the return-to-top control
   * made homepage section titles for Guides, Wiki, and API clickable
   * moved the API overview "Where to start" section higher in the page and TOC
   * added shared SEO metadata, including canonical, robots, Open Graph, and Twitter tags

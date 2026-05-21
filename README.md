@@ -1,5 +1,7 @@
 # causal-order
 
+![causal-order banner](https://causal-order.gazali.one/readme-banner.svg)
+
 An event integrity library for distributed systems that still use clocks, but cannot rely on one globally synchronized clock as the truth model.
 
 `causal-order` helps developers design and run event processing, replay, and recovery flows without assuming the system has one perfect global time source.
@@ -300,6 +302,10 @@ Workloads and hardening:
 * [Implementation Guide `0.3.3`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/implementation-guide-0.3.3.md)
 * [Runtime Stability 0.3.4](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/runtime-stability-0.3.4.md)
 * [Implementation Guide 0.3.4](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/implementation-guide-0.3.4.md)
+* [Developer Experience `0.4.x`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/dx/developer-experience-0.4.x.md)
+* [Implementation Guide `0.4.0`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/dx/implementation-guide-0.4.0.md)
+* [Implementation Guide `0.4.1`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/dx/implementation-guide-0.4.1.md)
+* [Implementation Guide `0.4.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/dx/implementation-guide-0.4.2.md)
 * [Stress Hardening](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stress-hardening.md)
 * [After-Hours Batch Processing](https://github.com/GazaliAhmad/causal-order/blob/main/guides/after-hours-batch-processing.md)
 * [Realistic Workloads](https://github.com/GazaliAhmad/causal-order/wiki/Realistic-Workloads)

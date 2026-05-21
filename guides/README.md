@@ -23,6 +23,10 @@ Workloads and hardening:
 * [Streaming Hardening And Pressure](./hardening/streaming-hardening-0.3.3.md)
 * [Runtime Stability](./hardening/runtime-stability-0.3.4.md)
 
+Developer experience:
+
+* [Developer Experience](./dx/developer-experience-0.4.x.md)
+
 Failure-mode guides:
 
 * [Replay Corruption](./replay-corruption.md)

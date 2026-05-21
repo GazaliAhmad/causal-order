@@ -59,6 +59,19 @@ const themeToggleScript = `
   })();
 `;
 
+const returnToTopScript = `
+  (() => {
+    const links = document.querySelectorAll("[data-return-top]");
+
+    for (const link of links) {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
+  })();
+`;
+
 const registerServiceWorkerScript = `
   (() => {
     if (!("serviceWorker" in navigator)) {
@@ -247,14 +260,18 @@ const registerServiceWorkerScript = `
     </main>
     <footer class="site-footer">
       <div class="site-shell">
-        <p>
-          © {currentYear}
-          <a href="https://gazali.one" target="_blank" rel="noreferrer">gazali.one</a>
-        </p>
-        <a href="/privacy/">Privacy</a>
+        <a class="mobile-return-top" href="#" data-return-top>Return to top</a>
+        <div class="footer-meta">
+          <p>
+            © {currentYear}
+            <a href="https://gazali.one" target="_blank" rel="noreferrer">gazali.one</a>
+          </p>
+          <a href="/privacy/">Privacy</a>
+        </div>
       </div>
     </footer>
     <script is:inline set:html={themeToggleScript}></script>
+    <script is:inline set:html={returnToTopScript}></script>
     {import.meta.env.PROD && <script is:inline set:html={registerServiceWorkerScript}></script>}
   </body>
 </html>

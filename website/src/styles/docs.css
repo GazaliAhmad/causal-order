@@ -12,6 +12,10 @@
 .docs-toc {
   position: sticky;
   top: 96px;
+  max-height: calc(100vh - 112px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   padding: 22px;
 }
 
@@ -111,11 +115,14 @@
   .docs-shell {
     width: min(calc(100vw - 28px), 100%);
     grid-template-columns: 1fr;
+    padding: 20px 0 18px;
   }
 
   .docs-sidebar,
   .docs-toc {
     position: static;
+    max-height: none;
+    overflow-y: visible;
   }
 
   .docs-article {
