@@ -64,7 +64,9 @@ For new features, the default design test should be:
 
 Current intended platform posture:
 
-* Node.js `20+`
+* active repository development targets Node.js `24`
+* published package support begins at Node.js `20+`
+* Node.js `18` remains in CI for best-effort regression detection, not as a formal long-term support contract
 * ESM only
 * core time representation stays primitive: `bigint` epoch milliseconds
 * no `Temporal` requirement in the core package

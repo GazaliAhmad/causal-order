@@ -81,8 +81,63 @@ npm install causal-order
 
 Platform:
 
-* Node.js `20+`
 * ESM only
+
+## Runtime Policy
+
+### Development Environment
+
+Primary active development targets Node.js `24`.
+
+Internal profiling, benchmarking, local tooling, and performance validation workflows are optimized against the latest stable Node.js runtime.
+
+---
+
+### Minimum Supported Runtime
+
+The published npm package declares:
+
+```text
+Node.js >=20
+```
+
+as the official supported runtime floor.
+
+Public package behavior, exported APIs, and example integrations must remain fully functional under Node.js 20 without requiring runtime feature flags or polyfills.
+
+No runtime-specific capabilities requiring versions newer than Node.js 20 may be introduced into the public package surface without a formal major-version compatibility review.
+
+---
+
+### CI Compatibility Matrix
+
+Continuous Integration validation executes against:
+
+* Node.js `18`
+* Node.js `20`
+* Node.js `24`
+
+Purpose by runtime tier:
+
+| Runtime | Role |
+| --- | --- |
+| Node.js 18 | Legacy compatibility regression detection |
+| Node.js 20 | Official supported runtime floor |
+| Node.js 24 | Active development and performance validation |
+
+---
+
+### Compatibility Contract Clarification
+
+Node.js 18 compatibility is treated as best-effort regression validation rather than a guaranteed long-term support contract.
+
+The project's formal runtime support boundary begins at:
+
+```text
+Node.js >=20
+```
+
+Successful execution under Node.js 18 should not be interpreted as a permanent stability guarantee across future release lines.
 
 ## Quick Example
 

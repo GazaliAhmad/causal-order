@@ -2,7 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.4.0]
+
+### Added
+
+* lightweight repository Node-version pinning via:
+  * `.nvmrc` targeting Node.js `24`
+  * `.node-version` targeting Node.js `24`
+
+### Changed
+
+* clarified the runtime and compatibility posture across the repo-facing docs by:
+  * documenting Node.js `24` as the active repository development target
+  * documenting Node.js `20+` as the published package support floor
+  * documenting Node.js `18` CI coverage as best-effort regression validation rather than a formal long-term support contract
+  * aligning the README, contributing guide, and roadmap around that same runtime policy
+
+## [Website]
 
 ### Changed
 
