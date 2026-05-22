@@ -1,5 +1,7 @@
 # causal-order
 
+![causal-order banner](https://causal-order.gazali.one/readme-banner.svg)
+
 An event integrity library for distributed systems that still use clocks, but cannot rely on one globally synchronized clock as the truth model.
 
 `causal-order` helps developers design and run event processing, replay, and recovery flows without assuming the system has one perfect global time source.
@@ -81,8 +83,63 @@ npm install causal-order
 
 Platform:
 
-* Node.js `20+`
 * ESM only
+
+## Runtime Policy
+
+### Development Environment
+
+Primary active development targets Node.js `24`.
+
+Internal profiling, benchmarking, local tooling, and performance validation workflows are optimized against the latest stable Node.js runtime.
+
+---
+
+### Minimum Supported Runtime
+
+The published npm package declares:
+
+```text
+Node.js >=20
+```
+
+as the official supported runtime floor.
+
+Public package behavior, exported APIs, and example integrations must remain fully functional under Node.js 20 without requiring runtime feature flags or polyfills.
+
+No runtime-specific capabilities requiring versions newer than Node.js 20 may be introduced into the public package surface without a formal major-version compatibility review.
+
+---
+
+### CI Compatibility Matrix
+
+Continuous Integration validation executes against:
+
+* Node.js `18`
+* Node.js `20`
+* Node.js `24`
+
+Purpose by runtime tier:
+
+| Runtime | Role |
+| --- | --- |
+| Node.js 18 | Legacy compatibility regression detection |
+| Node.js 20 | Official supported runtime floor |
+| Node.js 24 | Active development and performance validation |
+
+---
+
+### Compatibility Contract Clarification
+
+Node.js 18 compatibility is treated as best-effort regression validation rather than a guaranteed long-term support contract.
+
+The project's formal runtime support boundary begins at:
+
+```text
+Node.js >=20
+```
+
+Successful execution under Node.js 18 should not be interpreted as a permanent stability guarantee across future release lines.
 
 ## Quick Example
 
@@ -245,6 +302,10 @@ Workloads and hardening:
 * [Implementation Guide `0.3.3`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/implementation-guide-0.3.3.md)
 * [Runtime Stability 0.3.4](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/runtime-stability-0.3.4.md)
 * [Implementation Guide 0.3.4](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/implementation-guide-0.3.4.md)
+* [Developer Experience `0.4.x`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/dx/developer-experience-0.4.x.md)
+* [Implementation Guide `0.4.0`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/dx/implementation-guide-0.4.0.md)
+* [Implementation Guide `0.4.1`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/dx/implementation-guide-0.4.1.md)
+* [Implementation Guide `0.4.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/dx/implementation-guide-0.4.2.md)
 * [Stress Hardening](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stress-hardening.md)
 * [After-Hours Batch Processing](https://github.com/GazaliAhmad/causal-order/blob/main/guides/after-hours-batch-processing.md)
 * [Realistic Workloads](https://github.com/GazaliAhmad/causal-order/wiki/Realistic-Workloads)

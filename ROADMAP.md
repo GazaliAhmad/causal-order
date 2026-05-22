@@ -64,7 +64,9 @@ For new features, the default design test should be:
 
 Current intended platform posture:
 
-* Node.js `20+`
+* active repository development targets Node.js `24`
+* published package support begins at Node.js `20+`
+* Node.js `18` remains in CI for best-effort regression detection, not as a formal long-term support contract
 * ESM only
 * core time representation stays primitive: `bigint` epoch milliseconds
 * no `Temporal` requirement in the core package
@@ -694,32 +696,80 @@ Current outcome:
 Goal:
 Make the package easy to adopt without reading the full spec first.
 
-Focus:
+This milestone should improve adoption without turning the core package into an environment-aware developer shell.
 
-* improve API ergonomics where it helps without weakening rigor
-* add examples directory
-* add a tiny CLI demo for fast hands-on evaluation, for example:
-  * `npx causal-order-demo sample.jsonl`
-* add JSONL adapter
-* improve error messages and anomaly formatting
-* add quick-start samples for:
-  * audit reconstruction
-  * replay pipelines
-  * distributed debugging
-  * offline sync inspection
-* add guidance for choosing strict mode and late-arrival policies
-* document stricter-mode guidance more explicitly, including where fail-fast behavior is the safer operational choice:
-  * audit and compliance pipelines
-  * financial or regulated event processing
-  * CI and fixture verification
-  * upstream data-quality enforcement
-  * producer debugging and contract testing
+The core repository should remain:
+
+* zero external runtime dependencies
+* free of CLI binaries
+* free of filesystem access
+* free of JSONL or other file-format adapters
+* free of environment orchestration glue
+* payload-agnostic with respect to business-domain structure
+
+That means `0.4.x` should make the public package easier to map into, inspect, and evaluate through the current npm API surface rather than by absorbing companion-tooling concerns.
+
+Release chunks:
+
+* `0.4.0`
+  * define the first narrow public ingress contract between arbitrary user-space data and the strict causal envelope
+  * treat `translateBatch()` or any equivalent entry point as compatibility-bearing API surface rather than as lightweight convenience glue
+  * lock deterministic coercion, anomaly, mapper, payload-preservation, and ownership expectations narrowly enough to defend across future release lines
+  * keep the first ingress contract synchronous
+  * reject `Date` values and ISO timestamp strings explicitly in the first ingress contract
+  * accept numeric strings only in canonical integer epoch-millisecond form
+  * accept safe integer epoch-millisecond values regardless of sign rather than imposing a non-negative-only timestamp floor
+* `0.4.1`
+  * improve structured diagnostics and anomaly formatting as machine-readable contract surface
+  * add clearer strictness-policy handling for fail-fast, warning, or continuation decisions
+  * keep anomaly-heavy diagnostic paths operationally disciplined
+* `0.4.2`
+  * expand self-contained examples and quick-start recipes for:
+    * audit reconstruction
+    * replay pipelines
+    * distributed debugging
+    * offline sync inspection
+  * add guidance for choosing strict mode and late-arrival policies
+  * document stricter-mode guidance more explicitly, including where fail-fast behavior is the safer operational choice:
+    * audit and compliance pipelines
+    * financial or regulated event processing
+    * CI and fixture verification
+    * upstream data-quality enforcement
+    * producer debugging and contract testing
+  * keep examples tied to the real public package surface rather than introducing shadow abstractions or fake helper APIs
+
+Out of scope for the core `0.4.x` line:
+
+* async translation APIs
+* async iterables or async-generator ingestion surfaces
+* stream translation helpers
+* backpressure-aware ingestion layers
+* CLI binaries and terminal rendering surfaces
+* local file I/O flows
+* JSONL ingestion helpers
+* broker or database connector glue
+* domain-aware payload reducers or merge layers
+
+Public contract stability:
+
+* new ingress-facing public surface introduced during `0.4.x` should not be treated as silently soft-stable before `1.0.0`
+* this especially applies to:
+  * `translateBatch()`
+  * mapper shape
+  * anomaly names
+  * policy keys
+  * timestamp coercion behavior
+* if a specific `0.4.x` behavior is intended to carry stronger compatibility expectations, the docs should say so explicitly
 
 Exit criteria:
 
 * new users can get value from the package quickly
-* examples teach the mental shift effectively
+* new users can map realistic input data into the current core contract without custom assertion-heavy glue
+* the ingress contract is explicit enough that downstream users are not forced to infer coercion, anomaly, and ownership rules from incidental behavior
+* diagnostics make invalid or unsupported input easier to understand
+* examples teach the mental shift effectively without introducing shadow abstractions
 * common use cases are obvious from docs alone
+* the current core package is easier to adopt without violating its zero-dependency, payload-agnostic boundary
 
 ## `0.5.x` Stability Candidate And Domain-Semantic Contract Design
 

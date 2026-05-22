@@ -31,6 +31,9 @@ const includedGuidesHardeningFiles = new Set([
   "hardening/runtime-stability-0.3.4.md",
   "hardening/streaming-hardening-0.3.3.md",
 ]);
+const includedGuidesDxFiles = new Set([
+  "dx/developer-experience-0.4.x.md",
+]);
 const hardeningTitleOverrides = new Map([
   ["hardening/anomaly-surface-0.3.2.md", "Anomaly Surface Audit"],
   ["hardening/fuzz-testing-0.3.2.md", "Fuzz Testing"],
@@ -234,6 +237,13 @@ function parseGuidesNavigation(bySource) {
       sections.push(currentSection);
       currentSection = createSection("Hardening");
       currentSectionKey = "hardening";
+      continue;
+    }
+
+    if (trimmed === "Developer experience:") {
+      sections.push(currentSection);
+      currentSection = createSection("Developer Experience");
+      currentSectionKey = "dx";
       continue;
     }
 
@@ -527,6 +537,14 @@ function shouldExcludeDoc(collection, relativePath) {
     collection === "guides" &&
     normalizedRelativePath.startsWith("hardening/") &&
     !includedGuidesHardeningFiles.has(normalizedRelativePath)
+  ) {
+    return true;
+  }
+
+  if (
+    collection === "guides" &&
+    normalizedRelativePath.startsWith("dx/") &&
+    !includedGuidesDxFiles.has(normalizedRelativePath)
   ) {
     return true;
   }

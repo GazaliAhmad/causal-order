@@ -1,0 +1,96 @@
+<svg width="1280" height="320" viewBox="0 0 1280 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">causal-order README banner</title>
+  <desc id="desc">A horizontal causal graph banner showing proven, derived, and unknown relationships across distributed events.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="320" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0B1714"/>
+      <stop offset="0.52" stop-color="#0D1C18"/>
+      <stop offset="1" stop-color="#13241F"/>
+    </linearGradient>
+    <radialGradient id="glowLeft" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(188 150) rotate(31.233) scale(332.156 154.719)">
+      <stop stop-color="#1FA092" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#1FA092" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowRight" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1036 172) rotate(158.909) scale(350.771 163.387)">
+      <stop stop-color="#E38A41" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#E38A41" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="rgba(255,255,255,0.06)"/>
+      <stop offset="1" stop-color="rgba(255,255,255,0.02)"/>
+    </linearGradient>
+    <linearGradient id="proven" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#8CF1E6"/>
+      <stop offset="1" stop-color="#34B3A5"/>
+    </linearGradient>
+    <linearGradient id="derived" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#F3C26D"/>
+      <stop offset="1" stop-color="#E38A41"/>
+    </linearGradient>
+    <filter id="softShadow" x="-40" y="-40" width="1360" height="400" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#040909" flood-opacity="0.32"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="320" rx="28" fill="url(#bg)"/>
+  <rect width="1280" height="320" rx="28" fill="url(#glowLeft)"/>
+  <rect width="1280" height="320" rx="28" fill="url(#glowRight)"/>
+
+  <g filter="url(#softShadow)">
+    <rect x="28" y="24" width="1224" height="272" rx="24" fill="url(#panel)" stroke="rgba(214,239,233,0.14)"/>
+  </g>
+
+  <g opacity="0.24">
+    <path d="M74 94H1206" stroke="rgba(214,239,233,0.12)" stroke-width="1"/>
+    <path d="M74 160H1206" stroke="rgba(214,239,233,0.12)" stroke-width="1"/>
+    <path d="M74 226H1206" stroke="rgba(214,239,233,0.12)" stroke-width="1"/>
+  </g>
+
+  <g>
+    <text x="78" y="88" fill="#EEF8F4" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="42" font-weight="700" letter-spacing="-1.5">causal-order</text>
+    <text x="80" y="122" fill="#9AB0A8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" font-weight="500">Order what can be proven. Expose what cannot.</text>
+  </g>
+
+  <g>
+    <rect x="78" y="208" width="104" height="34" rx="17" fill="rgba(127,231,219,0.10)" stroke="rgba(127,231,219,0.18)"/>
+    <circle cx="97" cy="225" r="5" fill="#7FE7DB"/>
+    <text x="110" y="231" fill="#CFE9E2" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="600">proven</text>
+
+    <rect x="196" y="208" width="108" height="34" rx="17" fill="rgba(243,194,109,0.10)" stroke="rgba(243,194,109,0.18)"/>
+    <circle cx="215" cy="225" r="5" fill="#F3C26D"/>
+    <text x="228" y="231" fill="#E8DDC4" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="600">derived</text>
+
+    <rect x="318" y="208" width="114" height="34" rx="17" fill="rgba(214,239,233,0.06)" stroke="rgba(214,239,233,0.14)"/>
+    <circle cx="337" cy="225" r="5" fill="#94A8A1"/>
+    <text x="350" y="231" fill="#C3D3CD" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="600">unknown</text>
+  </g>
+
+  <g transform="translate(-58 0) scale(0.94 0.94)">
+    <path d="M564 118C608 118 640 86 694 86C742 86 770 128 820 128C860 128 889 104 922 82" stroke="url(#proven)" stroke-width="6" stroke-linecap="round"/>
+    <path d="M564 164C606 164 637 145 674 145C714 145 745 176 789 176C831 176 865 152 910 152" stroke="url(#derived)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="10 10"/>
+    <path d="M564 210C602 210 634 194 668 194C706 194 742 226 782 226C818 226 854 212 890 212" stroke="#859A93" stroke-width="3" stroke-linecap="round" stroke-dasharray="3 10"/>
+
+    <circle cx="564" cy="118" r="12" fill="#7FE7DB"/>
+    <circle cx="694" cy="86" r="12" fill="#7FE7DB"/>
+    <circle cx="820" cy="128" r="12" fill="#7FE7DB"/>
+    <circle cx="922" cy="82" r="12" fill="#7FE7DB"/>
+
+    <circle cx="564" cy="164" r="10" fill="#F3C26D"/>
+    <circle cx="674" cy="145" r="10" fill="#F3C26D"/>
+    <circle cx="789" cy="176" r="10" fill="#F3C26D"/>
+    <circle cx="910" cy="152" r="10" fill="#F3C26D"/>
+
+    <circle cx="564" cy="210" r="9" fill="#94A8A1"/>
+    <circle cx="668" cy="194" r="9" fill="#94A8A1"/>
+    <circle cx="782" cy="226" r="9" fill="#94A8A1"/>
+    <circle cx="890" cy="212" r="9" fill="#94A8A1"/>
+  </g>
+
+  <g>
+    <circle cx="1002" cy="112" r="16" fill="rgba(251,113,133,0.14)" stroke="rgba(251,113,133,0.28)"/>
+    <path d="M1002 103V121" stroke="#FB7185" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M993 112H1011" stroke="#FB7185" stroke-width="3.2" stroke-linecap="round"/>
+    <text x="1034" y="108" fill="#EEF8F4" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="600">anomaly surfaced</text>
+    <text x="1034" y="132" fill="#95AAA3" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14">honest deterministic output</text>
+  </g>
+</svg>
