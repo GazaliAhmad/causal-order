@@ -9,6 +9,9 @@ For the practical, repository-coupled layer with operational walkthroughs, deplo
 
 If the README is the quick path, this wiki is the deeper explanation.
 
+For the repo-coupled usage side, that now includes the `0.4.0` raw-record ingress surface around synchronous `translateBatch()` translation before ordering.
+The practical contract and examples for that surface live in `/guides` and the main README rather than in the conceptual wiki pages.
+
 ## Start Here
 
 If you are new to the project, read these pages first:
@@ -53,7 +56,10 @@ It is also:
 * refusing to flatten concurrency into fake sequence
 * making suspicious or weak metadata visible
 
-In the current `0.3.x` release line, that also includes an explicit streaming model for day-to-day live processing, delayed reconnect, and resync flows.
+That includes both:
+
+* the explicit streaming model for day-to-day live processing, delayed reconnect, and resync flows
+* the narrow synchronous ingress path for translating raw user-space records into the event envelope without pulling file, CLI, or transport glue into the core package
 
 So the project is not only about explaining distributed timelines after the fact.
 It is about giving real systems an event-integrity model designed to work without treating global clock sync as the source of truth.

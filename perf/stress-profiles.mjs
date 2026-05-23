@@ -218,7 +218,7 @@ function createMalformedRatioEvents(profile) {
     }
 
     if (index % 9 === 0) {
-      next.clock.physicalTimeMs = -1n - BigInt(index)
+      next.clock.logicalCounter = -1
     } else if (index % 7 === 0) {
       delete next.sequence
     }

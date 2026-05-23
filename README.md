@@ -203,6 +203,66 @@ Example output shape:
 The important part is not just the order.
 It is the explanation of why that order exists and how trustworthy it is.
 
+## Raw Record Translation
+
+When your data is not already in the library's event-envelope shape, use `translateBatch()` first and then pass the translated records into `orderEvents()`.
+
+```ts
+import { orderEvents, translateBatch } from "causal-order"
+
+const records = [
+  {
+    eventId: "evt-1",
+    source: "orders-api",
+    occurredAt: "1714971840123",
+    sequence: 1n,
+    body: { type: "order.created" },
+  },
+  {
+    eventId: "evt-2",
+    source: "payments-worker",
+    occurredAt: 1714971840125,
+    sequence: 1n,
+    parent: "evt-1",
+    body: { type: "payment.captured" },
+  },
+]
+
+const translated = translateBatch(records, {
+  getEventId: (record) => record.eventId,
+  getNodeId: (record) => record.source,
+  getPhysicalTime: (record) => record.occurredAt,
+  getSequence: (record) => record.sequence,
+  getParentEventId: (record) => record.parent,
+  getPayload: (record) => record.body,
+})
+
+console.log(translated.anomalies)
+
+const ordered = orderEvents(translated.translated, {
+  strict: false,
+  detectAnomalies: true,
+})
+
+console.log(ordered.ordered)
+```
+
+Current ingress contract highlights:
+
+* required mappers: `getEventId`, `getNodeId`, `getPhysicalTime`
+* accepted timestamp inputs: `bigint`, safe integer `number`, or canonical integer `string`
+* rejected timestamp inputs include `Date`, ISO timestamp strings, decimals, exponent notation, and unsafe integers
+* translated results split accepted records from structured translation anomalies
+* the returned envelope shell is shallowly frozen, while `payload` stays by reference
+
+Ingestion design rules:
+
+* pass original source records into `translateBatch()` whenever possible
+* keep pre-translation shaping narrow and cheap rather than building per-record "almost-envelope" wrappers
+* let `translateBatch()` own coercion, rejection, and anomaly reporting instead of hiding those rules in ad hoc adapter code
+* avoid broad cloning or repeated metadata copying before translation unless a real upstream constraint requires it
+* if a wrapper layer can be removed without losing anything except convenience, it is probably the wrong layer to keep
+
 ## Streaming Overview
 
 For large or unbounded event flows, use `orderEventStream()` instead of assuming everything belongs in one in-memory batch.
@@ -302,10 +362,19 @@ Workloads and hardening:
 * [Implementation Guide `0.3.3`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/implementation-guide-0.3.3.md)
 * [Runtime Stability 0.3.4](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/runtime-stability-0.3.4.md)
 * [Implementation Guide 0.3.4](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/implementation-guide-0.3.4.md)
-* [Developer Experience `0.4.x`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/dx/developer-experience-0.4.x.md)
-* [Implementation Guide `0.4.0`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/dx/implementation-guide-0.4.0.md)
-* [Implementation Guide `0.4.1`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/dx/implementation-guide-0.4.1.md)
-* [Implementation Guide `0.4.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/dx/implementation-guide-0.4.2.md)
+
+Published `0.4.0` developer-experience docs:
+
+* [Developer Experience `0.4.0`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/devex/developer-experience-0.4.0.md)
+* [Implementation Guide `0.4.0`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/devex/implementation-guide-0.4.0.md)
+
+Developer-experience follow-through notes after the published `0.4.0` release:
+
+* [Implementation Guide `0.4.1`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/devex/implementation-guide-0.4.1.md)
+* [Implementation Guide `0.4.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/devex/implementation-guide-0.4.2.md)
+
+Additional operational reading:
+
 * [Stress Hardening](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stress-hardening.md)
 * [After-Hours Batch Processing](https://github.com/GazaliAhmad/causal-order/blob/main/guides/after-hours-batch-processing.md)
 * [Realistic Workloads](https://github.com/GazaliAhmad/causal-order/wiki/Realistic-Workloads)
@@ -325,27 +394,29 @@ Runnable examples:
 
 ## Status
 
-`causal-order` is in the public `0.3.x` release line.
+`causal-order` is now at `0.4.0`.
 
-Current release shape:
+`0.4.0` release shape:
 
 * `0.3.2` established the current production-gate hardening baseline
 * `0.3.3` broadened the streaming hardening and pressure release story after that production-gate milestone
-* `0.3.4` is the current runtime-stability release for prolonged and constrained-runtime streaming proof
+* `0.3.4` hardened prolonged and constrained-runtime streaming stability
+* `0.4.0` adds the first narrow raw-record ingress contract through `translateBatch()`
 
-The current `0.3.4` release is centered on:
+`0.4.0` is centered on:
 
-* explicit `0.3.2` production-gate proof
-* the broader `0.3.3` streaming pressure profiles and higher-scale visibility bands that established the current pressure surface
-* repeated-cycle stream endurance runs
-* constrained-heap stream endurance runs
-* GC-observed stream runs
-* sustained correction-churn and anomaly-heavy reconnect endurance profiles
+* the existing `0.3.x` hardening and runtime-stability foundation
+* a top-level synchronous raw-record ingress surface via `translateBatch()`
+* explicit mapper rules for required and optional fields
+* deterministic timestamp coercion for accepted primitive inputs
+* structured translation anomalies
+* shallow immutability guarantees for translated envelopes with payload preservation by reference
 
 Current deployment posture:
 
-* bounded batch recovery, replay, reconciliation, and audit-style workloads are the stronger production-credible side of the current contract
-* the main remaining operational hardening work is on prolonged and constrained-runtime streaming behavior
+* bounded batch recovery, replay, reconciliation, and audit-style workloads remain the stronger production-credible side of the current contract
+* streaming remains part of the public contract, with the earlier hardening and runtime-stability work still defining its current proof base
+* raw-record translation into the event envelope is now part of the package surface rather than repo-local work
 
 That means:
 
@@ -386,7 +457,8 @@ Current benchmark posture:
 
 * `10k` and `100k` are the main enforced guardrail bands
 * `150k` corrupted-dataset profiles are available for stress visibility, but are not currently enforced in `npm run bench:check`
-* `150k` remains the enforced sustained watermark-lag stream guard band while `250k` remains exploratory stretch visibility rather than a routine guard target
+* `150k` remains the enforced sustained watermark-lag stream guard band
+* named `250k` batch and stream profiles are already operational extended-validation runs, even though they remain outside the default lightweight `bench:check` guard path
 * repeated-cycle, constrained-heap, GC-observed, and sustained correction/reconnect endurance runs are now available as explicit runtime-stability evidence commands
 * `npm run bench:profile` is available when you need CPU profiles for the slowest stress cases
 

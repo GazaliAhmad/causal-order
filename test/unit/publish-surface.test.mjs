@@ -17,6 +17,7 @@ test("built package exposes the documented top-level runtime API", () => {
     "orderEventStream",
     "parseHlc",
     "serializeHlc",
+    "translateBatch",
     "validateClock",
     "validateEvent",
   ]

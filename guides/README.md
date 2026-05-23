@@ -5,6 +5,9 @@ They explain how to use `causal-order`, how the main deployment patterns work, a
 
 For the deeper conceptual layer, mental-model pages, and explanatory write-ups that are less tied to operational walkthroughs, see the wiki.
 
+Alongside the current ordering and streaming surfaces, the published `0.4.0` line now also covers the first narrow raw-record ingress path via `translateBatch()`.
+For that contract, start with the developer-experience guide and the README's raw-record translation example.
+
 Start here:
 
 * [Mental Model](./mental-model.md)
@@ -25,7 +28,7 @@ Workloads and hardening:
 
 Developer experience:
 
-* [Developer Experience](./dx/developer-experience-0.4.x.md)
+* [Developer Experience](./devex/developer-experience-0.4.0.md)
 
 Failure-mode guides:
 

@@ -44,7 +44,13 @@ But in distributed systems, clean-looking answers are often wrong.
 
 `causal-order` exists to make that uncertainty visible instead of hiding it.
 
-In the current `0.3.x` release line, that scope includes both bounded batch ordering and the streaming contract for late arrivals, watermarks, correction-capable output, and reconnect-heavy recovery flows.
+In `0.4.0`, that scope includes:
+
+* bounded batch ordering
+* the streaming contract for late arrivals, watermarks, correction-capable output, and reconnect-heavy recovery flows
+* the narrow synchronous ingress surface for translating raw application records into the event envelope through `translateBatch()` before ordering
+
+That ingress work is intentionally kept payload-agnostic and environment-free rather than growing into file parsing, CLI tooling, or transport adapters inside the core package.
 
 That means this library has become more than a nicer sort function.
 It is now a deployment-oriented event-integrity layer for event pipelines that need to survive drift, replay, late sync, and partial causal evidence without falling back to fake global-clock certainty.

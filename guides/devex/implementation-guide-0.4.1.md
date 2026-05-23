@@ -10,8 +10,8 @@ The main sequencing for `0.4.1` is:
 
 For the broader milestone intent, see:
 
-* [ROADMAP `0.4.x`](../../ROADMAP.md)
-* [Developer Experience `0.4.x`](./developer-experience-0.4.x.md)
+* [ROADMAP `0.4.0`](../../ROADMAP.md)
+* [Developer Experience `0.4.0`](./developer-experience-0.4.0.md)
 
 ## Working Rule
 

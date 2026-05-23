@@ -33,6 +33,8 @@ const exportDescriptions = {
     "Deterministically compares two already validated events using the current tie-breaker.",
   validateClock: "Validates an HLC clock value and reports structured failures or warnings.",
   validateEvent: "Validates an event envelope and returns a branded validated value on success.",
+  translateBatch:
+    "Translates raw user-space records into event envelopes and structured translation anomalies.",
   detectSingleEventAnomalies: "Detects anomalies that can be inferred from one event in isolation.",
   detectAnomalies: "Detects structured anomalies across a bounded event set.",
   DEFAULT_TIE_BREAKER: "Default deterministic tie-breaker used when stronger ordering is unavailable.",
@@ -47,13 +49,155 @@ const exportDescriptions = {
   createProcessingTimeWatermark:
     "Builds a processing-time watermark helper for more aggressive stream progress.",
 };
+const pageEnhancements = {
+  translateBatch: {
+    primary: true,
+    summary:
+      "This is the raw-record ingress entry point. It maps arbitrary user-space records into the event envelope, applies the published timestamp coercion rules, and separates accepted envelopes from structured translation anomalies.",
+    usage: `import { orderEvents, translateBatch } from "causal-order"
+
+const translated = translateBatch(records, {
+  getEventId: (record) => record.eventId,
+  getNodeId: (record) => record.source,
+  getPhysicalTime: (record) => record.occurredAt,
+  getSequence: (record) => record.sequence,
+  getParentEventId: (record) => record.parent,
+  getPayload: (record) => record.body,
+})
+
+const ordered = orderEvents(translated.translated, {
+  strict: false,
+  detectAnomalies: true,
+})
+
+console.log(translated.anomalies)
+console.log(ordered.ordered)`,
+    bullets: [
+      "<code>translated</code>: readonly translated event envelopes ready for ordering.",
+      "<code>anomalies</code>: structured translation failures with field, mapper, stage, and actual-value metadata.",
+      "<code>getEventId</code>, <code>getNodeId</code>, and <code>getPhysicalTime</code> are required mappers.",
+      "Timestamps accept <code>bigint</code>, safe integer <code>number</code>, and canonical integer <code>string</code>.",
+      "<code>Date</code>, ISO timestamp strings, decimals, exponent notation, and unsafe integers are rejected deterministically.",
+      "The returned envelope shell is shallowly frozen, while <code>payload</code> remains by reference.",
+    ],
+  },
+  orderEvents: {
+    primary: true,
+    summary:
+      "This is the main bounded-batch entry point. It validates input, builds ordering constraints from supported causal evidence, and emits a deterministic result even when full proof is not available.",
+    usage: `import { orderEvents } from "causal-order"
+
+const result = orderEvents(events, {
+  strict: false,
+  detectAnomalies: true,
+  tieBreaker: "event_id",
+})
+
+console.log(result.ordered)
+console.log(result.anomalies)
+console.log(result.stats)`,
+    bullets: [
+      "<code>ordered</code>: ordered events with <code>orderIndex</code>, <code>orderBasis</code>, and <code>confidence</code>.",
+      "<code>anomalies</code>: invalid, suspicious, or operationally important records.",
+      "<code>stats</code>: counts for total, valid, invalid, ordered, and anomaly totals.",
+      "<code>tieBreaker</code>: deterministic tie breaker such as <code>event_id</code> or <code>ingestion_order</code>.",
+      "<code>strict</code>: throw on invalid or unresolved conditions instead of returning a tolerant result.",
+      "<code>detectAnomalies</code>: include anomaly detection in the returned batch result.",
+      "<code>allowUnknownOrder</code>: permit unresolved ordering to remain explicit in non-strict mode.",
+      "<code>maxClockDriftMs</code>: validation bound for future clock drift checks.",
+    ],
+  },
+  orderEventStream: {
+    primary: true,
+    summary:
+      "This is the streaming entry point for watermark-aware ordering with explicit late-arrival and correction behavior.",
+    usage: `import { orderEventStream } from "causal-order"
+
+for await (const batch of orderEventStream(source(), {
+  batchSize: 100,
+  maxLateArrivalMs: 30_000n,
+  lateArrivalPolicy: "flag",
+  strict: false,
+})) {
+  console.log(batch.events)
+  console.log(batch.anomalies)
+  console.log(batch.watermark, batch.isFinal)
+}`,
+    bullets: [
+      "Consumes an async iterable of event envelopes.",
+      "Emits watermark-aware ordered batches.",
+      "Supports explicit late-arrival policies and correction-capable output.",
+    ],
+  },
+  validateEvent: {
+    primary: true,
+    summary:
+      "Use this when you need to validate event-envelope input directly before ordering or other downstream processing.",
+    usage: `import { validateEvent } from "causal-order"
+
+const validation = validateEvent(event, {
+  includeWarnings: true,
+})
+
+if (!validation.valid) {
+  console.error(validation.errors)
+} else {
+  console.log(validation.value)
+  console.log(validation.warnings)
+}`,
+    bullets: [
+      "<code>valid: true</code> returns a branded <code>value</code> plus any warnings.",
+      "<code>valid: false</code> returns structured <code>errors</code> and <code>warnings</code>.",
+      "<code>event.id</code> must be a non-empty string.",
+      "<code>event.nodeId</code> must be a non-empty string.",
+      "<code>event.clock</code> must pass HLC validation.",
+      "<code>event.sequence</code>, when present, must be a non-negative <code>bigint</code>.",
+    ],
+  },
+  compareByCausality: {
+    primary: true,
+    summary:
+      "Use this for pairwise causal comparison when you need a relation answer without emitting a full ordered batch.",
+    usage: `import { compareByCausality } from "causal-order"
+
+const relation = compareByCausality(eventA, eventB)
+
+if (relation === "before") {
+  console.log("A is before B")
+} else if (relation === "unknown") {
+  console.log("The library cannot justify the pairwise relationship")
+}`,
+    bullets: [
+      "Possible results are <code>before</code>, <code>after</code>, <code>equal</code>, and <code>unknown</code>.",
+      "The current exported pairwise contract does not promote unsupported cross-node cases into a first-class <code>concurrent</code> result.",
+      "Supported evidence includes <code>parentEventId</code>, <code>dependencyEventIds</code>, and same-node monotonic <code>sequence</code>.",
+    ],
+  },
+};
 const typeDescriptions = {
   NodeId: "Branded node identifier used to separate same-node and cross-node reasoning.",
   EventId: "Branded event identifier used for duplicate and reference checks.",
   HlcTimestamp: "Serialized hybrid logical clock string.",
   ValidatedHlcTimestamp: "Branded HLC timestamp that has passed validation.",
   EventEnvelope: "Public shape for an input event and its ordering metadata.",
+  TranslatedEventEnvelope:
+    "Readonly translated event-envelope shape returned by the raw-record ingress layer.",
   ValidatedEventEnvelope: "Validated event envelope safe for downstream ordering logic.",
+  TranslateMapper: "Synchronous mapper shape used by translateBatch() field extractors.",
+  TranslateTimestampInput:
+    "Accepted raw timestamp input for translation: bigint, safe integer number, canonical integer string, or Date for explicit rejection handling.",
+  TranslateBatchConfig:
+    "Mapper configuration for translating raw records into event envelopes.",
+  TranslationAnomalyCode: "Stable code describing a translation-time mapping or coercion failure.",
+  TranslationField: "Stable field label used in structured translation anomalies.",
+  TranslationMapperName: "Stable mapper-function label used in structured translation anomalies.",
+  TranslationAnomalyStage: "Translation pipeline stage where a structured anomaly was raised.",
+  TranslationActualValueType:
+    "Normalized runtime value classification attached to translation anomalies.",
+  TranslationAnomaly:
+    "Structured translation failure record carrying mapper, field, stage, and actual-value metadata.",
+  TranslateBatchResult:
+    "Top-level translation result containing accepted envelopes and structured anomalies.",
   CausalOrdering: "Pairwise ordering result such as before, after, equal, or unknown.",
   CausalEvidence: "Machine-readable evidence explaining why one event was ordered relative to another.",
   ValidationErrorCode: "Stable code describing a validation failure category.",
@@ -80,123 +224,27 @@ const typeDescriptions = {
   OrderBatch: "Structured batch emitted by streaming ordering.",
 };
 
-const navigationItems = [
-  { key: "overview", title: "Overview", href: "/api/" },
-  { key: "orderEvents", title: "orderEvents()", href: "/api/order-events/" },
-  { key: "orderEventStream", title: "orderEventStream()", href: "/api/order-event-stream/" },
-  { key: "validateEvent", title: "validateEvent()", href: "/api/validate-event/" },
-  { key: "compareByCausality", title: "compareByCausality()", href: "/api/compare-by-causality/" },
-  { key: "types", title: "Types", href: "/api/types/" },
-];
-
+const exportedModules = extractExportedModules(readSource("src/index.ts"));
+const exportsByPath = new Map(
+  exportedModules.map((sourcePath) => [sourcePath, extractExports(readSource(sourcePath))]),
+);
+const publicFunctions = collectPublicFunctions();
+const apiFunctionPages = buildApiFunctionPages();
+const navigationItems = buildNavigationItems(apiFunctionPages);
 const apiPages = {
-  orderEvents: {
-    title: "orderEvents()",
-    description:
-      "Orders a bounded set of distributed events and returns ordered output, anomalies, and summary stats.",
-    sourcePath: "src/order/orderEvents.ts",
-    signatures: extractFunctionDeclarations(
-      readSource("src/order/orderEvents.ts"),
-      "orderEvents",
-      1,
-    ),
-  },
-  orderEventStream: {
-    title: "orderEventStream()",
-    description:
-      "Consumes an async iterable of events and emits ordered stream batches with watermark-aware behavior.",
-    sourcePath: "src/order/orderEventStream.ts",
-    signatures: extractFunctionDeclarations(
-      readSource("src/order/orderEventStream.ts"),
-      "orderEventStream",
-      1,
-    ),
-  },
-  validateEvent: {
-    title: "validateEvent()",
-    description:
-      "Validates an event envelope and returns either a branded validated value or structured errors and warnings.",
-    sourcePath: "src/validate/validateEvent.ts",
-    signatures: extractFunctionDeclarations(
-      readSource("src/validate/validateEvent.ts"),
-      "validateEvent",
-      2,
-    ),
-  },
-  compareByCausality: {
-    title: "compareByCausality()",
-    description:
-      "Performs a pairwise causality comparison without pretending weak metadata is causal proof.",
-    sourcePath: "src/compare/causalCompare.ts",
-    signatures: extractFunctionDeclarations(
-      readSource("src/compare/causalCompare.ts"),
-      "compareByCausality",
-      1,
-    ),
-  },
+  ...apiFunctionPages,
   types: {
     title: "Types",
     description: "The main public types exported by causal-order.",
     sourcePath: "src/types.ts",
     signatures: [],
+    href: "/api/types/",
+    sourceUrl: toSourceUrl("src/types.ts"),
   },
 };
 
-const exportedModules = extractExportedModules(readSource("src/index.ts"));
-const exportsByPath = new Map(
-  exportedModules.map((sourcePath) => [sourcePath, extractExports(readSource(sourcePath))]),
-);
-
 const overviewGroups = [
-  {
-    title: "Clocks",
-    items: [
-      symbolItem("HlcClock", "src/clock/hlc.ts", { kind: "type" }),
-      symbolItem("createHlcClock", "src/clock/hlc.ts"),
-      symbolItem("parseHlc", "src/clock/parse.ts"),
-      symbolItem("serializeHlc", "src/clock/serialize.ts"),
-    ],
-  },
-  {
-    title: "Comparison",
-    items: [
-      symbolItem("compareByHlc", "src/compare/hlcCompare.ts"),
-      symbolItem("compareClocks", "src/compare/hlcCompare.ts"),
-      symbolItem("compareByCausality", "src/compare/causalCompare.ts"),
-      symbolItem("compareValidatedByCausality", "src/compare/causalCompare.ts"),
-      symbolItem("applyTieBreaker", "src/compare/deterministicCompare.ts"),
-      symbolItem("compareDeterministically", "src/compare/deterministicCompare.ts"),
-      symbolItem("compareValidatedDeterministically", "src/compare/deterministicCompare.ts"),
-    ],
-  },
-  {
-    title: "Validation",
-    items: [
-      symbolItem("validateClock", "src/validate/validateClock.ts"),
-      symbolItem("validateEvent", "src/validate/validateEvent.ts"),
-    ],
-  },
-  {
-    title: "Anomalies",
-    items: [
-      symbolItem("detectSingleEventAnomalies", "src/anomalies/detectAnomalies.ts"),
-      symbolItem("detectAnomalies", "src/anomalies/detectAnomalies.ts"),
-    ],
-  },
-  {
-    title: "Ordering",
-    items: [
-      symbolItem("DEFAULT_TIE_BREAKER", "src/order/tieBreakers.ts", { kind: "const" }),
-      symbolItem("getTieBreaker", "src/order/tieBreakers.ts"),
-      symbolItem("compareWithTieBreaker", "src/order/tieBreakers.ts"),
-      symbolItem("orderValidatedEvents", "src/order/orderEvents.ts"),
-      symbolItem("orderEvents", "src/order/orderEvents.ts"),
-      symbolItem("orderEventStream", "src/order/orderEventStream.ts"),
-      symbolItem("eventTimeWatermark", "src/order/watermarkStrategies.ts"),
-      symbolItem("ingestedAtWatermark", "src/order/watermarkStrategies.ts"),
-      symbolItem("createProcessingTimeWatermark", "src/order/watermarkStrategies.ts"),
-    ],
-  },
+  ...buildOverviewGroups(),
 ];
 
 const exportedTypes = exportsByPath.get("src/types.ts")?.types ?? new Set();
@@ -214,6 +262,22 @@ const types = {
         typeItem("ValidatedEventEnvelope", "ValidatedEventEnvelope<T = unknown>"),
         typeItem("CausalOrdering"),
         typeItem("CausalEvidence"),
+      ],
+    },
+    {
+      title: "Translation types",
+      items: [
+        typeItem("TranslatedEventEnvelope", "TranslatedEventEnvelope<T = unknown>"),
+        typeItem("TranslateMapper", "TranslateMapper<TInput, TValue>"),
+        typeItem("TranslateTimestampInput"),
+        typeItem("TranslateBatchConfig", "TranslateBatchConfig<TInput, TPayload = TInput>"),
+        typeItem("TranslationAnomalyCode"),
+        typeItem("TranslationField"),
+        typeItem("TranslationMapperName"),
+        typeItem("TranslationAnomalyStage"),
+        typeItem("TranslationActualValueType"),
+        typeItem("TranslationAnomaly", "TranslationAnomaly<TInput = unknown>"),
+        typeItem("TranslateBatchResult", "TranslateBatchResult<TPayload = unknown, TInput = unknown>"),
       ],
     },
     {
@@ -260,12 +324,7 @@ const types = {
 const apiData = {
   repoUrl,
   sourceBaseUrl,
-  navigation: [
-    {
-      title: "Reference",
-      items: navigationItems.map(({ title, href }) => ({ title, href })),
-    },
-  ],
+  navigation: navigationItems,
   overview: {
     title: "API Overview",
     description: "The public API surface exported by causal-order today.",
@@ -273,16 +332,7 @@ const apiData = {
     sourceUrl: toSourceUrl("src/index.ts"),
   },
   exportsByGroup: overviewGroups,
-  pages: Object.fromEntries(
-    Object.entries(apiPages).map(([key, page]) => [
-      key,
-      {
-        ...page,
-        href: navigationItems.find((item) => item.key === key)?.href ?? "/api/",
-        sourceUrl: toSourceUrl(page.sourcePath),
-      },
-    ]),
-  ),
+  pages: apiPages,
   types,
 };
 
@@ -336,6 +386,10 @@ function extractExports(source) {
 }
 
 function extractFunctionDeclarations(source, name, count) {
+  return extractAllFunctionDeclarations(source, name).slice(0, count);
+}
+
+function extractAllFunctionDeclarations(source, name) {
   const lines = source.split(/\r?\n/);
   const declarations = [];
   const declarationPattern = new RegExp(
@@ -381,14 +435,10 @@ function extractFunctionDeclarations(source, name, count) {
         .replace(/\s*\{\s*$/, "")
         .trim(),
     );
-
-    if (declarations.length === count) {
-      break;
-    }
   }
 
-  if (declarations.length !== count) {
-    throw new Error(`Expected ${count} declaration(s) for ${name}, found ${declarations.length}`);
+  if (declarations.length === 0) {
+    throw new Error(`Expected at least one declaration for ${name}, found 0`);
   }
 
   return declarations;
@@ -436,4 +486,120 @@ function typeItem(name, label = name) {
 
 function toSourceUrl(sourcePath) {
   return `${sourceBaseUrl}/${sourcePath.replaceAll(path.sep, "/")}`;
+}
+
+function collectPublicFunctions() {
+  const functions = [];
+
+  for (const sourcePath of exportedModules) {
+    const exports = exportsByPath.get(sourcePath);
+    if (!exports) {
+      continue;
+    }
+
+    for (const name of exports.functions) {
+      functions.push({ name, sourcePath });
+    }
+  }
+
+  return functions.sort((left, right) => left.name.localeCompare(right.name));
+}
+
+function buildApiFunctionPages() {
+  return Object.fromEntries(
+    publicFunctions.map(({ name, sourcePath }) => {
+      const enhancements = pageEnhancements[name] ?? {};
+      const href = `/api/${functionSlug(name)}/`;
+
+      return [
+        name,
+        {
+          title: `${name}()`,
+          description: exportDescriptions[name] ?? `Public function exported by causal-order.`,
+          sourcePath,
+          signatures: extractAllFunctionDeclarations(readSource(sourcePath), name),
+          href,
+          sourceUrl: toSourceUrl(sourcePath),
+          primary: enhancements.primary ?? false,
+          summary: enhancements.summary ?? null,
+          usage: enhancements.usage ?? null,
+          bullets: enhancements.bullets ?? [],
+        },
+      ];
+    }),
+  );
+}
+
+function buildNavigationItems(apiFunctionPages) {
+  const primaryFunctionPages = Object.values(apiFunctionPages)
+    .filter((page) => page.primary)
+    .sort((left, right) => left.title.localeCompare(right.title));
+
+  return [
+    {
+      title: "Reference",
+      items: [
+        { title: "Overview", href: "/api/" },
+        ...primaryFunctionPages.map((page) => ({
+          title: page.title,
+          href: page.href,
+        })),
+        { title: "Types", href: "/api/types/" },
+      ],
+    },
+  ];
+}
+
+function buildOverviewGroups() {
+  const groups = [];
+
+  for (const group of [
+    { title: "Clocks", prefix: "src/clock/" },
+    { title: "Comparison", prefix: "src/compare/" },
+    { title: "Translation", prefix: "src/translate/" },
+    { title: "Validation", prefix: "src/validate/" },
+    { title: "Anomalies", prefix: "src/anomalies/" },
+    { title: "Ordering", prefix: "src/order/" },
+  ]) {
+    const items = [];
+
+    for (const sourcePath of exportedModules.filter((value) => value.startsWith(group.prefix))) {
+      const exports = exportsByPath.get(sourcePath);
+      if (!exports) {
+        continue;
+      }
+
+      for (const name of sortSet(exports.consts)) {
+        items.push(symbolItem(name, sourcePath, { kind: "const" }));
+      }
+
+      for (const name of sortSet(exports.functions)) {
+        items.push(symbolItem(name, sourcePath));
+      }
+    }
+
+    if (items.length > 0) {
+      groups.push({ title: group.title, items });
+    }
+  }
+
+  return groups;
+}
+
+function functionSlug(name) {
+  const slugOverrides = {
+    orderEvents: "order-events",
+    orderEventStream: "order-event-stream",
+    validateEvent: "validate-event",
+    validateClock: "validate-clock",
+    compareByCausality: "compare-by-causality",
+    compareByHlc: "compare-by-hlc",
+    compareClocks: "compare-clocks",
+  };
+
+  return slugOverrides[name] ?? name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+}
+
+function sortSet(values) {
+  return [...values].sort((left, right) => left.localeCompare(right));
 }

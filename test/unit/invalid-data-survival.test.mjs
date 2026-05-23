@@ -22,8 +22,8 @@ test("orderEvents survives messy mixed batches in non-strict mode", () => {
       id: "evt-invalid",
       nodeId: "node-c",
       clock: {
-        physicalTimeMs: -1n,
-        logicalCounter: 0,
+        physicalTimeMs: 1_015n,
+        logicalCounter: -1,
         nodeId: "node-c",
       },
       payload: {},
@@ -69,8 +69,8 @@ test("orderEvents fails fast on messy mixed batches in strict mode", () => {
       id: "evt-invalid",
       nodeId: "node-b",
       clock: {
-        physicalTimeMs: -1n,
-        logicalCounter: 0,
+        physicalTimeMs: 1_010n,
+        logicalCounter: -1,
         nodeId: "node-b",
       },
       payload: {},

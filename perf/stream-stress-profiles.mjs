@@ -129,7 +129,7 @@ function createReconnectPressureEvents(profile, options = {}) {
         ...events[index],
         clock: {
           ...events[index].clock,
-          physicalTimeMs: -1n - BigInt(index),
+          logicalCounter: -1,
         },
         payload: {
           ...events[index].payload,

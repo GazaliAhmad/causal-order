@@ -96,7 +96,7 @@ test("orderEvents returns structured anomalies by default for invalid input", ()
     id: "evt-invalid",
     nodeId: "node-a",
     clock: {
-      physicalTimeMs: -100n,
+      physicalTimeMs: 100,
       logicalCounter: 0,
       nodeId: "node-a",
     },
@@ -114,7 +114,7 @@ test("orderEvents throws in strict mode when input is invalid", () => {
     id: "evt-invalid",
     nodeId: "node-a",
     clock: {
-      physicalTimeMs: -100n,
+      physicalTimeMs: 100,
       logicalCounter: 0,
       nodeId: "node-a",
     },

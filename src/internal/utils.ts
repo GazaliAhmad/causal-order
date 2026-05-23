@@ -62,7 +62,7 @@ export function assertValidHlcTimestamp(clock: unknown): asserts clock is HlcTim
 
   const candidate = clock as Partial<HlcTimestamp>
 
-  if (!isBigInt(candidate.physicalTimeMs) || candidate.physicalTimeMs < 0n) {
+  if (!isBigInt(candidate.physicalTimeMs)) {
     throw new Error("Invalid HLC physicalTimeMs")
   }
 

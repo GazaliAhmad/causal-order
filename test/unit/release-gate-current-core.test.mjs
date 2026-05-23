@@ -156,8 +156,8 @@ function createPartialLogCorruptionEvents() {
       id: "evt-invalid",
       nodeId: "node-c",
       clock: {
-        physicalTimeMs: -1n,
-        logicalCounter: 0,
+        physicalTimeMs: 1_015n,
+        logicalCounter: -1,
         nodeId: "node-c",
       },
       payload: {},
