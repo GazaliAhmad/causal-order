@@ -35,10 +35,10 @@ export function validateClock(
   const physicalTimeMs = candidate.physicalTimeMs
   const currentTime = options?.now?.()
 
-  if (!isBigInt(physicalTimeMs) || physicalTimeMs < 0n) {
+  if (!isBigInt(physicalTimeMs)) {
     errors.push({
       code: "invalid_physical_time",
-      message: "clock.physicalTimeMs must be a non-negative bigint",
+      message: "clock.physicalTimeMs must be a bigint",
       path: "clock.physicalTimeMs",
     })
   }

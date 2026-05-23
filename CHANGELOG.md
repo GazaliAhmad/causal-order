@@ -6,130 +6,52 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-* lightweight repository Node-version pinning via:
-  * `.nvmrc` targeting Node.js `24`
-  * `.node-version` targeting Node.js `24`
-* dedicated `0.4.x` developer-experience planning docs in:
-  * `guides/dx/developer-experience-0.4.x.md`
-  * `guides/dx/implementation-guide-0.4.0.md`
-  * `guides/dx/implementation-guide-0.4.1.md`
-  * `guides/dx/implementation-guide-0.4.2.md`
+* the first public synchronous raw-record ingress surface via top-level `translateBatch()`
+* public ingress-facing translation types for translated envelopes, mapper configuration, structured translation anomalies, and translated-versus-rejected batch results
+* direct unit coverage for the first `0.4.0` ingress contract surface
 
 ### Changed
 
-* clarified the runtime and compatibility posture across the repo-facing docs by:
-  * documenting Node.js `24` as the active repository development target
-  * documenting Node.js `20+` as the published package support floor
-  * documenting Node.js `18` CI coverage as best-effort regression validation rather than a formal long-term support contract
-  * aligning the README, contributing guide, and roadmap around that same runtime policy
-* refined the `0.4.x` roadmap so core DX work stays inside the zero-dependency package boundary instead of implying CLI or JSONL glue in the core repo
-* organized the new `0.4.x` planning notes under `guides/dx/` as a separate developer-experience docs track instead of mixing them into `guides/hardening/`
-* surfaced only the `0.4.x` developer-experience overview in the website guides navigation while keeping the `0.4.0` through `0.4.2` implementation guides as repo-only planning notes
-* tightened the `0.4.0` planning language so the translation layer is framed as a future public ingress contract with explicit coercion, anomaly, mapper, and ownership obligations rather than as a lightweight convenience helper
+* finalized the first published ingress contract around explicit mapper rules, deterministic timestamp coercion, structured translation anomalies, and shallow translated-envelope immutability with payload preservation by reference
+* aligned the README, guides, wiki, roadmap, changelog, and website around `0.4.0` as the published ingress release and the current Node/runtime posture
+* added detailed `0.4.0` release notes in `docs/releases/0.4.0.md`
 
 ## [Website]
 
 ### Changed
 
-* website refinements without a package version bump, including:
-  * deduplicated repeated intro paragraphs on rendered docs pages
-  * cleaned docs and wiki TOC/sidebar labels by removing markdown backticks
-  * reduced noisy repeated TOC entries on long guide pages
-  * made sticky docs sidebars scroll independently on smaller desktop heights instead of waiting for the main article scroll to reach the end
-  * added a mobile-only footer "Return to top" control for long docs pages
-  * switched the mobile "Return to top" control from a sticky-header anchor target to an explicit smooth scroll-to-top action so it works reliably on narrow mobile layouts
-  * tightened mobile footer spacing and grouping so the "Return to top" control sits closer to the end of docs content while copyright and privacy stay grouped underneath
-  * softened the mobile footer privacy link styling so it reads as secondary metadata instead of competing with the return-to-top control
-  * made homepage section titles for Guides, Wiki, and API clickable
-  * moved the API overview "Where to start" section higher in the page and TOC
-  * added shared SEO metadata, including canonical, robots, Open Graph, and Twitter tags
-  * added `robots.txt` and `sitemap.xml` routes for the docs site
-  * added PWA install metadata improvements, offline asset caching support, and raster icon fallbacks
-  * removed timestamp-only churn from the generated API docs snapshot so routine site builds do not dirty the worktree
-  * updated the privacy page to mention Cloudflare-based site delivery
+* website refinements without a package version bump, including docs navigation cleanup, mobile docs polish, SEO/PWA metadata updates, and generated API reference improvements
+* rebuilt the docs-site API reference to derive its function pages and overview groups from the actual public export surface while keeping navigation focused on primary entry points
+* added detailed website notes in `docs/releases/website.md`
+
+### Notes
+
+* the website notes also include the `translateBatch()` API-reference surfacing, the published `0.4.0` docs-navigation updates, and the README banner layout fix
 
 ## [0.3.4]
 
 ### Added
 
-* explicit `0.3.4` stream runtime-stability documentation in:
-  * `guides/hardening/runtime-stability-0.3.4.md`
-  * `guides/hardening/implementation-guide-0.3.4.md`
-* dedicated stream endurance runner support for:
-  * repeated in-process cycles
-  * time-boxed duration runs
-  * warmup control
-  * pause control between cycles
-* constrained-heap stream endurance wrapper and scripts
-* GC-observed stream endurance wrapper and scripts
-* sustained `150k` endurance profiles for:
-  * correction churn
-  * anomaly-heavy reconnect backlog
-* docs-site surfacing in the README for:
-  * the public website
-  * the released `0.3.4` runtime-stability line
-* generated API reference metadata for the docs site via:
-  * source-code export inspection
-  * build-time JSON generation
-  * Astro rendering from generated API data
-* fuller API index coverage on the docs site, including:
-  * all public runtime exports grouped by category
-  * public type-group pages
-  * brief one-line descriptions for exported functions and types
+* explicit `0.3.4` stream runtime-stability documentation plus dedicated stream endurance runners and sustained `150k` endurance profiles
+* generated API reference metadata and fuller API index coverage for the docs site
 
 ### Changed
 
-* the README now treats `0.3.4` as the current released runtime-stability line instead of as in-repo follow-up work
-* the `0.3.4` implementation guide and runtime-stability note now read in completed release terms rather than as an unfinished milestone pass
-* the docs-site API section now uses generated metadata instead of a hand-maintained API map for the current public surface
-* the `/api/` overview page now acts as a true all-exports reference index rather than only a partial overview
-* the docs-site hardening sidebar now surfaces only the intended release-hardening documents with cleaner display labels
-* website build compatibility was hardened for newer Astro / Cloudflare prerendering by:
-  * removing layout-time runtime assumptions
-  * hardening docs root and repository URL resolution
-  * resolving generated API metadata more defensively during prerender
+* aligned the README, runtime-stability docs, docs-site API surface, and build compatibility around `0.3.4` as the published runtime-stability line
+* added detailed `0.3.4` release notes in `docs/releases/0.3.4.md`
 
 ## [0.3.3]
 
 ### Added
 
-* an Astro-based documentation website under `website/` that reads directly from the repository’s `guides/` and `wiki/` content without maintaining a duplicated docs tree
-* public docs-site surfaces for:
-  * practical guides
-  * conceptual wiki pages
-  * API reference pages with short usage snippets for the main entry points
-* a lightweight privacy page and a branded 404 page for the docs site
-* dedicated `0.3.3` stream stress profiles for correction churn, watermark lag, fragmented ready subsets, and anomaly-heavy reconnect backlog
-* explicit `150k` and `250k` watermark-lag stream profiles so broader `0.3.3` pressure work has named higher-scale visibility targets
-* explicit `250k` shuffled batch stretch profile so batch-side exploratory pressure can be rerun as a named benchmark target
-* exploratory `0.3.3` streaming fuzz coverage for fragmented watermark-lag pressure and correction-burst pressure with seeded reproducibility checks
-* additional `0.3.3` streaming fuzz coverage for sustained correction-churn pressure and fragmented reconnect-burst pressure
-* additional `0.3.3` streaming fuzz coverage for bounded-window lagging-watermark pressure and bounded-memory cross-window replay pressure
-* richer streaming benchmark visibility for:
-  * correction-batch counts
-  * late-arrival counts
-  * empty emitted batches
-  * max anomalies per batch
+* the first Astro-based documentation website under `website/`, including public guides, wiki, API, privacy, and 404 surfaces
+* broader `0.3.3` stream-pressure visibility through named stress profiles, exploratory fuzz coverage, and richer benchmark reporting
 
 ### Changed
 
-* refined the docs-site shell and homepage presentation:
-  * npm install and package-link surfacing
-  * stronger header/navigation treatment
-  * automatic npm version badge sourced from the root package version
-  * theme preference persistence plus light/dark controls
-  * footer privacy/copyright treatment
-* clarified the `0.3.3` stream-pressure posture in the docs:
-  * `100k` remains the routine comparison band
-  * `150k` is the main stream stress-visibility band
-  * `250k` remains exploratory stretch visibility rather than a routine guard target
-* fixed the `streaming-100k-watermark-lag` synthetic profile so same-node clock behavior stays monotonic under plateau-style time pressure and the profile no longer generates malformed `causal_inversion` noise
-* extended benchmark visibility with start, end, and peak heap sampling, peak RSS, and best-effort GC metrics so `0.3.3` memory-pressure work is observable before it becomes enforceable
-* documented current `0.3.3` forced-GC evidence for the `150k` and `250k` watermark-lag stream profiles as descriptive hardening evidence rather than as a hard guard
-* optimized the `orderEventStream()` flush path so ready events are buffered separately from pending events, reducing repeated full-backlog rescans and compaction work under watermark-lag pressure
-* reduced anomaly-heavy stream overhead by using a cheaper single-event anomaly path for invalid stream records and a lighter pending-anomaly merge path in `orderEventStream()`
-* promoted `streaming-150k-watermark-lag` into the enforced perf guard set as the current stable `0.3.3` stream-pressure guard
-* clarified the docs so bounded batch recovery, replay, reconciliation, and audit-style workloads are described as the stronger current deployment story, while the larger remaining proof bar stays on streaming
+* refined the docs-site shell and homepage, clarified the `0.3.3` stream-pressure posture, and hardened the streaming benchmark story around the `150k` guard band
+* improved `orderEventStream()` under watermark-lag and anomaly-heavy pressure by reducing rescans and merge overhead
+* added detailed `0.3.3` release notes in `docs/releases/0.3.3.md`
 
 ## [0.3.2]
 
@@ -211,6 +133,18 @@ All notable changes to this project will be documented in this file.
 * reduced ordering-path allocation overhead by validating and collecting events in a single pass before anomaly analysis
 * reduced stream flush overhead by avoiding repeated buffer rescans when watermark progress and flush readiness have not changed
 * extended the perf harness so streaming profiles can run through the same reporting flow as batch profiles
+
+## [0.2.3]
+
+### Added
+
+* after-hours batch processing guidance covering scheduled replay, HLC-backed batch ordering, recommended DB table patterns, and how batch recovery differs from the later streaming recovery story
+
+### Changed
+
+* corrected the `0.2.x` publish history wording so the docs present the public release line more cleanly
+* clarified the roadmap handoff between `0.2.2` batch recovery guidance and the later `0.3.0` streaming recovery surface
+* improved docs cross-linking between case studies, stress hardening, and after-hours batch processing guidance
 
 ## [0.2.2]
 

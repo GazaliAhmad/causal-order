@@ -13,7 +13,7 @@ test("validateEvent reports invalid clocks and missing sequence warnings", () =>
     id: "evt-invalid",
     nodeId: "node-a",
     clock: {
-      physicalTimeMs: -1n,
+      physicalTimeMs: 1,
       logicalCounter: -1,
       nodeId: "",
     },
@@ -25,6 +25,28 @@ test("validateEvent reports invalid clocks and missing sequence warnings", () =>
   assert.ok(result.errors.some((error) => error.code === "invalid_logical_counter"))
   assert.ok(result.errors.some((error) => error.code === "missing_node_id"))
   assert.ok(result.warnings.some((warning) => warning.code === "missing_sequence"))
+})
+
+test("validateClock and validateEvent accept negative bigint epoch timestamps", () => {
+  const rawClock = {
+    physicalTimeMs: -1_000n,
+    logicalCounter: 0,
+    nodeId: "node-a",
+  }
+
+  const clockResult = validateClock(rawClock)
+  assert.equal(clockResult.valid, true)
+  assert.equal(clockResult.value.physicalTimeMs, -1_000n)
+
+  const eventResult = validateEvent({
+    id: "evt-negative-epoch",
+    nodeId: "node-a",
+    clock: rawClock,
+    payload: {},
+    sequence: 1n,
+  })
+  assert.equal(eventResult.valid, true)
+  assert.equal(eventResult.value.clock.physicalTimeMs, -1_000n)
 })
 
 test("validateEvent accepts raw unknown input and returns a validated value on success", () => {

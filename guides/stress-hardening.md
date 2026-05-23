@@ -28,6 +28,7 @@ The repository now treats large-batch guidance in two bands:
 
 * `100k` is the routine credible batch band
 * `150k` is the corrupted-dataset stress band for hardening and visibility
+* named `250k` batch and stream profiles are already in place as heavier operational validation runs beyond the default routine guard path
 
 This distinction is intentional.
 
@@ -100,6 +101,8 @@ Useful commands:
 ```bash
 npm run bench:all
 npm run bench:csv
+node perf/run.mjs --profile baseline-250k-shuffled
+node perf/run.mjs --profile streaming-250k-watermark-lag
 node perf/run.mjs --profile stress-150k-inversion-chains
 node perf/run.mjs --profile stress-150k-replay-storms
 node perf/run.mjs --profile stress-150k-sequence-conflicts
@@ -139,7 +142,7 @@ Use the guides this way:
 
 * [Mental Model](./mental-model.md) explains the package philosophy
 * [Case Studies](./case-studies.md) explains small, human-readable failure modes
-* this guide explains how those same failure modes are pressure-tested at `150k` stress scale
+* this guide explains how those same failure modes are pressure-tested at `150k` stress scale, with `250k` batch and stream validation runs also available when you want a heavier operational check
 
 That is the intended progression:
 

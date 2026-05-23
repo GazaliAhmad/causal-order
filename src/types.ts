@@ -36,6 +36,111 @@ export type EventEnvelope<T = unknown> = {
   ingestedAt?: bigint
 }
 
+export type TranslatedEventEnvelope<T = unknown> = {
+  readonly id: EventId
+  readonly nodeId: NodeId
+  readonly clock: Readonly<HlcTimestamp>
+  readonly payload: T
+  readonly sequence?: bigint
+  readonly partition?: string
+  readonly parentEventId?: EventId
+  readonly traceId?: string
+  readonly dependencyEventIds?: readonly EventId[]
+  readonly ingestedAt?: bigint
+}
+
+export type TranslateMapper<TInput, TValue> = (
+  record: TInput,
+  index: number,
+) => TValue
+
+export type TranslateTimestampInput =
+  | bigint
+  | number
+  | string
+  | Date
+
+export type TranslateBatchConfig<TInput, TPayload = TInput> = {
+  getEventId: TranslateMapper<TInput, EventId>
+  getNodeId: TranslateMapper<TInput, NodeId>
+  getPhysicalTime: TranslateMapper<TInput, TranslateTimestampInput>
+  getLogicalCounter?: TranslateMapper<TInput, number | undefined>
+  getSequence?: TranslateMapper<TInput, bigint | undefined>
+  getParentEventId?: TranslateMapper<TInput, EventId | undefined>
+  getDependencyEventIds?: TranslateMapper<TInput, readonly EventId[] | undefined>
+  getTraceId?: TranslateMapper<TInput, string | undefined>
+  getPartition?: TranslateMapper<TInput, string | undefined>
+  getIngestedAt?: TranslateMapper<TInput, TranslateTimestampInput | undefined>
+  getPayload?: TranslateMapper<TInput, TPayload>
+}
+
+export type TranslationAnomalyCode =
+  | "missing_required_value"
+  | "invalid_mapped_value"
+  | "mapper_exception"
+
+export type TranslationField =
+  | "event_id"
+  | "node_id"
+  | "physical_time"
+  | "logical_counter"
+  | "sequence"
+  | "parent_event_id"
+  | "dependency_event_ids"
+  | "trace_id"
+  | "partition"
+  | "ingested_at"
+  | "payload"
+
+export type TranslationMapperName =
+  | "getEventId"
+  | "getNodeId"
+  | "getPhysicalTime"
+  | "getLogicalCounter"
+  | "getSequence"
+  | "getParentEventId"
+  | "getDependencyEventIds"
+  | "getTraceId"
+  | "getPartition"
+  | "getIngestedAt"
+  | "getPayload"
+
+export type TranslationAnomalyStage =
+  | "mapper"
+  | "field_validation"
+  | "timestamp_coercion"
+
+export type TranslationActualValueType =
+  | "undefined"
+  | "null"
+  | "bigint"
+  | "number"
+  | "string"
+  | "boolean"
+  | "symbol"
+  | "function"
+  | "date"
+  | "array"
+  | "object"
+
+export type TranslationAnomaly<TInput = unknown> = {
+  code: TranslationAnomalyCode
+  message: string
+  index: number
+  input: TInput
+  field: TranslationField
+  mapper: TranslationMapperName
+  stage: TranslationAnomalyStage
+  expected: string
+  actualType?: TranslationActualValueType
+  actualValue?: unknown
+}
+
+export type TranslateBatchResult<TPayload = unknown, TInput = unknown> = {
+  translated: readonly TranslatedEventEnvelope<TPayload>[]
+  anomalies: readonly TranslationAnomaly<TInput>[]
+}
+
 declare const validatedEventEnvelopeBrand: unique symbol
 export type ValidatedEventEnvelope<T = unknown> = EventEnvelope<T> & {
   readonly [validatedEventEnvelopeBrand]: true

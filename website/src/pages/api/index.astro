@@ -5,15 +5,13 @@ import {
   apiNavigation,
   apiOverview,
   apiPages,
+  apiPageList,
   apiTypes,
 } from "../../lib/api.js";
-
-const functionPageByName = new Map([
-  ["orderEvents", apiPages.orderEvents.href],
-  ["orderEventStream", apiPages.orderEventStream.href],
-  ["validateEvent", apiPages.validateEvent.href],
-  ["compareByCausality", apiPages.compareByCausality.href],
-]);
+const functionPageByName = new Map(
+  apiPageList.map((page) => [page.title.replace(/\(\)$/, ""), page.href]),
+);
+const primaryPages = apiPageList.filter((page) => page.primary);
 
 const toc = [
   { id: "where-to-start", text: "Where to start", depth: 2 },
@@ -33,23 +31,26 @@ const toc = [
 >
   <p>
     The package currently exports one public surface from <code>src/index.ts</code>. The API is
-    grouped around event ordering, streaming, validation, causality comparison, clocks, anomalies,
-    and types.
+    grouped around translation, event ordering, streaming, validation, causality comparison,
+    clocks, anomalies, and types.
   </p>
 
   <h2 id="where-to-start">Where to start</h2>
   <p>
-    If you are using the package for the first time, start with <code>orderEvents()</code> for
-    bounded replay or audit slices. Move to <code>orderEventStream()</code> when you need watermark,
-    late-arrival, and correction-capable behavior.
+    If your data is not already in the event-envelope shape, start with <code>translateBatch()</code>.
+    Use <code>orderEvents()</code> for bounded replay or audit slices, and move to
+    <code>orderEventStream()</code> when you need watermark, late-arrival, and correction-capable
+    behavior.
   </p>
 
   <h2 id="entry-points">Primary entry points</h2>
   <ul>
-    <li><a href={apiPages.orderEvents.href}><code>{apiPages.orderEvents.title}</code></a> for bounded batch ordering.</li>
-    <li><a href={apiPages.orderEventStream.href}><code>{apiPages.orderEventStream.title}</code></a> for async streaming output.</li>
-    <li><a href={apiPages.validateEvent.href}><code>{apiPages.validateEvent.title}</code></a> for event-envelope validation.</li>
-    <li><a href={apiPages.compareByCausality.href}><code>{apiPages.compareByCausality.title}</code></a> for pairwise causal comparison.</li>
+    {primaryPages.map((page) => (
+      <li>
+        <a href={page.href}><code>{page.title}</code></a>
+        {page.description ? ` - ${page.description}` : ""}
+      </li>
+    ))}
   </ul>
 
   <h2 id="all-exports">All exports</h2>
@@ -91,9 +92,6 @@ const toc = [
   ))}
 
   <pre><code>{`import {
-  orderEvents,
-  orderEventStream,
-  validateEvent,
-  compareByCausality,
+${primaryPages.map((page) => `  ${page.title.replace(/\(\)$/, "")},`).join("\n")}
 } from "causal-order"`}</code></pre>
 </ApiLayout>

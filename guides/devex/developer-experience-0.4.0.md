@@ -1,13 +1,13 @@
-# `0.4.x` Developer Experience
+# `0.4.0` Developer Experience
 
-`0.4.x` is the release line where `causal-order` makes the core package easier to adopt without weakening the payload-agnostic boundary that the current contract depends on.
+`0.4.0` is the release where `causal-order` makes the core package easier to adopt without weakening the payload-agnostic boundary that the current contract depends on.
 
-This guide records the intended `0.4.x` step.
+This guide records the `0.4.0` developer-experience release.
 It does not redefine the causal semantics established in the earlier `0.3.x` hardening work.
 
 ## Goal
 
-`0.4.x` should let a new user make one simple claim:
+`0.4.0` lets a new user make one simple claim:
 
 > I can map my data into the core event model, understand what the package will accept or reject, and evaluate the current behavior without first building my own glue layer
 
@@ -15,19 +15,38 @@ That is different from turning the core package into a CLI, file loader, or envi
 
 ## What This Milestone Is
 
-`0.4.x` is about:
+The published `0.4.0` release is about:
 
 * a clearer public ingress boundary between user-space data and the core event envelope
-* keeping that ingress boundary synchronous and environment-free for the full `0.4.x` line
+* keeping that ingress boundary synchronous and environment-free for the `0.4.0` ingress contract
+
+The broader developer-experience follow-through around that published `0.4.0` line also includes:
+
 * better structured diagnostics for mapping and validation failures
 * stronger quick-start and scenario guidance for the current public API
 * self-contained examples that rely only on native Node.js and the published package surface
 * tighter docs synchronization so the examples and public wording stay aligned
 
-`0.4.x` is not about widening the core package into an environment-aware toolkit.
+`0.4.0` is not about widening the core package into an environment-aware toolkit.
 
 It is also not about quietly widening the package surface through convenience pressure.
 If a capability changes the shape of the public ingress contract, the repo should treat that as contract work, not as lightweight DX polish.
+
+## `0.4.0` Release Shape
+
+`0.4.0` now has the first ingress contract in place.
+
+That currently means:
+
+* `translateBatch()` exists as the top-level synchronous raw-record ingress surface
+* accepted records are split from structured translation anomalies explicitly
+* mapper behavior, timestamp coercion, and ownership rules are now narrow enough to document directly
+* the practical examples now show the real path from raw records into `orderEvents()` rather than a helper-only aspirational flow
+
+Follow-up `0.4.1` and `0.4.2` work beyond `0.4.0` is therefore:
+
+* `0.4.1` continues the diagnostics and policy surface
+* `0.4.2` continues the examples and docs synchronization surface
 
 ## Architectural Boundary
 
@@ -43,16 +62,34 @@ That means the core package may help users translate data into the causal envelo
 
 Those concerns belong in companion tooling or later ecosystem work built strictly on the public npm API.
 
-## `0.4.x` Release Chunks
+## Ingestion Design Rules
 
-The intended `0.4.x` line is split into three scoped steps:
+For the published `0.4.0` ingress surface, the intended shape is direct mapping from user-space records into `translateBatch()`, not a wrapper-heavy mini-framework in front of it.
+
+Good `0.4.0` ingestion design usually means:
+
+* mapper functions read from the original input record directly
+* any pre-translation normalization stays small, local, and cheap
+* `translateBatch()` remains the place where coercion, rejection, and translation anomalies are decided
+
+Poor `0.4.0` ingestion design usually means:
+
+* building a new per-record "almost-envelope" object before calling `translateBatch()`
+* copying payloads or metadata collections just to reshape them for mapper convenience
+* burying field validation or timestamp handling in transient adapter objects instead of letting the public ingress contract own it
+
+That kind of slop does not make the architecture useless, but it does give back avoidable allocation pressure and contract clarity right at the boundary `0.4.0` was meant to make explicit.
+
+## `0.4.0` Follow-Through
+
+`0.4.0` also points at two explicit follow-through releases, with `0.4.1` and `0.4.2` continuing the same developer-experience track:
 
 ### `0.4.0` Public Ingress Contract Definition
 
-The core package should define a narrow, defensible ingress contract between arbitrary user-space data and the strict immutable causal envelope.
+The core package now defines a narrow, defensible ingress contract between arbitrary user-space data and the strict immutable causal envelope.
 
-This step is not just about adding a helpful `translateBatch()` entry point.
-It is about deciding what users may rely on around:
+This published step is not just a helpful `translateBatch()` entry point.
+It is the release where users can rely on:
 
 * coercion guarantees
 * anomaly taxonomy
@@ -86,7 +123,7 @@ It is about showing that:
 
 ## Current Boundary Rule
 
-Before `1.0.0`, `0.4.x` should keep these out of the core repository:
+Before `1.0.0`, `0.4.0` and its immediate follow-through keep these out of the core repository:
 
 * JSONL or other file-format ingestion adapters
 * async translation APIs
@@ -99,13 +136,13 @@ Before `1.0.0`, `0.4.x` should keep these out of the core repository:
 
 If a feature needs those concerns, it likely belongs in a companion repository or in post-`1.0` ecosystem work rather than in the core package itself.
 
-For the `0.4.x` line specifically, the default assumption should be:
+For the `0.4.0` contract specifically, the default assumption is:
 
 * synchronous ingress only
 * no async translation contract
 * no backpressure-aware ingestion contract
 
-None of those convenience pressures should creep into `0.4.x` PRs through helper layers.
+None of those convenience pressures should creep into follow-up `0.4.1` and `0.4.2` PRs through helper layers.
 
 That means:
 
@@ -115,9 +152,9 @@ That means:
 
 ## Public Contract Stability
 
-`0.4.x` may introduce new public ingress-facing types and functions without implying that they are fully stable in the `1.0` sense.
+`0.4.0` introduces new public ingress-facing types and functions without implying that they are fully stable in the `1.0` sense.
 
-Before `1.0.0`, the repo should be explicit that the following surfaces are still under deliberate refinement within the `0.4.x` line:
+Before `1.0.0`, the repo should be explicit that the following surfaces may still see deliberate refinement during `0.4.1` and `0.4.2` follow-through work:
 
 * `translateBatch()`
 * mapper shape
@@ -125,16 +162,16 @@ Before `1.0.0`, the repo should be explicit that the following surfaces are stil
 * policy keys
 * timestamp coercion behavior
 
-The important rule is that new public surface in `0.4.x` should not be treated as silently soft-stable by default.
+The important rule is that this new public surface should not be treated as silently soft-stable by default.
 
-If maintainers want to preserve a behavior across future `0.4.x` releases, they should say so explicitly.
+If maintainers want to preserve a behavior across future `0.4.1` and `0.4.2` releases, they should say so explicitly.
 If a behavior is still under active contract design, the docs should say that too.
 
 This section exists to prevent accidental long-term promises before the package reaches `1.0.0`.
 
 ## Exit Criteria
 
-By the end of `0.4.x`, these should feel true:
+By the end of `0.4.2`, these should feel true:
 
 * new users can map realistic input data into the public core contract without custom type-assertion glue
 * the package ingress contract is explicit enough that downstream tooling is not forced to learn it by accident

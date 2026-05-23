@@ -162,7 +162,7 @@ function applyOperationalOutageNoise(baseEvents, seed) {
     }
 
     if (randomBool(random, 0.03)) {
-      mutated.clock.physicalTimeMs = -1n
+      mutated.clock.logicalCounter = -1
       mutated.payload.corruptedClock = true
     }
 
@@ -370,7 +370,7 @@ function assertCurrentCoreInvariants({ seed, events, options }) {
 
   const anomalyTypes = new Set(result.anomalies.map((anomaly) => anomaly.type))
 
-  if (events.some((event) => event.clock.physicalTimeMs < 0n)) {
+  if (events.some((event) => event.payload.corruptedClock === true)) {
     assert.ok(anomalyTypes.has("invalid_clock"), `expected invalid_clock for seed ${seed}`)
   }
 

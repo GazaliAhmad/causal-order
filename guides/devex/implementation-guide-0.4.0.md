@@ -1,6 +1,8 @@
 # `0.4.0` Implementation Guide
 
 This note records the `0.4.0` work in the same scoped, commit-friendly style as the earlier `0.3.x` implementation guides.
+`0.4.0` is already a published release.
+This document is now a historical implementation note for that published release, even where some milestone-planning language remains for context.
 
 The important sequencing for `0.4.0` is:
 
@@ -10,8 +12,8 @@ The important sequencing for `0.4.0` is:
 
 For the broader milestone intent, see:
 
-* [ROADMAP `0.4.x`](../../ROADMAP.md)
-* [Developer Experience `0.4.x`](./developer-experience-0.4.x.md)
+* [ROADMAP `0.4.0`](../../ROADMAP.md)
+* [Developer Experience `0.4.0`](./developer-experience-0.4.0.md)
 
 ## Working Rule
 
@@ -56,10 +58,10 @@ The most important questions at this stage are basic boundary questions:
 
 This milestone is about defining a defensible protocol boundary, not about evaluation tooling or companion-repo convenience.
 
-For `0.4.x`, that ingress boundary should stay synchronous.
+For the published `0.4.0` contract, that ingress boundary should stay synchronous.
 
 Async translation, async iterables, stream translation, and backpressure-aware ingestion should all remain out of scope for this release line.
-If those concerns matter later, they should arrive as deliberate post-`0.4.x` surface design rather than as incidental DX expansion.
+If those concerns matter later, they should arrive as deliberate later-surface design rather than as incidental DX expansion.
 
 ## Chunk Order
 
@@ -99,6 +101,34 @@ The most important sequencing rule inside `0.4.0` is:
 * do not finalize the proof layer before the mapper contract is fully spelled out
 
 If tests land before the field-level mapper rules are explicit, the tests will quietly become the contract by accident.
+
+## Current Outcome Snapshot
+
+The repo now has the intended `0.4.0` ingress contract in place.
+
+In practical terms, the current outcome is:
+
+* `translateBatch()` is a top-level synchronous ingress surface
+* required mappers are explicit:
+  * `getEventId`
+  * `getNodeId`
+  * `getPhysicalTime`
+* optional mapper behavior is explicit:
+  * omitted optional mappers are allowed
+  * optional mappers may return `undefined` to mean omitted
+  * required mapper `undefined` is treated as missing rather than merely invalid
+* temporal coercion is explicit:
+  * accept `bigint`
+  * accept safe integer `number`
+  * accept canonical integer `string`
+  * reject `Date`, ISO strings, fractional forms, and other ambiguous numeric parsing cases
+* translation anomalies are structured and machine-readable rather than being raw thrown behavior
+* translated structural envelopes are shallowly frozen
+* `payload` remains caller-owned by reference
+* direct tests and user-facing examples now exercise the real raw-record ingress flow instead of describing an aspirational helper shape
+
+That means the proof layer is no longer only a future note here.
+For `0.4.0`, the repo now has tests, examples, and release wording that all describe the same narrow ingress boundary.
 
 ## Translation Surface Shape
 
@@ -285,7 +315,7 @@ During `0.4.0`, PRs should reject additions such as:
 * stream-handling helpers that exist only to adapt file or transport input into the synchronous batch ingress contract
 * `Promise.all`, `async` / `await`, or other async control flow inside the translation pipeline
 
-If a proposed helper exists mainly to make `translateBatch()` feel more like file ingestion or streaming ingestion, it belongs outside the core `0.4.x` line.
+If a proposed helper exists mainly to make `translateBatch()` feel more like file ingestion or streaming ingestion, it belongs outside the core `0.4.0` contract and its immediate follow-through.
 
 ## Public Contract Stability
 
@@ -299,7 +329,7 @@ The repo should be explicit about the current status of:
 * policy keys
 * timestamp coercion behavior
 
-Within `0.4.x`, these should be treated as contract-design surface unless the docs explicitly elevate a specific behavior to stronger compatibility expectations.
+Within `0.4.0` and its immediate follow-through, these should be treated as contract-design surface unless the docs explicitly elevate a specific behavior to stronger compatibility expectations.
 
 The goal is to avoid accidental “soft stable” promises created only by exposure.
 Public visibility and long-term stability should not be treated as the same thing before `1.0.0`.

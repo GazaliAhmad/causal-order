@@ -74,8 +74,8 @@ test("orderEvents survives mixed valid and invalid same-node histories in non-st
       id: "evt-invalid",
       nodeId: "node-a",
       clock: {
-        physicalTimeMs: -5n,
-        logicalCounter: 0,
+        physicalTimeMs: 1_100n,
+        logicalCounter: -1,
         nodeId: "node-a",
       },
       payload: {},

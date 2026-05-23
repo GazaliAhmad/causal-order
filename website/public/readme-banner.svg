@@ -48,7 +48,10 @@
 
   <g>
     <text x="78" y="88" fill="#EEF8F4" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="42" font-weight="700" letter-spacing="-1.5">causal-order</text>
-    <text x="80" y="122" fill="#9AB0A8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" font-weight="500">Order what can be proven. Expose what cannot.</text>
+    <text x="80" y="120" fill="#9AB0A8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" font-weight="500">
+      <tspan x="80" dy="0">Order what can be proven.</tspan>
+      <tspan x="80" dy="24">Expose what cannot.</tspan>
+    </text>
   </g>
 
   <g>
@@ -65,7 +68,7 @@
     <text x="350" y="231" fill="#C3D3CD" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="600">unknown</text>
   </g>
 
-  <g transform="translate(-58 0) scale(0.94 0.94)">
+  <g transform="translate(20 0) scale(0.94 0.94)">
     <path d="M564 118C608 118 640 86 694 86C742 86 770 128 820 128C860 128 889 104 922 82" stroke="url(#proven)" stroke-width="6" stroke-linecap="round"/>
     <path d="M564 164C606 164 637 145 674 145C714 145 745 176 789 176C831 176 865 152 910 152" stroke="url(#derived)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="10 10"/>
     <path d="M564 210C602 210 634 194 668 194C706 194 742 226 782 226C818 226 854 212 890 212" stroke="#859A93" stroke-width="3" stroke-linecap="round" stroke-dasharray="3 10"/>

@@ -43,6 +43,18 @@ It is meant to represent a believable operational slice such as:
 
 So the scale matters because it makes the corruption patterns operationally meaningful, not because the project is trying to claim unlimited in-memory scale.
 
+## Current Extended Validation
+
+The current repo posture is no longer limited to `100k` routine guards and `150k` hardening language alone.
+
+Named `250k` profiles are already in place for both:
+
+* heavier batch validation
+* heavier stream validation
+
+Those `250k` runs are best understood as operational extended-validation surfaces.
+They are heavier than the default lightweight guard path, but they are real runnable checks in the repository today rather than only tentative future ideas.
+
 ## Where To Go Next
 
 For the canonical operational guide, profile shapes, commands, and benchmark interpretation, see:

@@ -5,6 +5,7 @@ website/node_modules/
 website/dist/
 website/.astro/
 website/.vite/
+.tmp-*/
 
 *.log
 npm-debug.log*
@@ -18,3 +19,5 @@ Thumbs.db
 .idea/
 .vscode/
 perf/results/
+
+website/public/*-check.png

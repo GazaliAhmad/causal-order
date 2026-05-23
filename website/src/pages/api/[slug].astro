@@ -1,0 +1,57 @@
+---
+import ApiLayout from "../../layouts/ApiLayout.astro";
+import { apiNavigation, apiPages } from "../../lib/api.js";
+
+export function getStaticPaths() {
+  return Object.values(apiPages)
+    .filter((page) => page.href !== "/api/types/")
+    .map((page) => ({
+      params: {
+        slug: page.href.replace(/^\/api\/|\/$/g, ""),
+      },
+      props: { page },
+    }));
+}
+
+const { page } = Astro.props;
+
+const toc = [
+  { id: "signature", text: "Signature", depth: 2 },
+  ...(page.usage ? [{ id: "usage", text: "Usage", depth: 2 }] : []),
+  ...(page.bullets.length > 0 ? [{ id: "details", text: "Details", depth: 2 }] : []),
+];
+---
+
+<ApiLayout
+  title={page.title}
+  description={page.description}
+  sourceUrl={page.sourceUrl}
+  toc={toc}
+  navigation={apiNavigation}
+  currentPath={page.href}
+>
+  <h2 id="signature">Signature</h2>
+  {page.signatures.map((signature) => (
+    <pre><code>{signature}</code></pre>
+  ))}
+
+  {page.summary && <p set:html={page.summary} />}
+
+  {page.usage && (
+    <>
+      <h2 id="usage">Usage</h2>
+      <pre><code>{page.usage}</code></pre>
+    </>
+  )}
+
+  {page.bullets.length > 0 && (
+    <>
+      <h2 id="details">Details</h2>
+      <ul>
+        {page.bullets.map((bullet) => (
+          <li set:html={bullet} />
+        ))}
+      </ul>
+    </>
+  )}
+</ApiLayout>

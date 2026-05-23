@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap describes how `causal-order` should mature from its current public `0.3.x` release line into a stable `1.0.0` npm package.
+This roadmap describes how `causal-order` should mature from its current public `0.4.x` release line into a stable `1.0.0` npm package.
 
 The goal is not to rush publication.
 The goal is to make sure the semantics are trustworthy before the package becomes a long-term contract.
@@ -93,8 +93,8 @@ That means the design target should be:
 Current benchmarking posture:
 
 * `100k` remains the main enforced large-batch guardrail
-* `150k` benchmark profiles are useful stretch visibility, but should not yet be treated as the formal baseline promise for CI enforcement
-* if `150k` becomes a required guard later, the docs and performance policy should be updated together rather than drifting separately
+* `150k` remains an important hardening band for corrupted-dataset and sustained-stream validation beyond the routine baseline
+* `250k` batch and stream profiles are now operational extended-validation runs, even though they are still heavier than the default lightweight `bench:check` guard path
 
 This distinction matters because there is no end to abstract number-chasing.
 If the package says `1M`, someone will ask why not `10M`.
@@ -121,15 +121,15 @@ Current status snapshot:
 
 | Checklist Item | Status | Notes |
 | --- | --- | --- |
-| Top-level API names and exported result types feel stable enough to support long-term | Partial | The surface is getting coherent, but semantics are still being hardened through testing and iteration. |
-| Confidence semantics are crisp and no longer expected to change materially | Partial | The model is strong, but still feels like it is being frozen rather than already frozen. |
-| `orderBasis`, `causalEvidence`, anomaly types, and strict-mode behavior feel intentional rather than exploratory | Partial | Stronger than before, but some stream semantics and a few public-contract decisions still feel actively defined. |
-| The difference between `orderEvents()` and `orderEventStream()` is clear in both code and docs | Partial | The boundary is now clearer in the README, guides, examples, and website surface, but it can still be made more explicit before `1.0`. |
-| The README describes the real shipped package, not a still-evolving intended shape | Partial | The README is now npm-facing, package-oriented, and better aligned with the current `0.3.3` work, but the broader documentation set still needs to feel fully settled as a long-term contract. |
-| Examples clearly show why this library is safer than naive timestamp sorting | Partial | The examples are good and aligned to failure modes, but can still be made more central for `1.0`. |
-| Performance guidance is honest about routine workloads, heavier batch workloads, and when streaming is the better model | Partial | This is now grounded by named `100k`, `150k`, and exploratory `250k` profiles plus explicit stream-guard policy, but it still needs more time and repetition to feel fully settled. |
-| Large-batch behavior has been benchmarked and pressure-tested enough that major surprises are unlikely in realistic use | Partial | This is the stronger current posture in the core library, but more repeated pressure would still strengthen confidence further and the larger remaining runtime-hardening question is on streaming. |
-| Anomaly and error messages are useful enough to support real debugging and audit work | Partial | Coverage is stronger, but message quality still feels like a polish area rather than a closed one. |
+| Top-level API names and exported result types feel stable enough to support long-term | Mostly | The published `0.4.0` surface is now narrow, explicit, and directly export-tested, including `translateBatch()`, but the project is still intentionally reserving room for pre-`1.0` contract cleanup. |
+| Confidence semantics are crisp and no longer expected to change materially | Partial | The `proven` / `derived` / `fallback` / `unknown` model is coherent and well-tested, but the roadmap still treats semantic freeze as a later milestone rather than as already complete. |
+| `orderBasis`, `causalEvidence`, anomaly types, and strict-mode behavior feel intentional rather than exploratory | Partial | The current runtime surface is much more deliberate across ordering, validation, translation anomalies, and strict-mode behavior, but there is still some remaining `1.0` contract-shaping work around semantics and diagnostics. |
+| The difference between `orderEvents()` and `orderEventStream()` is clear in both code and docs | Mostly | The batch, stream, and raw-record ingress split is now much clearer across the README, guides, examples, tests, and website API reference, though the stream boundary can still be taught more simply before `1.0`. |
+| The README describes the real shipped package, not a still-evolving intended shape | Mostly | The README now reflects the published `0.4.0` package surface, including `translateBatch()`, current Node support, and the real batch-versus-stream posture, even though the wider docs set still has room to settle further. |
+| Examples clearly show why this library is safer than naive timestamp sorting | Partial | The repo has good scenario coverage for replay corruption, offline sync, false audit timelines, drift, and streaming recovery, but those examples can still be made more central and easier to discover for first-time evaluators. |
+| Performance guidance is honest about routine workloads, heavier batch workloads, and when streaming is the better model | Mostly | The current guidance is explicit about routine `10k` and `100k` guardrails, stronger `150k` hardening bands, and operational `250k` batch and stream validation runs without pretending every heavier path belongs in the default guard loop. |
+| Large-batch behavior has been benchmarked and pressure-tested enough that major surprises are unlikely in realistic use | Mostly | The repo now has meaningful `100k` guardrails, `150k` hardening coverage, and operational `250k` batch and stream runs, though more repeated history would still make the `1.0` confidence story stronger. |
+| Anomaly and error messages are useful enough to support real debugging and audit work | Partial | Machine-readable anomaly coverage is stronger now, especially with the `0.4.0` translation surface, but message quality and operator-facing polish still feel like active improvement areas rather than a finished contract. |
 | The project is ready to preserve the semantics as a public contract, not just the function names | Not Yet | This is the real `1.0` threshold, and the project does not appear to be claiming that yet. |
 
 ## Release Phases
@@ -361,7 +361,7 @@ Implementation posture for the matrix:
 * treat `150k` corrupted-dataset profiles as the main `0.2.2` stress band
 * prefer named synthetic profiles over one giant mixed-chaos profile so regressions stay attributable
 * start by enforcing correctness and survivability, then decide later which stress profiles deserve timing or memory thresholds
-* keep `250k+` experiments as optional visibility work unless real usage evidence justifies expanding the milestone
+* treat `250k` named profiles as operational extended-validation runs rather than leaving them only as hypothetical visibility work
 * prioritize real operational questions over vanity-scale claims:
   * can the library stay honest under replay, duplication, inversion, malformed data, sparse evidence, and conflict-heavy input?
 
@@ -691,7 +691,87 @@ Current outcome:
 * `0.3.4` has established the runtime-stability evidence line that follows the broader `0.3.3` pressure release
 * the next meaningful maturity step is no longer basic runtime-stability scaffolding, but the later API, tooling, and adoption milestones that follow it
 
-## `0.4.x` Developer Experience
+## Public Docs Website
+
+Goal:
+Make the documentation a real public product surface rather than only a repo-internal reading experience.
+
+This work belongs between the later `0.3.x` hardening line and the `0.4.0` package-surface work because the site already started becoming real during that transition.
+It is no longer a tentative idea.
+The public site already exists at `https://causal-order.gazali.one`.
+
+Core constraints:
+
+* the website should not create a second duplicated docs tree inside the repo
+* the source of truth should remain the root documentation set, especially:
+  * `/guides`
+  * `/wiki`
+* the site should make conceptual and operational material easier to browse without turning the project into documentation theater that drifts away from the shipped package
+
+Current repo progress:
+
+* the public docs site app is in the repo
+* the site already renders the shared docs content from `/guides` and `/wiki`
+* the README already points to the deployed public site
+* the site now reflects the published `0.4.0` package surface more directly, including the current API reference and raw-record ingress surface
+
+Why this belongs here:
+
+* it started before `1.0.0`, not after it
+* it was already becoming real during the later `0.3.x` website-surfacing and docs-hardening work
+* it directly supports the `0.4.0` goal of making the package easier to evaluate and adopt without forcing every user to read the repo like an internal notebook
+
+Exit criteria:
+
+* the public website exists as a real maintained project surface
+* the content remains authored once and rendered from the shared docs sources
+* conceptual docs, guides, and API reference are easy to browse publicly
+* the site is strong enough to serve as the long-term public reference surface by the time `1.0.0` arrives
+
+## Extended Validation Beyond The Main Guardrails
+
+Goal:
+Represent the repo's heavier validation posture honestly without pretending every extended run belongs in the default lightweight guard loop.
+
+This is no longer a tentative idea.
+The repo already has operational heavier validation beyond the main default guard path.
+
+Current posture:
+
+* the default `bench:check` path still centers the lighter routine guardrails and the current sustained `150k` stream guard
+* named `250k` batch and stream profiles are already runnable and operational today as extended-validation paths
+* the useful distinction now is not "tentative versus real"
+* it is "default lightweight guardrail versus heavier operational validation run"
+
+Why this belongs here:
+
+* it is already part of the real repository posture
+* it follows naturally from the later `0.3.x` hardening and runtime-stability work
+* it helps keep the roadmap honest about what the repo already does versus what still needs a workflow decision
+
+That matters because the project should not overclaim by pretending every heavier validation path belongs in every routine merge check.
+At the same time, it should not understate the repo by describing already-operational `250k` runs as merely aspirational or exploratory in principle.
+
+The practical direction from here is:
+
+* keep routine correctness and compatibility checks fast enough to stay usable
+* keep the current heavier `250k` batch and stream runs available as real validation surfaces
+* decide separately whether any future CI or release workflow should promote more of those heavier runs into a stricter default gate
+
+One tentative next CI step would be a GitHub Actions post-merge validation workflow that:
+
+* runs on merges into `main`
+* runs `150k` batch and `150k` stream validation across Node.js `18`, `20`, and `24`
+* treats that matrix as merge-to-`main` confidence work rather than as a requirement for docs-only or website-only updates
+* skips the heavier validation when the change only touches documentation or website surfaces
+
+That idea fits the current platform posture well:
+
+* Node.js `18` remains best-effort regression detection
+* Node.js `20` remains the supported runtime floor
+* Node.js `24` remains the active development and performance target
+
+## `0.4.0` Developer Experience
 
 Goal:
 Make the package easy to adopt without reading the full spec first.
@@ -707,7 +787,7 @@ The core repository should remain:
 * free of environment orchestration glue
 * payload-agnostic with respect to business-domain structure
 
-That means `0.4.x` should make the public package easier to map into, inspect, and evaluate through the current npm API surface rather than by absorbing companion-tooling concerns.
+That means `0.4.0` should make the public package easier to map into, inspect, and evaluate through the current npm API surface rather than by absorbing companion-tooling concerns.
 
 Release chunks:
 
@@ -738,7 +818,33 @@ Release chunks:
     * producer debugging and contract testing
   * keep examples tied to the real public package surface rather than introducing shadow abstractions or fake helper APIs
 
-Out of scope for the core `0.4.x` line:
+`0.4.0` outcome:
+
+* chunks 1 through 5 are now represented directly in code:
+  * `translateBatch()` exists as a top-level exported synchronous ingress surface
+  * the public ingress container splits translated envelopes from translation anomalies
+  * the mapper contract distinguishes required fields from optional fields explicitly
+  * required mapper `undefined` is separated from invalid mapped values
+  * mapper exceptions are surfaced as structured field-specific anomalies
+  * mapper evaluation order is deterministic and stops on the first unrecoverable field issue for a record
+  * relationship handling stays intentionally narrow:
+    * `parentEventId` is scalar-or-omitted
+    * `dependencyEventIds` is array-or-omitted
+    * scalar-to-array convenience coercion is not part of the first public ingress contract
+  * timestamp coercion is locked to:
+    * `bigint`
+    * safe integer `number`
+    * canonical integer `string`
+  * unsupported date-like or ambiguous timestamp forms are rejected intentionally rather than by incidental runtime behavior
+  * translated structural envelopes are shallowly frozen while `payload` remains caller-owned by reference
+* chunk 6 proof-layer work is now also in the repo:
+  * direct unit coverage includes the raw-record path from `translateBatch()` into `orderEvents()`
+  * README and release docs now describe the real accepted timestamp forms, translation anomaly split, and ownership boundary in release terms
+* the next meaningful follow-through step is `0.4.1`:
+  * improve structured diagnostics and anomaly formatting further as explicit contract surface
+  * add clearer strictness-policy handling without widening the synchronous ingress boundary
+
+Out of scope for the `0.4.0` release and its immediate follow-through:
 
 * async translation APIs
 * async iterables or async-generator ingestion surfaces
@@ -752,14 +858,14 @@ Out of scope for the core `0.4.x` line:
 
 Public contract stability:
 
-* new ingress-facing public surface introduced during `0.4.x` should not be treated as silently soft-stable before `1.0.0`
+* new ingress-facing public surface introduced in `0.4.0` and its immediate follow-through should not be treated as silently soft-stable before `1.0.0`
 * this especially applies to:
   * `translateBatch()`
   * mapper shape
   * anomaly names
   * policy keys
   * timestamp coercion behavior
-* if a specific `0.4.x` behavior is intended to carry stronger compatibility expectations, the docs should say so explicitly
+* if a specific post-`0.4.0` behavior is intended to carry stronger compatibility expectations, the docs should say so explicitly
 
 Exit criteria:
 
@@ -999,6 +1105,41 @@ That could include:
 
 These should stay tentative until the core runtime is stable enough that downstream packages are not forced to absorb semantic or operational churn from the center of the project.
 
+### JSONL Companion CLI
+
+Another tentative direction is a separate-repository companion CLI focused on JSONL-style ingestion and inspection flows rather than adding that surface to the core package itself.
+
+The purpose of that CLI would be operational convenience:
+
+* read newline-delimited event dumps from disk
+* map raw JSONL records into the current event-envelope or `translateBatch()` flow
+* run ordering, anomaly detection, and confidence-aware inspection without requiring a custom script first
+* make replay-batch review, audit-style inspection, outage recovery analysis, and incident-timeline debugging easier for humans
+
+The important boundary is already decided:
+
+* the core package should remain free of CLI binaries
+* the core package should remain free of JSONL or other file-format adapters
+* if this exists, it should live in another repo or ecosystem package rather than being absorbed into `causal-order` itself
+
+The likely value of that companion would be:
+
+* turning JSONL event dumps into the current event-envelope or `translateBatch()` flow
+* making local inspection and replay-style evaluation easier without pushing file and terminal concerns into the core runtime
+* providing a more practical operator-facing surface for batch-oriented analysis work
+
+Over time, that companion could also become a glue layer around the core runtime:
+
+* ingestion glue from JSONL files into the package surface
+* workflow glue for replay review, anomaly inspection, and audit-style evaluation
+* operator-facing glue that connects raw event dumps to practical local analysis without changing the core package boundary
+
+The exact package name does not need to be fixed yet.
+What matters here is preserving the separation:
+
+* core runtime semantics stay in this repo
+* file-oriented and CLI-oriented JSONL workflows, if pursued, belong in a companion surface
+
 ### Confidence-Aware Operational Glue
 
 Another tentative direction is to add confidence-aware operational glue on top of the core runtime rather than pushing it directly into the core package by default.
@@ -1018,27 +1159,6 @@ The motivation is real:
 But the right implementation shape is still open.
 This may never belong in the core package itself.
 It may fit better as higher-level glue or ecosystem packages once the core runtime is stable enough to build around safely.
-
-### Public Docs Website
-
-Another tentative direction is to keep building a public documentation site for `causal-order` ahead of `1.0.0`, without turning it into a release-track promise too early.
-
-The main value would be:
-
-* a friendlier public reading surface for the README, guides, and wiki
-* a clearer conceptual entry point for developers who are new to the library
-* a long-term home for examples, mental-model pages, and operational write-ups
-
-The important constraint is that the website should not create a second duplicated docs tree inside the repo.
-The source of truth should remain the existing documentation set, especially:
-
-* `/guides`
-* `/wiki`
-
-The site layer can evolve as a separate app or publishing surface, but the content should continue to be authored once and rendered from that shared source.
-
-This is a directional docs effort, not a core milestone promise.
-It should become more serious closer to `1.0.0`, once the package contract and the documentation surface both feel settled enough to present publicly with confidence.
 
 ### Causal Timestamp API
 
