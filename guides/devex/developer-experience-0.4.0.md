@@ -20,9 +20,9 @@ The published `0.4.0` release is about:
 * a clearer public ingress boundary between user-space data and the core event envelope
 * keeping that ingress boundary synchronous and environment-free for the `0.4.0` ingress contract
 
-The broader developer-experience follow-through around that published `0.4.0` line also includes:
+The broader developer-experience follow-through around that published `0.4.0` line now includes:
 
-* better structured diagnostics for mapping and validation failures
+* the published `0.4.1` diagnostics and policy follow-through
 * stronger quick-start and scenario guidance for the current public API
 * self-contained examples that rely only on native Node.js and the published package surface
 * tighter docs synchronization so the examples and public wording stay aligned
@@ -43,9 +43,9 @@ That currently means:
 * mapper behavior, timestamp coercion, and ownership rules are now narrow enough to document directly
 * the practical examples now show the real path from raw records into `orderEvents()` rather than a helper-only aspirational flow
 
-Follow-up `0.4.1` and `0.4.2` work beyond `0.4.0` is therefore:
+Follow-up work beyond `0.4.0` is therefore:
 
-* `0.4.1` continues the diagnostics and policy surface
+* published `0.4.1` continues the diagnostics and policy surface
 * `0.4.2` continues the examples and docs synchronization surface
 
 ## Architectural Boundary
@@ -82,7 +82,7 @@ That kind of slop does not make the architecture useless, but it does give back 
 
 ## `0.4.0` Follow-Through
 
-`0.4.0` also points at two explicit follow-through releases, with `0.4.1` and `0.4.2` continuing the same developer-experience track:
+`0.4.0` also pointed at two explicit follow-through releases, with `0.4.1` and `0.4.2` continuing the same developer-experience track:
 
 ### `0.4.0` Public Ingress Contract Definition
 
@@ -97,12 +97,12 @@ It is the release where users can rely on:
 * payload preservation
 * ownership and immutability rules
 
-### `0.4.1` Structural Diagnostics And Bounded-Allocation Anomalies
+### Published `0.4.1` Structural Diagnostics And Bounded-Allocation Anomalies
 
-The core package should make translation and structural failures more inspectable as machine-readable contract surface without turning diagnostics into a heavy formatting subsystem.
+The core package now makes translation and structural failures more inspectable as machine-readable contract surface without turning diagnostics into a heavy formatting subsystem.
 
-This step is not just about nicer error text.
-It is about deciding what downstream tooling may rely on around:
+This published follow-through is not just about nicer error text.
+It defines what downstream tooling may rely on around:
 
 * anomaly names
 * field references

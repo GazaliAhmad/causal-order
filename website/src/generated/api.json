@@ -40,7 +40,33 @@
     "title": "API Overview",
     "description": "The public API surface exported by causal-order today.",
     "sourcePath": "src/index.ts",
-    "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/index.ts"
+    "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/index.ts",
+    "focusedEntrypoints": [
+      {
+        "path": "causal-order",
+        "description": "Full top-level surface for users who prefer one import path."
+      },
+      {
+        "path": "causal-order/translate",
+        "description": "Raw-record translation surface, including translateBatch() and TranslateBatchPolicyError."
+      },
+      {
+        "path": "causal-order/batch",
+        "description": "Bounded batch ordering plus tie-breaker helpers."
+      },
+      {
+        "path": "causal-order/stream",
+        "description": "Streaming ordering surface through orderEventStream()."
+      },
+      {
+        "path": "causal-order/watermarks",
+        "description": "Watermark helpers only."
+      },
+      {
+        "path": "causal-order/order",
+        "description": "Combined ordering barrel for users who want batch, stream, tie-breakers, and watermarks together."
+      }
+    ]
   },
   "exportsByGroup": [
     {
@@ -136,6 +162,14 @@
     {
       "title": "Translation",
       "items": [
+        {
+          "name": "TranslateBatchPolicyError",
+          "kind": "class",
+          "label": "TranslateBatchPolicyError",
+          "description": "Error raised when translateBatch() policy configuration chooses fail-fast handling for a structured translation anomaly.",
+          "sourcePath": "src/translate/translateBatch.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/translate/translateBatch.ts"
+        },
         {
           "name": "translateBatch",
           "kind": "function",
@@ -271,6 +305,7 @@
       "title": "applyTieBreaker()",
       "description": "Applies the active deterministic tie-breaker when stronger ordering is absent.",
       "sourcePath": "src/compare/deterministicCompare.ts",
+      "kind": "function",
       "signatures": [
         "function applyTieBreaker<T>(\n  a: EventEnvelope<T>,\n  b: EventEnvelope<T>,\n  tieBreaker?: TieBreaker<T>,\n): number"
       ],
@@ -285,6 +320,7 @@
       "title": "compareByCausality()",
       "description": "Performs pairwise causal comparison without inventing evidence.",
       "sourcePath": "src/compare/causalCompare.ts",
+      "kind": "function",
       "signatures": [
         "function compareByCausality<T>(\n  a: EventEnvelope<T>,\n  b: EventEnvelope<T>,\n): CausalOrdering"
       ],
@@ -303,6 +339,7 @@
       "title": "compareByHlc()",
       "description": "Compares two events by their HLC values only.",
       "sourcePath": "src/compare/hlcCompare.ts",
+      "kind": "function",
       "signatures": [
         "function compareByHlc(a: HlcTimestamp, b: HlcTimestamp): CausalOrdering"
       ],
@@ -317,6 +354,7 @@
       "title": "compareClocks()",
       "description": "Compares two validated HLC timestamps directly.",
       "sourcePath": "src/compare/hlcCompare.ts",
+      "kind": "function",
       "signatures": [
         "function compareClocks(a: HlcTimestamp, b: HlcTimestamp): CausalOrdering"
       ],
@@ -331,6 +369,7 @@
       "title": "compareDeterministically()",
       "description": "Deterministically compares two events when causal proof is insufficient.",
       "sourcePath": "src/compare/deterministicCompare.ts",
+      "kind": "function",
       "signatures": [
         "function compareDeterministically<T>(\n  a: EventEnvelope<T>,\n  b: EventEnvelope<T>,\n  tieBreaker?: TieBreaker<T>,\n): number"
       ],
@@ -345,6 +384,7 @@
       "title": "compareValidatedByCausality()",
       "description": "Performs pairwise causal comparison on already validated events.",
       "sourcePath": "src/compare/causalCompare.ts",
+      "kind": "function",
       "signatures": [
         "function compareValidatedByCausality<T>(\n  a: ValidatedEventEnvelope<T>,\n  b: ValidatedEventEnvelope<T>,\n): CausalOrdering"
       ],
@@ -359,6 +399,7 @@
       "title": "compareValidatedDeterministically()",
       "description": "Deterministically compares two already validated events using the current tie-breaker.",
       "sourcePath": "src/compare/deterministicCompare.ts",
+      "kind": "function",
       "signatures": [
         "function compareValidatedDeterministically<T>(\n  a: ValidatedEventEnvelope<T>,\n  b: ValidatedEventEnvelope<T>,\n  tieBreaker?: TieBreaker<T>,\n): number"
       ],
@@ -373,6 +414,7 @@
       "title": "compareWithTieBreaker()",
       "description": "Compares two events with the configured deterministic tie-breaker.",
       "sourcePath": "src/order/tieBreakers.ts",
+      "kind": "function",
       "signatures": [
         "function compareWithTieBreaker<T>(\n  a: EventEnvelope<T>,\n  b: EventEnvelope<T>,\n  tieBreaker?: TieBreaker<T>,\n): number"
       ],
@@ -387,6 +429,7 @@
       "title": "createHlcClock()",
       "description": "Creates a monotonic hybrid logical clock for a single node.",
       "sourcePath": "src/clock/hlc.ts",
+      "kind": "function",
       "signatures": [
         "function createHlcClock(options: {\n  nodeId: NodeId\n  now?: () => bigint\n  maxDriftMs?: bigint\n}): HlcClock"
       ],
@@ -401,6 +444,7 @@
       "title": "createProcessingTimeWatermark()",
       "description": "Builds a processing-time watermark helper for more aggressive stream progress.",
       "sourcePath": "src/order/watermarkStrategies.ts",
+      "kind": "function",
       "signatures": [
         "function createProcessingTimeWatermark<T>(\n  options?: {\n    now?: () => bigint\n    floorToEventTime?: boolean\n  },\n): WatermarkFunction<T>"
       ],
@@ -415,6 +459,7 @@
       "title": "detectAnomalies()",
       "description": "Detects structured anomalies across a bounded event set.",
       "sourcePath": "src/anomalies/detectAnomalies.ts",
+      "kind": "function",
       "signatures": [
         "function detectAnomalies<T>(\n  events: EventEnvelope<T>[],\n  options?: Pick<OrderOptions<T>, \"maxClockDriftMs\"> & {\n    validations?: EventValidationRecord<T>[]\n  },\n): EventAnomaly<T>[]"
       ],
@@ -429,6 +474,7 @@
       "title": "detectSingleEventAnomalies()",
       "description": "Detects anomalies that can be inferred from one event in isolation.",
       "sourcePath": "src/anomalies/detectAnomalies.ts",
+      "kind": "function",
       "signatures": [
         "function detectSingleEventAnomalies<T>(\n  event: EventEnvelope<T>,\n  validation: ValidationResult<ValidatedEventEnvelope<T>>,\n): EventAnomaly<T>[]"
       ],
@@ -443,6 +489,7 @@
       "title": "eventTimeWatermark()",
       "description": "Advances stream readiness from event-time timestamps.",
       "sourcePath": "src/order/watermarkStrategies.ts",
+      "kind": "function",
       "signatures": [
         "function eventTimeWatermark<T>(\n  event: EventEnvelope<T>,\n): bigint | undefined"
       ],
@@ -457,6 +504,7 @@
       "title": "getTieBreaker()",
       "description": "Resolves the tie-breaker function from the current ordering options.",
       "sourcePath": "src/order/tieBreakers.ts",
+      "kind": "function",
       "signatures": [
         "function getTieBreaker<T>(tieBreaker?: TieBreaker<T>): TieBreaker<T>"
       ],
@@ -471,6 +519,7 @@
       "title": "ingestedAtWatermark()",
       "description": "Advances stream readiness from ingestion-time metadata.",
       "sourcePath": "src/order/watermarkStrategies.ts",
+      "kind": "function",
       "signatures": [
         "function ingestedAtWatermark<T>(\n  event: EventEnvelope<T>,\n): bigint | undefined"
       ],
@@ -485,6 +534,7 @@
       "title": "orderEvents()",
       "description": "Orders a bounded event set and returns ordered output, anomalies, and stats.",
       "sourcePath": "src/order/orderEvents.ts",
+      "kind": "function",
       "signatures": [
         "function orderEvents<T>(\n  events: EventEnvelope<T>[],\n  options?: OrderOptions<T>,\n): OrderResult<T>"
       ],
@@ -508,6 +558,7 @@
       "title": "orderEventStream()",
       "description": "Consumes an async event source and emits watermark-aware ordered batches.",
       "sourcePath": "src/order/orderEventStream.ts",
+      "kind": "function",
       "signatures": [
         "async function* orderEventStream<T>(\n  source: AsyncIterable<EventEnvelope<T>>,\n  options?: StreamOrderOptions<T>,\n): AsyncIterable<OrderBatch<T>>"
       ],
@@ -526,6 +577,7 @@
       "title": "orderValidatedEvents()",
       "description": "Orders already validated events without re-running validation.",
       "sourcePath": "src/order/orderEvents.ts",
+      "kind": "function",
       "signatures": [
         "function orderValidatedEvents<T>(\n  validEvents: ValidatedEventEnvelope<T>[],\n  options?: OrderOptions<T>,\n  internal?: {\n    sourceEvents?: EventEnvelope<T>[]\n    validations?: EventValidationRecord<T>[]\n    anomalies?: EventAnomaly<T>[]\n    invalidEvents?: number\n  },\n): OrderResult<T>"
       ],
@@ -540,6 +592,7 @@
       "title": "parseHlc()",
       "description": "Parses a serialized HLC string into its structured parts.",
       "sourcePath": "src/clock/parse.ts",
+      "kind": "function",
       "signatures": [
         "function parseHlc(value: string): HlcTimestamp"
       ],
@@ -554,6 +607,7 @@
       "title": "serializeHlc()",
       "description": "Serializes an HLC value into the canonical string form.",
       "sourcePath": "src/clock/serialize.ts",
+      "kind": "function",
       "signatures": [
         "function serializeHlc(clock: HlcTimestamp): string"
       ],
@@ -568,6 +622,7 @@
       "title": "translateBatch()",
       "description": "Translates raw user-space records into event envelopes and structured translation anomalies.",
       "sourcePath": "src/translate/translateBatch.ts",
+      "kind": "function",
       "signatures": [
         "function translateBatch<TInput, TPayload = TInput>(\n  records: readonly TInput[],\n  config: TranslateBatchConfig<TInput, TPayload>,\n): TranslateBatchResult<TPayload, TInput>"
       ],
@@ -585,10 +640,30 @@
         "The returned envelope shell is shallowly frozen, while <code>payload</code> remains by reference."
       ]
     },
+    "TranslateBatchPolicyError": {
+      "title": "TranslateBatchPolicyError",
+      "description": "Error raised when translateBatch() policy configuration chooses fail-fast handling for a structured translation anomaly.",
+      "sourcePath": "src/translate/translateBatch.ts",
+      "kind": "class",
+      "signatures": [
+        "class TranslateBatchPolicyError<TInput = unknown> extends Error"
+      ],
+      "href": "/api/translate-batch-policy-error/",
+      "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/translate/translateBatch.ts",
+      "primary": false,
+      "summary": "This exported error class is raised when <code>translateBatch()</code> policy configuration chooses fail-fast handling for a structured translation anomaly.",
+      "usage": "import { TranslateBatchPolicyError, translateBatch } from \"causal-order/translate\"\n\ntry {\n  translateBatch(records, {\n    getEventId: (record) => record.eventId,\n    getNodeId: (record) => record.nodeId,\n    getPhysicalTime: (record) => record.occurredAt,\n    policy: {\n      recordFailure: \"fail\",\n      optionalFieldFailure: \"warn\",\n    },\n  })\n} catch (error) {\n  if (error instanceof TranslateBatchPolicyError) {\n    console.error(error.anomaly)\n  }\n}",
+      "bullets": [
+        "Extends <code>Error</code> and carries the triggering structured <code>anomaly</code>.",
+        "Raised only when the configured translation policy chooses <code>fail</code> for the encountered anomaly class.",
+        "Available from both <code>causal-order</code> and the narrower <code>causal-order/translate</code> entrypoint."
+      ]
+    },
     "validateClock": {
       "title": "validateClock()",
       "description": "Validates an HLC clock value and reports structured failures or warnings.",
       "sourcePath": "src/validate/validateClock.ts",
+      "kind": "function",
       "signatures": [
         "function validateClock(\n  clock: HlcTimestamp,\n  options?: { maxDriftMs?: bigint; now?: () => bigint; includeWarnings?: boolean },\n): ValidationResult<ValidatedHlcTimestamp>",
         "function validateClock(\n  clock: unknown,\n  options?: { maxDriftMs?: bigint; now?: () => bigint; includeWarnings?: boolean },\n): ValidationResult<ValidatedHlcTimestamp>",
@@ -605,6 +680,7 @@
       "title": "validateEvent()",
       "description": "Validates an event envelope and returns a branded validated value on success.",
       "sourcePath": "src/validate/validateEvent.ts",
+      "kind": "function",
       "signatures": [
         "function validateEvent<T>(\n  event: EventEnvelope<T>,\n  options?: { maxClockDriftMs?: bigint; now?: () => bigint; includeWarnings?: boolean },\n): ValidationResult<ValidatedEventEnvelope<T>>",
         "function validateEvent(\n  event: unknown,\n  options?: { maxClockDriftMs?: bigint; now?: () => bigint; includeWarnings?: boolean },\n): ValidationResult<ValidatedEventEnvelope<unknown>>",
@@ -728,9 +804,65 @@
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },
           {
+            "name": "TranslateBatchPolicy",
+            "label": "TranslateBatchPolicy",
+            "description": "Policy configuration controlling how translation failures are surfaced or failed.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
             "name": "TranslationAnomalyCode",
             "label": "TranslationAnomalyCode",
             "description": "Stable code describing a translation-time mapping or coercion failure.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TranslationAnomalyDomain",
+            "label": "TranslationAnomalyDomain",
+            "description": "Stable top-level domain for translation anomaly classification.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TranslationAnomalyFamily",
+            "label": "TranslationAnomalyFamily",
+            "description": "Stable family split between mapping and structural translation failures.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TranslationAnomalyCategory",
+            "label": "TranslationAnomalyCategory",
+            "description": "Stable category used for machine-readable translation anomaly handling.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TranslationRecordFailureAction",
+            "label": "TranslationRecordFailureAction",
+            "description": "Fail-fast or warning action for record-level translation failures.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TranslationOptionalFieldAction",
+            "label": "TranslationOptionalFieldAction",
+            "description": "Handling action for optional-field translation failures, including continue behavior where omission is honest.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TranslationPolicyKey",
+            "label": "TranslationPolicyKey",
+            "description": "Stable policy selector describing the translation failure class being handled.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TranslationPolicyDecision",
+            "label": "TranslationPolicyDecision",
+            "description": "Resolved policy decision attached to structured translation anomalies.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },
@@ -759,6 +891,69 @@
             "name": "TranslationActualValueType",
             "label": "TranslationActualValueType",
             "description": "Normalized runtime value classification attached to translation anomalies.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TranslationDiagnosticSource",
+            "label": "TranslationDiagnosticSource",
+            "description": "Stable source split between mapping and structural translation failures.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TranslationDiagnosticRecord",
+            "label": "TranslationDiagnosticRecord<TInput = unknown>",
+            "description": "Record-local translation diagnostic context including index and original input.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TranslationDiagnosticOrdering",
+            "label": "TranslationDiagnosticOrdering",
+            "description": "Deterministic ordering metadata attached to emitted translation anomalies.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TranslationFieldReferenceKind",
+            "label": "TranslationFieldReferenceKind",
+            "description": "Stable field-reference kind used by translation diagnostics.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TranslationFieldReference",
+            "label": "TranslationFieldReference",
+            "description": "Machine-readable field reference attached to translation diagnostics.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TranslationAnomalyClassification",
+            "label": "TranslationAnomalyClassification",
+            "description": "Stable machine-readable classification attached to translation anomalies.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TranslationDiagnosticLocation",
+            "label": "TranslationDiagnosticLocation",
+            "description": "Structured field and mapper location metadata for translation diagnostics.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TranslationDiagnosticContract",
+            "label": "TranslationDiagnosticContract",
+            "description": "Contract-facing detail attached to translation diagnostics.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "TranslationDiagnostic",
+            "label": "TranslationDiagnostic<TInput = unknown>",
+            "description": "Nested machine-readable diagnostic object attached to translation anomalies.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },

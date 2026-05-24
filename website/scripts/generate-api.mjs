@@ -35,6 +35,8 @@ const exportDescriptions = {
   validateEvent: "Validates an event envelope and returns a branded validated value on success.",
   translateBatch:
     "Translates raw user-space records into event envelopes and structured translation anomalies.",
+  TranslateBatchPolicyError:
+    "Error raised when translateBatch() policy configuration chooses fail-fast handling for a structured translation anomaly.",
   detectSingleEventAnomalies: "Detects anomalies that can be inferred from one event in isolation.",
   detectAnomalies: "Detects structured anomalies across a bounded event set.",
   DEFAULT_TIE_BREAKER: "Default deterministic tie-breaker used when stronger ordering is unavailable.",
@@ -79,6 +81,32 @@ console.log(ordered.ordered)`,
       "Timestamps accept <code>bigint</code>, safe integer <code>number</code>, and canonical integer <code>string</code>.",
       "<code>Date</code>, ISO timestamp strings, decimals, exponent notation, and unsafe integers are rejected deterministically.",
       "The returned envelope shell is shallowly frozen, while <code>payload</code> remains by reference.",
+    ],
+  },
+  TranslateBatchPolicyError: {
+    summary:
+      "This exported error class is raised when <code>translateBatch()</code> policy configuration chooses fail-fast handling for a structured translation anomaly.",
+    usage: `import { TranslateBatchPolicyError, translateBatch } from "causal-order/translate"
+
+try {
+  translateBatch(records, {
+    getEventId: (record) => record.eventId,
+    getNodeId: (record) => record.nodeId,
+    getPhysicalTime: (record) => record.occurredAt,
+    policy: {
+      recordFailure: "fail",
+      optionalFieldFailure: "warn",
+    },
+  })
+} catch (error) {
+  if (error instanceof TranslateBatchPolicyError) {
+    console.error(error.anomaly)
+  }
+}`,
+    bullets: [
+      "Extends <code>Error</code> and carries the triggering structured <code>anomaly</code>.",
+      "Raised only when the configured translation policy chooses <code>fail</code> for the encountered anomaly class.",
+      "Available from both <code>causal-order</code> and the narrower <code>causal-order/translate</code> entrypoint.",
     ],
   },
   orderEvents: {
@@ -188,12 +216,33 @@ const typeDescriptions = {
     "Accepted raw timestamp input for translation: bigint, safe integer number, canonical integer string, or Date for explicit rejection handling.",
   TranslateBatchConfig:
     "Mapper configuration for translating raw records into event envelopes.",
+  TranslateBatchPolicy:
+    "Policy configuration controlling how translation failures are surfaced or failed.",
   TranslationAnomalyCode: "Stable code describing a translation-time mapping or coercion failure.",
+  TranslationAnomalyDomain: "Stable top-level domain for translation anomaly classification.",
+  TranslationAnomalyFamily: "Stable family split between mapping and structural translation failures.",
+  TranslationAnomalyCategory: "Stable category used for machine-readable translation anomaly handling.",
+  TranslationRecordFailureAction: "Fail-fast or warning action for record-level translation failures.",
+  TranslationOptionalFieldAction:
+    "Handling action for optional-field translation failures, including continue behavior where omission is honest.",
+  TranslationPolicyKey: "Stable policy selector describing the translation failure class being handled.",
+  TranslationPolicyDecision: "Resolved policy decision attached to structured translation anomalies.",
   TranslationField: "Stable field label used in structured translation anomalies.",
   TranslationMapperName: "Stable mapper-function label used in structured translation anomalies.",
   TranslationAnomalyStage: "Translation pipeline stage where a structured anomaly was raised.",
   TranslationActualValueType:
     "Normalized runtime value classification attached to translation anomalies.",
+  TranslationDiagnosticSource: "Stable source split between mapping and structural translation failures.",
+  TranslationDiagnosticRecord: "Record-local translation diagnostic context including index and original input.",
+  TranslationDiagnosticOrdering:
+    "Deterministic ordering metadata attached to emitted translation anomalies.",
+  TranslationFieldReferenceKind: "Stable field-reference kind used by translation diagnostics.",
+  TranslationFieldReference: "Machine-readable field reference attached to translation diagnostics.",
+  TranslationAnomalyClassification:
+    "Stable machine-readable classification attached to translation anomalies.",
+  TranslationDiagnosticLocation: "Structured field and mapper location metadata for translation diagnostics.",
+  TranslationDiagnosticContract: "Contract-facing detail attached to translation diagnostics.",
+  TranslationDiagnostic: "Nested machine-readable diagnostic object attached to translation anomalies.",
   TranslationAnomaly:
     "Structured translation failure record carrying mapper, field, stage, and actual-value metadata.",
   TranslateBatchResult:
@@ -271,11 +320,28 @@ const types = {
         typeItem("TranslateMapper", "TranslateMapper<TInput, TValue>"),
         typeItem("TranslateTimestampInput"),
         typeItem("TranslateBatchConfig", "TranslateBatchConfig<TInput, TPayload = TInput>"),
+        typeItem("TranslateBatchPolicy"),
         typeItem("TranslationAnomalyCode"),
+        typeItem("TranslationAnomalyDomain"),
+        typeItem("TranslationAnomalyFamily"),
+        typeItem("TranslationAnomalyCategory"),
+        typeItem("TranslationRecordFailureAction"),
+        typeItem("TranslationOptionalFieldAction"),
+        typeItem("TranslationPolicyKey"),
+        typeItem("TranslationPolicyDecision"),
         typeItem("TranslationField"),
         typeItem("TranslationMapperName"),
         typeItem("TranslationAnomalyStage"),
         typeItem("TranslationActualValueType"),
+        typeItem("TranslationDiagnosticSource"),
+        typeItem("TranslationDiagnosticRecord", "TranslationDiagnosticRecord<TInput = unknown>"),
+        typeItem("TranslationDiagnosticOrdering"),
+        typeItem("TranslationFieldReferenceKind"),
+        typeItem("TranslationFieldReference"),
+        typeItem("TranslationAnomalyClassification"),
+        typeItem("TranslationDiagnosticLocation"),
+        typeItem("TranslationDiagnosticContract"),
+        typeItem("TranslationDiagnostic", "TranslationDiagnostic<TInput = unknown>"),
         typeItem("TranslationAnomaly", "TranslationAnomaly<TInput = unknown>"),
         typeItem("TranslateBatchResult", "TranslateBatchResult<TPayload = unknown, TInput = unknown>"),
       ],
@@ -330,6 +396,32 @@ const apiData = {
     description: "The public API surface exported by causal-order today.",
     sourcePath: "src/index.ts",
     sourceUrl: toSourceUrl("src/index.ts"),
+    focusedEntrypoints: [
+      {
+        path: "causal-order",
+        description: "Full top-level surface for users who prefer one import path.",
+      },
+      {
+        path: "causal-order/translate",
+        description: "Raw-record translation surface, including translateBatch() and TranslateBatchPolicyError.",
+      },
+      {
+        path: "causal-order/batch",
+        description: "Bounded batch ordering plus tie-breaker helpers.",
+      },
+      {
+        path: "causal-order/stream",
+        description: "Streaming ordering surface through orderEventStream().",
+      },
+      {
+        path: "causal-order/watermarks",
+        description: "Watermark helpers only.",
+      },
+      {
+        path: "causal-order/order",
+        description: "Combined ordering barrel for users who want batch, stream, tie-breakers, and watermarks together.",
+      },
+    ],
   },
   exportsByGroup: overviewGroups,
   pages: apiPages,
@@ -378,11 +470,14 @@ function extractExports(source) {
   const consts = new Set(
     Array.from(source.matchAll(/^export const (\w+)/gm), ([, name]) => name),
   );
+  const classes = new Set(
+    Array.from(source.matchAll(/^export class (\w+)/gm), ([, name]) => name),
+  );
   const types = new Set(
     Array.from(source.matchAll(/^export type (\w+)/gm), ([, name]) => name),
   );
 
-  return { functions, consts, types };
+  return { functions, consts, classes, types };
 }
 
 function extractFunctionDeclarations(source, name, count) {
@@ -448,6 +543,32 @@ function countMatches(value, token) {
   return Array.from(value).filter((character) => character === token).length;
 }
 
+function extractAllClassDeclarations(source, name) {
+  const lines = source.split(/\r?\n/);
+  const declarations = [];
+  const declarationPattern = new RegExp(`^export\\s+class\\s+${name}(?:<|\\s|\\{)`);
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line === undefined || !declarationPattern.test(line)) {
+      continue;
+    }
+
+    declarations.push(
+      line
+        .replace(/^export\s+/, "")
+        .replace(/\s*\{\s*$/, "")
+        .trim(),
+    );
+  }
+
+  if (declarations.length === 0) {
+    throw new Error(`Expected at least one class declaration for ${name}, found 0`);
+  }
+
+  return declarations;
+}
+
 function symbolItem(name, sourcePath, options = {}) {
   const { kind = "function" } = options;
   const exports = exportsByPath.get(sourcePath);
@@ -455,7 +576,13 @@ function symbolItem(name, sourcePath, options = {}) {
     throw new Error(`Missing exports for ${sourcePath}`);
   }
 
-  const exportSet = kind === "type" ? exports.types : kind === "const" ? exports.consts : exports.functions;
+  const exportSet = kind === "type"
+    ? exports.types
+    : kind === "const"
+      ? exports.consts
+      : kind === "class"
+        ? exports.classes
+        : exports.functions;
   if (!exportSet.has(name)) {
     throw new Error(`Expected ${name} in ${sourcePath}`);
   }
@@ -498,7 +625,11 @@ function collectPublicFunctions() {
     }
 
     for (const name of exports.functions) {
-      functions.push({ name, sourcePath });
+      functions.push({ name, sourcePath, kind: "function" });
+    }
+
+    for (const name of exports.classes) {
+      functions.push({ name, sourcePath, kind: "class" });
     }
   }
 
@@ -507,17 +638,20 @@ function collectPublicFunctions() {
 
 function buildApiFunctionPages() {
   return Object.fromEntries(
-    publicFunctions.map(({ name, sourcePath }) => {
+    publicFunctions.map(({ name, sourcePath, kind }) => {
       const enhancements = pageEnhancements[name] ?? {};
       const href = `/api/${functionSlug(name)}/`;
 
       return [
         name,
         {
-          title: `${name}()`,
-          description: exportDescriptions[name] ?? `Public function exported by causal-order.`,
+          title: kind === "class" ? name : `${name}()`,
+          description: exportDescriptions[name] ?? `Public ${kind} exported by causal-order.`,
           sourcePath,
-          signatures: extractAllFunctionDeclarations(readSource(sourcePath), name),
+          kind,
+          signatures: kind === "class"
+            ? extractAllClassDeclarations(readSource(sourcePath), name)
+            : extractAllFunctionDeclarations(readSource(sourcePath), name),
           href,
           sourceUrl: toSourceUrl(sourcePath),
           primary: enhancements.primary ?? false,
@@ -571,6 +705,10 @@ function buildOverviewGroups() {
 
       for (const name of sortSet(exports.consts)) {
         items.push(symbolItem(name, sourcePath, { kind: "const" }));
+      }
+
+      for (const name of sortSet(exports.classes)) {
+        items.push(symbolItem(name, sourcePath, { kind: "class" }));
       }
 
       for (const name of sortSet(exports.functions)) {

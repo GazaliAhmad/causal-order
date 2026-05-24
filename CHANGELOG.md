@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.1]
+
+### Added
+
+* additive focused subpath exports for narrower public entrypoints, including `causal-order/clock`, `causal-order/compare`, `causal-order/validate`, `causal-order/anomalies`, `causal-order/order`, `causal-order/batch`, `causal-order/stream`, `causal-order/watermarks`, `causal-order/translate`, and `causal-order/types`
+* direct package-surface coverage proving the new subpath exports resolve as focused runtime entrypoints
+* explicit nested translation diagnostics on `TranslationAnomaly` via `diagnostic.source`, `diagnostic.classification`, `diagnostic.record`, `diagnostic.location`, and `diagnostic.contract`
+* stable translation field references and anomaly classification metadata for ingress diagnostics
+* explicit strictness-policy handling for translation failures, including `record_failure`, `optional_field_failure`, and exported `TranslateBatchPolicyError`
+* deterministic diagnostic ordering metadata on translation anomalies, including stable record order, field order, and emitted sequence metadata
+* bounded-allocation anomaly collection for batch ordering through the shared internal anomaly collector
+* a non-blocking post-merge GitHub Actions confidence workflow for `150k` batch and `150k` stream validation on Node.js `20` and `24`
+* detailed `0.4.1` release notes in `docs/releases/0.4.1.md`
+
+### Changed
+
+* kept the existing top-level `causal-order` package surface intact while adding narrower import paths for consumers who want smaller public entrypoints
+* split the broader ordering surface into more focused additive entrypoints so consumers can import batch ordering, stream ordering, or watermark helpers without coming through the combined `causal-order/order` barrel
+* made translation diagnostics safer for downstream tooling to build against by adding a stable `classification` object and `fieldReference` shape alongside the existing flat anomaly fields
+* clarified the README install section with focused-import examples that point consumers toward narrower entrypoints without breaking current root imports
+* kept heavier `150k` confidence validation out of the blocking pull-request gate by running it as a separate post-merge workflow on `main`
+* added explicit policy decisions and deterministic ordering metadata to the translation diagnostic surface without widening the synchronous ingress boundary
+* reduced anomaly-heavy batch allocation pressure by removing the full retained validation-record path from `orderEvents()`, making graph evidence lazy, and trimming intermediate ordering structures
+* aligned the README, roadmap, guides, wiki, package metadata, and release notes around `0.4.1` as the published structural-diagnostics and bounded-allocation follow-through release
+
 ## [0.4.0]
 
 ### Added

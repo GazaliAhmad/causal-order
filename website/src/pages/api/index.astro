@@ -15,6 +15,7 @@ const primaryPages = apiPageList.filter((page) => page.primary);
 
 const toc = [
   { id: "where-to-start", text: "Where to start", depth: 2 },
+  { id: "focused-entrypoints", text: "Focused entrypoints", depth: 2 },
   { id: "entry-points", text: "Primary entry points", depth: 2 },
   { id: "all-exports", text: "All exports", depth: 2 },
   { id: "public-types", text: "Public types", depth: 2 },
@@ -30,9 +31,9 @@ const toc = [
   currentPath="/api/"
 >
   <p>
-    The package currently exports one public surface from <code>src/index.ts</code>. The API is
-    grouped around translation, event ordering, streaming, validation, causality comparison,
-    clocks, anomalies, and types.
+    The package exports a full top-level surface from <code>src/index.ts</code>, plus focused npm
+    subpath entrypoints for narrower import shapes. The API is grouped around translation, event
+    ordering, streaming, validation, causality comparison, clocks, anomalies, and types.
   </p>
 
   <h2 id="where-to-start">Where to start</h2>
@@ -42,6 +43,19 @@ const toc = [
     <code>orderEventStream()</code> when you need watermark, late-arrival, and correction-capable
     behavior.
   </p>
+
+  <h2 id="focused-entrypoints">Focused entrypoints</h2>
+  <p>
+    If you prefer smaller import surfaces, the published package also exposes additive focused
+    entrypoints alongside the root <code>causal-order</code> import.
+  </p>
+  <ul>
+    {apiOverview.focusedEntrypoints.map((entrypoint) => (
+      <li>
+        <code>{entrypoint.path}</code>{` - ${entrypoint.description}`}
+      </li>
+    ))}
+  </ul>
 
   <h2 id="entry-points">Primary entry points</h2>
   <ul>

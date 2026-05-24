@@ -5,8 +5,8 @@ They explain how to use `causal-order`, how the main deployment patterns work, a
 
 For the deeper conceptual layer, mental-model pages, and explanatory write-ups that are less tied to operational walkthroughs, see the wiki.
 
-Alongside the current ordering and streaming surfaces, the published `0.4.0` line now also covers the first narrow raw-record ingress path via `translateBatch()`.
-For that contract, start with the developer-experience guide and the README's raw-record translation example.
+Alongside the current ordering and streaming surfaces, the published `0.4.1` line now covers both the narrow raw-record ingress path via `translateBatch()` and its machine-readable diagnostics follow-through.
+For that contract, start with the developer-experience guide, the `0.4.1` implementation note, and the README's raw-record translation example.
 
 Start here:
 
@@ -29,6 +29,7 @@ Workloads and hardening:
 Developer experience:
 
 * [Developer Experience](./devex/developer-experience-0.4.0.md)
+* [Implementation Guide `0.4.1`](./devex/implementation-guide-0.4.1.md)
 
 Failure-mode guides:
 
