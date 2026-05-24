@@ -85,6 +85,14 @@ Platform:
 
 * ESM only
 
+Focused imports are also available when you want a narrower public entrypoint:
+
+```ts
+import { orderEvents } from "causal-order/order"
+import { translateBatch } from "causal-order/translate"
+import { createHlcClock } from "causal-order/clock"
+```
+
 ## Runtime Policy
 
 ### Development Environment
