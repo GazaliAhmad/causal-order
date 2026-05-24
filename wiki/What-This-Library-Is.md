@@ -44,11 +44,12 @@ But in distributed systems, clean-looking answers are often wrong.
 
 `causal-order` exists to make that uncertainty visible instead of hiding it.
 
-In `0.4.0`, that scope includes:
+In the published `0.4.1` line, that scope includes:
 
 * bounded batch ordering
 * the streaming contract for late arrivals, watermarks, correction-capable output, and reconnect-heavy recovery flows
 * the narrow synchronous ingress surface for translating raw application records into the event envelope through `translateBatch()` before ordering
+* the machine-readable diagnostics and strictness-policy surface for understanding translation failures without scraping free-form text
 
 That ingress work is intentionally kept payload-agnostic and environment-free rather than growing into file parsing, CLI tooling, or transport adapters inside the core package.
 

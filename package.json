@@ -1,6 +1,6 @@
 {
   "name": "causal-order",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "An event integrity library for ordering and analyzing distributed events without false certainty.",
   "keywords": [
     "distributed-systems",
@@ -58,6 +58,18 @@
       "types": "./dist/order.d.ts",
       "import": "./dist/order.js"
     },
+    "./batch": {
+      "types": "./dist/batch.d.ts",
+      "import": "./dist/batch.js"
+    },
+    "./stream": {
+      "types": "./dist/stream.d.ts",
+      "import": "./dist/stream.js"
+    },
+    "./watermarks": {
+      "types": "./dist/watermarks.d.ts",
+      "import": "./dist/watermarks.js"
+    },
     "./translate": {
       "types": "./dist/translate.d.ts",
       "import": "./dist/translate.js"
@@ -91,6 +103,7 @@
     "bench:stream:heap:small": "npm run build && node perf/constrained-heap.mjs --heap-mb 128 --profile streaming-150k-watermark-lag --repeat 3 --warmup 0",
     "bench:stream:gc": "npm run build && node perf/gc-observed.mjs --heap-mb 256 --profile streaming-150k-watermark-lag --repeat 6",
     "bench:stream:gc:small": "npm run build && node perf/gc-observed.mjs --heap-mb 128 --profile streaming-150k-watermark-lag --repeat 3 --warmup 0",
+    "bench:confidence:150k": "npm run build && node perf/run.mjs --profile baseline-150k-shuffled --profile streaming-150k-watermark-lag",
     "bench:check": "npm run build && node perf/check.mjs",
     "prepack": "npm run build"
   },

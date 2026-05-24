@@ -72,12 +72,48 @@ export type TranslateBatchConfig<TInput, TPayload = TInput> = {
   getPartition?: TranslateMapper<TInput, string | undefined>
   getIngestedAt?: TranslateMapper<TInput, TranslateTimestampInput | undefined>
   getPayload?: TranslateMapper<TInput, TPayload>
+  policy?: TranslateBatchPolicy
 }
 
 export type TranslationAnomalyCode =
   | "missing_required_value"
   | "invalid_mapped_value"
   | "mapper_exception"
+
+export type TranslationAnomalyDomain = "translation"
+
+export type TranslationAnomalyFamily = "mapping" | "structural"
+
+export type TranslationAnomalyCategory =
+  | "required_value_missing"
+  | "invalid_value"
+  | "mapper_failure"
+
+export type TranslationRecordFailureAction = "warn" | "fail"
+
+export type TranslationOptionalFieldAction =
+  | "warn"
+  | "continue"
+  | "fail"
+
+export type TranslationPolicyKey =
+  | "record_failure"
+  | "optional_field_failure"
+
+export type TranslateBatchPolicy = {
+  recordFailure?: TranslationRecordFailureAction
+  optionalFieldFailure?: TranslationOptionalFieldAction
+}
+
+export type TranslationPolicyDecision =
+  | {
+    key: "record_failure"
+    action: TranslationRecordFailureAction
+  }
+  | {
+    key: "optional_field_failure"
+    action: TranslationOptionalFieldAction
+  }
 
 export type TranslationField =
   | "event_id"
@@ -123,6 +159,58 @@ export type TranslationActualValueType =
   | "array"
   | "object"
 
+export type TranslationDiagnosticSource = "mapping" | "structural"
+
+export type TranslationDiagnosticRecord<TInput = unknown> = {
+  index: number
+  input: TInput
+}
+
+export type TranslationDiagnosticOrdering = {
+  kind: "record_field_order"
+  sequence: number
+  recordIndex: number
+  fieldOrder: number
+}
+
+export type TranslationFieldReferenceKind = "ingress_field"
+
+export type TranslationFieldReference = {
+  kind: TranslationFieldReferenceKind
+  field: TranslationField
+  mapper: TranslationMapperName
+}
+
+export type TranslationAnomalyClassification = {
+  domain: TranslationAnomalyDomain
+  family: TranslationAnomalyFamily
+  category: TranslationAnomalyCategory
+  code: TranslationAnomalyCode
+}
+
+export type TranslationDiagnosticLocation = {
+  field: TranslationField
+  mapper: TranslationMapperName
+  fieldReference: TranslationFieldReference
+}
+
+export type TranslationDiagnosticContract = {
+  expected: string
+  actualType?: TranslationActualValueType
+  actualValue?: unknown
+}
+
+export type TranslationDiagnostic<TInput = unknown> = {
+  source: TranslationDiagnosticSource
+  classification: TranslationAnomalyClassification
+  policy: TranslationPolicyDecision
+  ordering: TranslationDiagnosticOrdering
+  stage: TranslationAnomalyStage
+  record: TranslationDiagnosticRecord<TInput>
+  location: TranslationDiagnosticLocation
+  contract: TranslationDiagnosticContract
+}
+
 export type TranslationAnomaly<TInput = unknown> = {
   code: TranslationAnomalyCode
   message: string
@@ -130,10 +218,15 @@ export type TranslationAnomaly<TInput = unknown> = {
   input: TInput
   field: TranslationField
   mapper: TranslationMapperName
+  fieldReference: TranslationFieldReference
+  classification: TranslationAnomalyClassification
+  policy: TranslationPolicyDecision
+  ordering: TranslationDiagnosticOrdering
   stage: TranslationAnomalyStage
   expected: string
   actualType?: TranslationActualValueType
   actualValue?: unknown
+  diagnostic: TranslationDiagnostic<TInput>
 }
 
 export type TranslateBatchResult<TPayload = unknown, TInput = unknown> = {

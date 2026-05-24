@@ -89,6 +89,9 @@ Focused imports are also available when you want a narrower public entrypoint:
 
 ```ts
 import { orderEvents } from "causal-order/order"
+import { orderEvents as batchOrderEvents } from "causal-order/batch"
+import { orderEventStream } from "causal-order/stream"
+import { createProcessingTimeWatermark } from "causal-order/watermarks"
 import { translateBatch } from "causal-order/translate"
 import { createHlcClock } from "causal-order/clock"
 ```
@@ -371,14 +374,15 @@ Workloads and hardening:
 * [Runtime Stability 0.3.4](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/runtime-stability-0.3.4.md)
 * [Implementation Guide 0.3.4](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/implementation-guide-0.3.4.md)
 
-Published `0.4.0` developer-experience docs:
+Published developer-experience docs:
 
 * [Developer Experience `0.4.0`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/devex/developer-experience-0.4.0.md)
 * [Implementation Guide `0.4.0`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/devex/implementation-guide-0.4.0.md)
-
-Developer-experience follow-through notes after the published `0.4.0` release:
-
 * [Implementation Guide `0.4.1`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/devex/implementation-guide-0.4.1.md)
+* [Release Notes `0.4.1`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.4.1.md)
+
+Continuing follow-through notes:
+
 * [Implementation Guide `0.4.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/devex/implementation-guide-0.4.2.md)
 
 Additional operational reading:
@@ -402,29 +406,33 @@ Runnable examples:
 
 ## Status
 
-`causal-order` is now at `0.4.0`.
+`causal-order` is now at `0.4.1`.
 
-`0.4.0` release shape:
+`0.4.1` release shape:
 
 * `0.3.2` established the current production-gate hardening baseline
 * `0.3.3` broadened the streaming hardening and pressure release story after that production-gate milestone
 * `0.3.4` hardened prolonged and constrained-runtime streaming stability
 * `0.4.0` adds the first narrow raw-record ingress contract through `translateBatch()`
+* `0.4.1` makes translation diagnostics safer to inspect and control without widening the ingress boundary
 
-`0.4.0` is centered on:
+`0.4.1` is centered on:
 
 * the existing `0.3.x` hardening and runtime-stability foundation
 * a top-level synchronous raw-record ingress surface via `translateBatch()`
 * explicit mapper rules for required and optional fields
 * deterministic timestamp coercion for accepted primitive inputs
-* structured translation anomalies
+* structured translation anomalies with nested diagnostics, stable classification, and field references
+* explicit translation strictness-policy handling
+* deterministic diagnostic ordering metadata
 * shallow immutability guarantees for translated envelopes with payload preservation by reference
+* additive focused subpath exports for narrower package entrypoints
 
 Current deployment posture:
 
 * bounded batch recovery, replay, reconciliation, and audit-style workloads remain the stronger production-credible side of the current contract
 * streaming remains part of the public contract, with the earlier hardening and runtime-stability work still defining its current proof base
-* raw-record translation into the event envelope is now part of the package surface rather than repo-local work
+* raw-record translation into the event envelope and its machine-readable failure contract are now part of the package surface rather than repo-local work
 
 That means:
 
@@ -466,6 +474,7 @@ Current benchmark posture:
 * `10k` and `100k` are the main enforced guardrail bands
 * `150k` corrupted-dataset profiles are available for stress visibility, but are not currently enforced in `npm run bench:check`
 * `150k` remains the enforced sustained watermark-lag stream guard band
+* a separate non-blocking GitHub Actions post-merge confidence workflow now runs the `150k` batch and `150k` stream validation pair on `main`
 * named `250k` batch and stream profiles are already operational extended-validation runs, even though they remain outside the default lightweight `bench:check` guard path
 * repeated-cycle, constrained-heap, GC-observed, and sustained correction/reconnect endurance runs are now available as explicit runtime-stability evidence commands
 * `npm run bench:profile` is available when you need CPU profiles for the slowest stress cases

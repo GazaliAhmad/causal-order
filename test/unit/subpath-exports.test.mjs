@@ -18,7 +18,19 @@ import {
   orderEventStream,
   createProcessingTimeWatermark,
 } from "causal-order/order"
-import { translateBatch } from "causal-order/translate"
+import {
+  orderEvents as batchOrderEvents,
+  compareWithTieBreaker,
+  getTieBreaker,
+} from "causal-order/batch"
+import {
+  orderEventStream as streamingOrderEventStream,
+} from "causal-order/stream"
+import {
+  createProcessingTimeWatermark as createProcessingTimeWatermarkOnly,
+  eventTimeWatermark,
+} from "causal-order/watermarks"
+import { TranslateBatchPolicyError, translateBatch } from "causal-order/translate"
 import { validateClock, validateEvent } from "causal-order/validate"
 import { test } from "../helpers/harness.mjs"
 
@@ -34,6 +46,12 @@ test("package subpath exports expose focused runtime entrypoints", () => {
     orderEvents,
     orderEventStream,
     createProcessingTimeWatermark,
+    batchOrderEvents,
+    compareWithTieBreaker,
+    getTieBreaker,
+    streamingOrderEventStream,
+    createProcessingTimeWatermarkOnly,
+    eventTimeWatermark,
     translateBatch,
     validateClock,
     validateEvent,
@@ -42,4 +60,6 @@ test("package subpath exports expose focused runtime entrypoints", () => {
   for (const exportedFunction of expectedFunctions) {
     assert.equal(typeof exportedFunction, "function")
   }
+
+  assert.equal(typeof TranslateBatchPolicyError, "function")
 })

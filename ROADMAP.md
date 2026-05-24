@@ -121,15 +121,15 @@ Current status snapshot:
 
 | Checklist Item | Status | Notes |
 | --- | --- | --- |
-| Top-level API names and exported result types feel stable enough to support long-term | Mostly | The published `0.4.0` surface is now narrow, explicit, and directly export-tested, including `translateBatch()`, but the project is still intentionally reserving room for pre-`1.0` contract cleanup. |
+| Top-level API names and exported result types feel stable enough to support long-term | Mostly | The published `0.4.1` surface is now narrow, explicit, directly export-tested, and split into focused subpath entrypoints, but the project is still intentionally reserving room for pre-`1.0` contract cleanup. |
 | Confidence semantics are crisp and no longer expected to change materially | Partial | The `proven` / `derived` / `fallback` / `unknown` model is coherent and well-tested, but the roadmap still treats semantic freeze as a later milestone rather than as already complete. |
-| `orderBasis`, `causalEvidence`, anomaly types, and strict-mode behavior feel intentional rather than exploratory | Partial | The current runtime surface is much more deliberate across ordering, validation, translation anomalies, and strict-mode behavior, but there is still some remaining `1.0` contract-shaping work around semantics and diagnostics. |
+| `orderBasis`, `causalEvidence`, anomaly types, and strict-mode behavior feel intentional rather than exploratory | Mostly | The current runtime surface is much more deliberate across ordering, validation, translation anomalies, and strict-mode behavior, including machine-readable diagnostics, policy controls, and deterministic translation anomaly ordering, though some remaining `1.0` contract-shaping work still exists around broader semantics and naming. |
 | The difference between `orderEvents()` and `orderEventStream()` is clear in both code and docs | Mostly | The batch, stream, and raw-record ingress split is now much clearer across the README, guides, examples, tests, and website API reference, though the stream boundary can still be taught more simply before `1.0`. |
-| The README describes the real shipped package, not a still-evolving intended shape | Mostly | The README now reflects the published `0.4.0` package surface, including `translateBatch()`, current Node support, and the real batch-versus-stream posture, even though the wider docs set still has room to settle further. |
+| The README describes the real shipped package, not a still-evolving intended shape | Mostly | The README now reflects the published `0.4.1` package surface, including `translateBatch()`, the current diagnostic contract, current Node support, and the real batch-versus-stream posture, even though the wider docs set still has room to settle further. |
 | Examples clearly show why this library is safer than naive timestamp sorting | Partial | The repo has good scenario coverage for replay corruption, offline sync, false audit timelines, drift, and streaming recovery, but those examples can still be made more central and easier to discover for first-time evaluators. |
 | Performance guidance is honest about routine workloads, heavier batch workloads, and when streaming is the better model | Mostly | The current guidance is explicit about routine `10k` and `100k` guardrails, stronger `150k` hardening bands, and operational `250k` batch and stream validation runs without pretending every heavier path belongs in the default guard loop. |
 | Large-batch behavior has been benchmarked and pressure-tested enough that major surprises are unlikely in realistic use | Mostly | The repo now has meaningful `100k` guardrails, `150k` hardening coverage, and operational `250k` batch and stream runs, though more repeated history would still make the `1.0` confidence story stronger. |
-| Anomaly and error messages are useful enough to support real debugging and audit work | Partial | Machine-readable anomaly coverage is stronger now, especially with the `0.4.0` translation surface, but message quality and operator-facing polish still feel like active improvement areas rather than a finished contract. |
+| Anomaly and error messages are useful enough to support real debugging and audit work | Mostly | Machine-readable anomaly coverage is substantially stronger after the published `0.4.1` diagnostics follow-through, though operator-facing wording and broader message polish still remain improvement areas rather than a fully finished `1.0` contract. |
 | The project is ready to preserve the semantics as a public contract, not just the function names | Not Yet | This is the real `1.0` threshold, and the project does not appear to be claiming that yet. |
 
 ## Release Phases
@@ -758,18 +758,18 @@ The practical direction from here is:
 * keep the current heavier `250k` batch and stream runs available as real validation surfaces
 * decide separately whether any future CI or release workflow should promote more of those heavier runs into a stricter default gate
 
-One tentative next CI step would be a GitHub Actions post-merge validation workflow that:
+The current next-step CI posture is now represented directly in the repo through a non-blocking GitHub Actions post-merge validation workflow that:
 
 * runs on merges into `main`
-* runs `150k` batch and `150k` stream validation across Node.js `18`, `20`, and `24`
-* treats that matrix as merge-to-`main` confidence work rather than as a requirement for docs-only or website-only updates
+* runs `150k` batch and `150k` stream validation across Node.js `20` and `24`
+* treats that matrix as merge-to-`main` confidence work rather than as a requirement for pull requests, docs-only updates, or website-only updates
 * skips the heavier validation when the change only touches documentation or website surfaces
 
 That idea fits the current platform posture well:
 
-* Node.js `18` remains best-effort regression detection
 * Node.js `20` remains the supported runtime floor
 * Node.js `24` remains the active development and performance target
+* Node.js `18` remains available for future expansion if the heavier confidence matrix is later widened
 
 ## `0.4.0` Developer Experience
 
@@ -800,9 +800,9 @@ Release chunks:
   * accept numeric strings only in canonical integer epoch-millisecond form
   * accept safe integer epoch-millisecond values regardless of sign rather than imposing a non-negative-only timestamp floor
 * `0.4.1`
-  * improve structured diagnostics and anomaly formatting as machine-readable contract surface
+  * publish structured machine-readable diagnostics for translation failures
   * add clearer strictness-policy handling for fail-fast, warning, or continuation decisions
-  * keep anomaly-heavy diagnostic paths operationally disciplined
+  * keep anomaly-heavy diagnostic paths operationally disciplined through bounded-allocation follow-through
 * `0.4.2`
   * expand self-contained examples and quick-start recipes for:
     * audit reconstruction
@@ -840,9 +840,26 @@ Release chunks:
 * chunk 6 proof-layer work is now also in the repo:
   * direct unit coverage includes the raw-record path from `translateBatch()` into `orderEvents()`
   * README and release docs now describe the real accepted timestamp forms, translation anomaly split, and ownership boundary in release terms
-* the next meaningful follow-through step is `0.4.1`:
-  * improve structured diagnostics and anomaly formatting further as explicit contract surface
-  * add clearer strictness-policy handling without widening the synchronous ingress boundary
+* the published `0.4.1` follow-through now adds:
+  * nested translation diagnostics with stable classification and field references
+  * explicit strictness-policy handling and deterministic anomaly ordering
+  * bounded-allocation follow-through for anomaly-heavy batch ordering
+* the next meaningful follow-through step is `0.4.2`:
+  * expand self-contained examples and quick-start guidance
+  * finish docs synchronization around the published ingress and diagnostics surface
+
+`0.4.1` outcome:
+
+* the diagnostics and policy follow-through is now represented directly in code:
+  * `TranslationAnomaly` includes nested `diagnostic`, `classification`, `fieldReference`, `policy`, and `ordering` metadata
+  * `translateBatch()` exposes explicit strictness-policy controls and exported `TranslateBatchPolicyError`
+  * translation anomaly output is deterministic by record order, field order, and emitted sequence
+  * focused subpath exports are available without breaking the top-level package surface
+* allocation-discipline follow-through is now also in the repo:
+  * anomaly-heavy batch ordering uses a shared internal anomaly collector rather than retaining a full validation-record array
+  * graph evidence is lazy in the batch ordering path
+  * intermediate ordering structures are reduced in `orderValidatedEvents()`
+* README, changelog, release notes, guides, and wiki now describe `0.4.1` in published-release terms rather than as tentative follow-through work
 
 Out of scope for the `0.4.0` release and its immediate follow-through:
 
