@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 * aligned the roadmap with the same `0.4.2` scope so the next follow-through release consistently points at executable ingress guidance and docs-to-example synchronization
 * established a standing `0.4.2` example rule that runnable package-facing examples should use `causal-order` or public subpath imports so copied code looks like real consumer usage
 * aligned the examples, guides, and wiki entry points around the new package-facing ingress examples and consumer-oriented documentation posture
+* added quick-start scenario guidance for audit reconstruction, replay pipelines, distributed debugging, and offline sync inspection, with direct links to the matching runnable examples and deeper guides
 
 ## [0.4.1]
 

@@ -11,6 +11,7 @@ For that contract, start with the developer-experience guide, the `0.4.2` implem
 
 Start here:
 
+* [Quick Start Scenarios](./quick-start-scenarios.md)
 * [Mental Model](./mental-model.md)
 * [Notation And Runtime Contract](./notation-and-runtime-contract.md)
 * [How Order Is Written](./how-order-is-written.md)
@@ -38,6 +39,8 @@ Runnable examples:
 * [Examples Index](../examples/README.md)
 * [Minimal Ingress Example](../examples/ingress-minimal.mjs)
 * [Ingress Replay Pipeline Example](../examples/ingress-replay-pipeline.mjs)
+* [False Audit Timeline Example](../examples/false-audit-timeline.mjs)
+* [Offline Sync Anomalies Example](../examples/offline-sync-anomalies.mjs)
 * [Streaming Recovery Resync Example](../examples/streaming-recovery-resync.mjs)
 
 Failure-mode guides:

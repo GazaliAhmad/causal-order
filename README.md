@@ -346,6 +346,7 @@ Start here:
 
 * [Wiki Home](https://github.com/GazaliAhmad/causal-order/wiki)
 * [What This Library Is](https://github.com/GazaliAhmad/causal-order/wiki/What-This-Library-Is)
+* [Quick Start Scenarios](https://github.com/GazaliAhmad/causal-order/blob/main/guides/quick-start-scenarios.md)
 * [Mental Model](https://github.com/GazaliAhmad/causal-order/blob/main/guides/mental-model.md)
 * [Clocks, Causality, And Why HLC](https://github.com/GazaliAhmad/causal-order/blob/main/guides/clocks-causality-and-why-hlc.md)
 
@@ -404,6 +405,8 @@ Runnable examples:
 * [Examples Index](https://github.com/GazaliAhmad/causal-order/blob/main/examples/README.md)
 * [Minimal Ingress Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/ingress-minimal.mjs)
 * [Ingress Replay Pipeline Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/ingress-replay-pipeline.mjs)
+* [False Audit Timeline Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/false-audit-timeline.mjs)
+* [Offline Sync Anomalies Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/offline-sync-anomalies.mjs)
 * [Streaming Recovery And Resync Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/streaming-recovery-resync.mjs)
 
 The runnable examples are written from the package consumer point of view.

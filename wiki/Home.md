@@ -11,6 +11,7 @@ If the README is the quick path, this wiki is the deeper explanation.
 
 For the repo-coupled usage side, that now includes the published `0.4.1` ingress-and-diagnostics surface around synchronous `translateBatch()` translation before ordering, plus the `0.4.2` follow-through work on runnable package-facing ingress examples.
 The practical contract and runnable customer-facing examples for that surface live in `/guides`, `/examples`, and the main README rather than in the conceptual wiki pages.
+For the fastest package-facing entry point by workload shape, start with `/guides/quick-start-scenarios.md`.
 
 ## Start Here
 

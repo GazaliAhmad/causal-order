@@ -867,6 +867,9 @@ Release chunks:
   * those ingress examples show the direct `translateBatch()` to `orderEvents()` path rather than only README snippets
   * the runnable examples now prefer `causal-order` or public subpath imports over repo-internal `../dist/...` wiring
   * the examples index, README, `/guides`, and `/wiki` entry points now route readers toward package-facing runnable ingress examples
+* the current `0.4.2` repo-state follow-through now has the second chunk in place:
+  * a package-facing quick-start scenarios guide exists for audit reconstruction, replay pipelines, distributed debugging, and offline sync inspection
+  * the quick-start layer routes readers from each scenario into the matching runnable examples and deeper operational guides
 * the remaining meaningful `0.4.2` work is now narrower:
   * add strict-mode and late-arrival policy guidance
   * add synchronization checks that keep docs and runnable examples aligned
