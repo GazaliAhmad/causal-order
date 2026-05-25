@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.2] Unreleased
+
+### Changed
+
+* scoped the `0.4.2` follow-through release explicitly around runnable ingress examples, policy guidance, and synchronization enforcement rather than further core API widening
+* clarified the `0.4.2` implementation guide so the developer-experience work is read concretely as:
+  * real `translateBatch()` to `orderEvents()` runnable ingress examples
+  * operational guidance for `strict` mode and late-arrival policy choices
+  * checks that keep README, guides, and runnable examples aligned
+* aligned the roadmap with the same `0.4.2` scope so the next follow-through release consistently points at executable ingress guidance and docs-to-example synchronization
+
 ## [0.4.1]
 
 ### Added

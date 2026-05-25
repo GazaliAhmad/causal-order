@@ -19,6 +19,13 @@ For the broader milestone intent, see:
 
 If the ingress and diagnostic contracts are now public surface, `0.4.2` should show that a new user can actually learn and evaluate those surfaces through the core package alone.
 
+The explicit `0.4.2` follow-through requirement is:
+
+* runnable ingress examples
+* policy guidance
+* synchronization enforcement
+* not more core API widening
+
 This work should stay split between a few clearly different kinds of DX work:
 
 * self-contained example coverage
@@ -77,6 +84,21 @@ At a good `0.4.2` stopping point, the package should feel easier to evaluate on 
 * the repo still has not drifted into companion-tooling responsibilities
 
 The key is that `0.4.2` should prove the contract is teachable, not just described.
+
+That means the implementation should now be read concretely as:
+
+* runnable ingress examples:
+  * real `translateBatch()` to `orderEvents()` example paths that a new user can run directly
+  * no repo-local shadow API that hides the published ingress contract
+* policy guidance:
+  * explicit guidance for choosing `strict: true` versus `strict: false`
+  * explicit guidance for choosing late-arrival policy by operational context
+* synchronization enforcement:
+  * checks that keep README, guides, and examples aligned with what is actually runnable
+  * preference for validating live examples over preserving stale copied snippets
+* not more core API widening:
+  * no new runtime surface added only to make examples look smoother
+  * no companion-tooling, async-ingress, or adapter expansion under the `0.4.2` banner
 
 ## Example Rule
 

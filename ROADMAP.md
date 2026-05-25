@@ -804,19 +804,27 @@ Release chunks:
   * add clearer strictness-policy handling for fail-fast, warning, or continuation decisions
   * keep anomaly-heavy diagnostic paths operationally disciplined through bounded-allocation follow-through
 * `0.4.2`
+  * focus the release explicitly on:
+    * runnable ingress examples
+    * policy guidance
+    * synchronization enforcement
+    * not more core API widening
   * expand self-contained examples and quick-start recipes for:
     * audit reconstruction
     * replay pipelines
     * distributed debugging
     * offline sync inspection
   * add guidance for choosing strict mode and late-arrival policies
+  * make the runnable-example layer cover the real `translateBatch()` to `orderEvents()` ingress path rather than only README snippets
   * document stricter-mode guidance more explicitly, including where fail-fast behavior is the safer operational choice:
     * audit and compliance pipelines
     * financial or regulated event processing
     * CI and fixture verification
     * upstream data-quality enforcement
     * producer debugging and contract testing
+  * add synchronization checks that keep README, guides, and runnable examples aligned with the current public package behavior
   * keep examples tied to the real public package surface rather than introducing shadow abstractions or fake helper APIs
+  * avoid widening the runtime surface merely to make examples or docs look smoother
 
 `0.4.0` outcome:
 
@@ -845,8 +853,10 @@ Release chunks:
   * explicit strictness-policy handling and deterministic anomaly ordering
   * bounded-allocation follow-through for anomaly-heavy batch ordering
 * the next meaningful follow-through step is `0.4.2`:
-  * expand self-contained examples and quick-start guidance
+  * add runnable ingress examples through the real public package surface
+  * add strict-mode and late-arrival policy guidance
   * finish docs synchronization around the published ingress and diagnostics surface
+  * keep the release out of further core API widening
 
 `0.4.1` outcome:
 
