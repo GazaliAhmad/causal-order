@@ -824,6 +824,10 @@ Release chunks:
     * producer debugging and contract testing
   * add synchronization checks that keep README, guides, and runnable examples aligned with the current public package behavior
   * keep examples tied to the real public package surface rather than introducing shadow abstractions or fake helper APIs
+  * keep runnable examples written from the customer point of view:
+    * prefer `causal-order` or published public subpaths over repo-internal imports
+    * make copied example code look like the right starting point in a consumer project
+  * update `/guides` and `/wiki` entry points so they route readers toward runnable ingress examples and the public package contract
   * avoid widening the runtime surface merely to make examples or docs look smoother
 
 `0.4.0` outcome:
@@ -856,7 +860,17 @@ Release chunks:
   * add runnable ingress examples through the real public package surface
   * add strict-mode and late-arrival policy guidance
   * finish docs synchronization around the published ingress and diagnostics surface
+  * keep examples and docs written from the consumer-package point of view
   * keep the release out of further core API widening
+* the current `0.4.2` repo-state follow-through now has the first chunk in place:
+  * runnable ingress examples exist through the real public package surface
+  * those ingress examples show the direct `translateBatch()` to `orderEvents()` path rather than only README snippets
+  * the runnable examples now prefer `causal-order` or public subpath imports over repo-internal `../dist/...` wiring
+  * the examples index, README, `/guides`, and `/wiki` entry points now route readers toward package-facing runnable ingress examples
+* the remaining meaningful `0.4.2` work is now narrower:
+  * add strict-mode and late-arrival policy guidance
+  * add synchronization checks that keep docs and runnable examples aligned
+  * finish release wording after those package-facing checks and guidance settle
 
 `0.4.1` outcome:
 

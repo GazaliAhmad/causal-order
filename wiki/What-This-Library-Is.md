@@ -51,6 +51,12 @@ In the published `0.4.1` line, that scope includes:
 * the narrow synchronous ingress surface for translating raw application records into the event envelope through `translateBatch()` before ordering
 * the machine-readable diagnostics and strictness-policy surface for understanding translation failures without scraping free-form text
 
+The current `0.4.2` follow-through work is about making that shipped surface easier to evaluate:
+
+* runnable ingress examples that show the real `translateBatch()` to `orderEvents()` path
+* example code that uses the public `causal-order` package surface rather than repo-internal imports
+* tighter synchronization between docs and what those runnable examples actually do
+
 That ingress work is intentionally kept payload-agnostic and environment-free rather than growing into file parsing, CLI tooling, or transport adapters inside the core package.
 
 That means this library has become more than a nicer sort function.

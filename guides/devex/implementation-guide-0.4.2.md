@@ -112,6 +112,12 @@ Examples should expose the real package surface directly:
 * the real ordering entry point
 * the real anomaly and policy surfaces
 
+Examples should also prefer customer-facing imports over repo-internal wiring:
+
+* use `causal-order` or published public subpaths in runnable examples whenever the repo can support it
+* avoid `../dist/...` imports for package-facing examples unless the example is explicitly maintainer-only
+* write examples so that copied code still looks like the right starting point in a consumer project
+
 Small setup helpers are fine when they stay obviously local and non-contractual.
 What `0.4.2` should avoid is any example structure that teaches users to think the package has a smoother abstraction than it really exports.
 

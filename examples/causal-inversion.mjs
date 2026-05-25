@@ -1,4 +1,4 @@
-import { orderEvents } from "../dist/index.js"
+import { orderEvents } from "causal-order"
 import {
   isDirectRun,
   makeEvent,

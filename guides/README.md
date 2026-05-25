@@ -5,8 +5,9 @@ They explain how to use `causal-order`, how the main deployment patterns work, a
 
 For the deeper conceptual layer, mental-model pages, and explanatory write-ups that are less tied to operational walkthroughs, see the wiki.
 
-Alongside the current ordering and streaming surfaces, the published `0.4.1` line now covers both the narrow raw-record ingress path via `translateBatch()` and its machine-readable diagnostics follow-through.
-For that contract, start with the developer-experience guide, the `0.4.1` implementation note, and the README's raw-record translation example.
+Alongside the current ordering and streaming surfaces, the published `0.4.1` line covers both the narrow raw-record ingress path via `translateBatch()` and its machine-readable diagnostics follow-through.
+The current `0.4.2` follow-through work makes that ingress contract easier to evaluate through runnable package-facing examples and tighter docs synchronization.
+For that contract, start with the developer-experience guide, the `0.4.2` implementation note, the README's raw-record translation example, and the runnable ingress examples under `/examples`.
 
 Start here:
 
@@ -30,6 +31,14 @@ Developer experience:
 
 * [Developer Experience](./devex/developer-experience-0.4.0.md)
 * [Implementation Guide `0.4.1`](./devex/implementation-guide-0.4.1.md)
+* [Implementation Guide `0.4.2`](./devex/implementation-guide-0.4.2.md)
+
+Runnable examples:
+
+* [Examples Index](../examples/README.md)
+* [Minimal Ingress Example](../examples/ingress-minimal.mjs)
+* [Ingress Replay Pipeline Example](../examples/ingress-replay-pipeline.mjs)
+* [Streaming Recovery Resync Example](../examples/streaming-recovery-resync.mjs)
 
 Failure-mode guides:
 

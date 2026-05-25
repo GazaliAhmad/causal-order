@@ -1,7 +1,7 @@
 import {
   ingestedAtWatermark,
   orderEventStream,
-} from "../dist/index.js"
+} from "causal-order"
 import {
   isDirectRun,
   makeEvent,

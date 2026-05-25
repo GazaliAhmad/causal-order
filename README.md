@@ -402,7 +402,12 @@ The `0.3.2` hardening story is now explicit:
 Runnable examples:
 
 * [Examples Index](https://github.com/GazaliAhmad/causal-order/blob/main/examples/README.md)
+* [Minimal Ingress Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/ingress-minimal.mjs)
+* [Ingress Replay Pipeline Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/ingress-replay-pipeline.mjs)
 * [Streaming Recovery And Resync Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/streaming-recovery-resync.mjs)
+
+The runnable examples are written from the package consumer point of view.
+They use the public `causal-order` package surface so copied example code still looks like the right starting point in a real project.
 
 ## Status
 
@@ -415,6 +420,12 @@ Runnable examples:
 * `0.3.4` hardened prolonged and constrained-runtime streaming stability
 * `0.4.0` adds the first narrow raw-record ingress contract through `translateBatch()`
 * `0.4.1` makes translation diagnostics safer to inspect and control without widening the ingress boundary
+
+Current `0.4.2` follow-through work is focused on:
+
+* runnable ingress examples through the real public package surface
+* stricter docs synchronization around those examples
+* policy guidance rather than further core API widening
 
 `0.4.1` is centered on:
 
