@@ -247,6 +247,13 @@ function parseGuidesNavigation(bySource) {
       continue;
     }
 
+    if (trimmed === "Stability candidate:") {
+      sections.push(currentSection);
+      currentSection = createSection("Stability");
+      currentSectionKey = "stability";
+      continue;
+    }
+
     const match = trimmed.match(/^\* \[(.+?)\]\((.+?)\)$/);
     if (!match) {
       continue;

@@ -51,13 +51,19 @@ In the published `0.4.1` line, that scope includes:
 * the narrow synchronous ingress surface for translating raw application records into the event envelope through `translateBatch()` before ordering
 * the machine-readable diagnostics and strictness-policy surface for understanding translation failures without scraping free-form text
 
-The current `0.4.2` follow-through work is about making that shipped surface easier to evaluate:
+The published `0.4.2` follow-through completed the package-facing evaluation work around that shipped surface:
 
 * runnable ingress examples that show the real `translateBatch()` to `orderEvents()` path
 * example code that uses the public `causal-order` package surface rather than repo-internal imports
 * tighter synchronization between docs and what those runnable examples actually do
 
 That ingress work is intentionally kept payload-agnostic and environment-free rather than growing into file parsing, CLI tooling, or transport adapters inside the core package.
+
+The active `0.5.x` line now focuses on a different question:
+
+* which exported names and defaults are stable enough to preserve into `1.0.0`?
+* which domain-semantic behaviors belong in the payload-agnostic core?
+* which domain-semantic behaviors should live behind extension points or remain out of scope?
 
 That means this library has become more than a nicer sort function.
 It is now a deployment-oriented event-integrity layer for event pipelines that need to survive drift, replay, late sync, and partial causal evidence without falling back to fake global-clock certainty.

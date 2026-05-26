@@ -47,10 +47,13 @@ async function main() {
   const policyGuidance = await readRootFile("guides/policy-guidance.md")
   const wikiHome = await readRootFile("wiki/Home.md")
   const releaseNotes = await readRootFile("docs/releases/0.4.2.md")
+  const stabilityGuide = await readRootFile("guides/stability/implementation-guide-0.5.0.md")
+  const surfaceInventory = await readRootFile("guides/stability/exported-surface-inventory-0.5.0.md")
 
   assertIncludes(readme, "guides/quick-start-scenarios.md", "README")
   assertIncludes(readme, "guides/policy-guidance.md", "README")
   assertIncludes(readme, "docs/releases/0.4.2.md", "README")
+  assertIncludes(readme, "guides/stability/implementation-guide-0.5.0.md", "README")
   assertIncludes(readme, "examples/ingress-minimal.mjs", "README")
   assertIncludes(readme, "examples/ingress-replay-pipeline.mjs", "README")
   assertIncludes(readme, "examples/false-audit-timeline.mjs", "README")
@@ -64,6 +67,8 @@ async function main() {
   assertIncludes(guidesReadme, "./quick-start-scenarios.md", "guides/README.md")
   assertIncludes(guidesReadme, "./policy-guidance.md", "guides/README.md")
   assertIncludes(guidesReadme, "../docs/releases/0.4.2.md", "guides/README.md")
+  assertIncludes(guidesReadme, "./stability/implementation-guide-0.5.0.md", "guides/README.md")
+  assertIncludes(guidesReadme, "./stability/exported-surface-inventory-0.5.0.md", "guides/README.md")
   assertIncludes(guidesReadme, "../examples/ingress-minimal.mjs", "guides/README.md")
   assertIncludes(guidesReadme, "../examples/ingress-replay-pipeline.mjs", "guides/README.md")
   assertIncludes(guidesReadme, "../examples/false-audit-timeline.mjs", "guides/README.md")
@@ -85,10 +90,17 @@ async function main() {
 
   assertIncludes(wikiHome, "/guides/quick-start-scenarios.md", "wiki/Home.md")
   assertIncludes(wikiHome, "/guides/policy-guidance.md", "wiki/Home.md")
+  assertIncludes(wikiHome, "/guides/stability/implementation-guide-0.5.0.md", "wiki/Home.md")
 
   assertIncludes(releaseNotes, "examples/ingress-minimal.mjs", "docs/releases/0.4.2.md")
   assertIncludes(releaseNotes, "guides/policy-guidance.md", "docs/releases/0.4.2.md")
   assertIncludes(releaseNotes, "docs synchronization enforcement", "docs/releases/0.4.2.md")
+
+  assertIncludes(stabilityGuide, "published package remains `0.4.2`", "guides/stability/implementation-guide-0.5.0.md")
+  assertIncludes(stabilityGuide, "contradictory events, entity forks, and semantic dedupe across different IDs", "guides/stability/implementation-guide-0.5.0.md")
+  assertIncludes(stabilityGuide, "./exported-surface-inventory-0.5.0.md", "guides/stability/implementation-guide-0.5.0.md")
+  assertIncludes(surfaceInventory, "`compareByHlc` versus `compareClocks`", "guides/stability/exported-surface-inventory-0.5.0.md")
+  assertIncludes(surfaceInventory, "`orderValidatedEvents()` keeps a public `internal` parameter", "guides/stability/exported-surface-inventory-0.5.0.md")
 
   await assertExampleImportsStayPackageFacing()
 

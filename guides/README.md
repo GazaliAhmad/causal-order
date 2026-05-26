@@ -6,7 +6,8 @@ They explain how to use `causal-order`, how the main deployment patterns work, a
 For the deeper conceptual layer, mental-model pages, and explanatory write-ups that are less tied to operational walkthroughs, see the wiki.
 
 Alongside the current ordering and streaming surfaces, the published `0.4.2` line now covers the narrow raw-record ingress path via `translateBatch()`, its machine-readable diagnostics follow-through, and the package-facing DX layer around runnable examples and docs synchronization.
-For that current contract, start with the developer-experience guide, the `0.4.2` implementation note, the README's raw-record translation example, and the runnable ingress examples under `/examples`.
+The active `0.5.x` line is the next contract-shaping pass, focused on stability review, compatibility notes, and explicit core-versus-extension decisions before `1.0.0`.
+For the current published contract, start with the developer-experience guide, the `0.4.2` implementation note, the README's raw-record translation example, and the runnable ingress examples under `/examples`.
 
 Start here:
 
@@ -34,6 +35,11 @@ Developer experience:
 * [Implementation Guide `0.4.2`](./devex/implementation-guide-0.4.2.md)
 * [Policy Guidance](./policy-guidance.md)
 * [Release Notes `0.4.2`](../docs/releases/0.4.2.md)
+
+Stability candidate:
+
+* [Implementation Guide `0.5.0`](./stability/implementation-guide-0.5.0.md)
+* [Exported Surface Inventory `0.5.0`](./stability/exported-surface-inventory-0.5.0.md)
 
 Runnable examples:
 

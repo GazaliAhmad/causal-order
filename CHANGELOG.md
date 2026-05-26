@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+* opened the `0.5.x` line as the active repository milestone through a dedicated stability-candidate implementation guide, tighter roadmap chunking, and top-level doc links while keeping the published package version honest at `0.4.2`
+
 ## [0.4.2]
 
 ### Changed

@@ -388,6 +388,10 @@ Continuing follow-through notes:
 * [Implementation Guide `0.4.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/devex/implementation-guide-0.4.2.md)
 * [Release Notes `0.4.2`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.4.2.md)
 
+Active stability-design line:
+
+* [Implementation Guide `0.5.0`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stability/implementation-guide-0.5.0.md)
+
 Additional operational reading:
 
 * [Stress Hardening](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stress-hardening.md)
@@ -416,7 +420,8 @@ They use the public `causal-order` package surface so copied example code still 
 
 ## Status
 
-`causal-order` is now at `0.4.2`.
+`causal-order` is published at `0.4.2`.
+The active repository implementation line is now `0.5.x`.
 
 `0.4.2` release shape:
 
@@ -446,6 +451,18 @@ For the current operational decision layer, see:
 * runnable ingress examples through the real public package surface
 * package-facing quick-start and policy guidance for the current contract
 * docs synchronization enforcement that keeps examples and top-level docs aligned
+
+`0.5.x` is the next contract-shaping line.
+It is centered on:
+
+* exported-surface stability review
+* compatibility and migration notes
+* explicit core-versus-extension decisions for contradictory events, entity forks, and semantic dedupe across different IDs
+
+For the active milestone guide, see:
+
+* [Implementation Guide `0.5.0`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stability/implementation-guide-0.5.0.md)
+* [ROADMAP `0.5.x`](https://github.com/GazaliAhmad/causal-order/blob/main/ROADMAP.md#05x-stability-candidate-and-domain-semantic-contract-design)
 
 Current deployment posture:
 
