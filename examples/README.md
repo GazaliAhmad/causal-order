@@ -15,6 +15,14 @@ Run the smoke demo:
 npm run demo
 ```
 
+Run one ingress example directly:
+
+```bash
+npm run build
+node examples/ingress-minimal.mjs
+node examples/ingress-replay-pipeline.mjs
+```
+
 Run one failure-mode example directly:
 
 ```bash
@@ -36,11 +44,21 @@ node examples/benchmark.mjs 100000
 
 Each example shows:
 
-* a naive clock-based story
+* either the raw-record ingress path or a failure-mode ordering story
 * the `causal-order` interpretation
+* anomalies when data or timelines are suspicious
+
+The ingress examples add:
+
+* the real `translateBatch()` to `orderEvents()` path
+* translated-versus-rejected record visibility
+* a runnable starting point for the published ingress contract
+
+The failure-mode and streaming examples add:
+
+* naive clock-order comparisons where they help
 * confidence labels
 * causal evidence where available
-* anomalies when the timeline is suspicious
 
 The streaming recovery example adds:
 

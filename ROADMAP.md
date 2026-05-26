@@ -804,19 +804,31 @@ Release chunks:
   * add clearer strictness-policy handling for fail-fast, warning, or continuation decisions
   * keep anomaly-heavy diagnostic paths operationally disciplined through bounded-allocation follow-through
 * `0.4.2`
+  * focus the release explicitly on:
+    * runnable ingress examples
+    * policy guidance
+    * synchronization enforcement
+    * not more core API widening
   * expand self-contained examples and quick-start recipes for:
     * audit reconstruction
     * replay pipelines
     * distributed debugging
     * offline sync inspection
   * add guidance for choosing strict mode and late-arrival policies
+  * make the runnable-example layer cover the real `translateBatch()` to `orderEvents()` ingress path rather than only README snippets
   * document stricter-mode guidance more explicitly, including where fail-fast behavior is the safer operational choice:
     * audit and compliance pipelines
     * financial or regulated event processing
     * CI and fixture verification
     * upstream data-quality enforcement
     * producer debugging and contract testing
+  * add synchronization checks that keep README, guides, and runnable examples aligned with the current public package behavior
   * keep examples tied to the real public package surface rather than introducing shadow abstractions or fake helper APIs
+  * keep runnable examples written from the customer point of view:
+    * prefer `causal-order` or published public subpaths over repo-internal imports
+    * make copied example code look like the right starting point in a consumer project
+  * update `/guides` and `/wiki` entry points so they route readers toward runnable ingress examples and the public package contract
+  * avoid widening the runtime surface merely to make examples or docs look smoother
 
 `0.4.0` outcome:
 
@@ -845,8 +857,32 @@ Release chunks:
   * explicit strictness-policy handling and deterministic anomaly ordering
   * bounded-allocation follow-through for anomaly-heavy batch ordering
 * the next meaningful follow-through step is `0.4.2`:
-  * expand self-contained examples and quick-start guidance
+  * add runnable ingress examples through the real public package surface
+  * add strict-mode and late-arrival policy guidance
   * finish docs synchronization around the published ingress and diagnostics surface
+  * keep examples and docs written from the consumer-package point of view
+  * keep the release out of further core API widening
+* the current `0.4.2` repo-state follow-through now has the first chunk in place:
+  * runnable ingress examples exist through the real public package surface
+  * those ingress examples show the direct `translateBatch()` to `orderEvents()` path rather than only README snippets
+  * the runnable examples now prefer `causal-order` or public subpath imports over repo-internal `../dist/...` wiring
+  * the examples index, README, `/guides`, and `/wiki` entry points now route readers toward package-facing runnable ingress examples
+* the current `0.4.2` repo-state follow-through now has the second chunk in place:
+  * a package-facing quick-start scenarios guide exists for audit reconstruction, replay pipelines, distributed debugging, and offline sync inspection
+  * the quick-start layer routes readers from each scenario into the matching runnable examples and deeper operational guides
+* the current `0.4.2` repo-state follow-through now has the third chunk in place:
+  * a package-facing policy guide exists for choosing `strict: true` versus `strict: false`
+  * the same guide now gives direct operational guidance for `lateArrivalPolicy: "flag"`, `"drop"`, `"emit_correction"`, and `"fail"`
+  * the README, guides index, quick-start guide, and wiki entry point now route readers toward that policy layer
+* the current `0.4.2` repo-state follow-through now has the fourth chunk in place:
+  * a docs-sync check now verifies the current package-facing docs and example entry points stay aligned
+  * the sync check also enforces that runnable examples do not fall back to repo-internal `../dist/...` imports
+  * pull requests now run docs synchronization checks on docs-only and example-facing changes instead of skipping CI entirely
+* the current `0.4.2` repo-state follow-through now has the fifth chunk in place:
+  * a dedicated `0.4.2` release note now summarizes the runnable examples, policy guidance, and synchronization enforcement work
+  * the README, guides, and follow-through entry points now link to that release wording directly
+* there is no remaining meaningful `0.4.2` repo-state follow-through work inside the current scoped boundary:
+  * the remaining step is the actual version bump and release/publication decision, not more API or DX scoping
 
 `0.4.1` outcome:
 

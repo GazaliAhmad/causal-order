@@ -9,8 +9,10 @@ For the practical, repository-coupled layer with operational walkthroughs, deplo
 
 If the README is the quick path, this wiki is the deeper explanation.
 
-For the repo-coupled usage side, that now includes the published `0.4.1` ingress-and-diagnostics surface around synchronous `translateBatch()` translation before ordering.
-The practical contract and examples for that surface live in `/guides` and the main README rather than in the conceptual wiki pages.
+For the repo-coupled usage side, that now includes the published `0.4.1` ingress-and-diagnostics surface around synchronous `translateBatch()` translation before ordering, plus the `0.4.2` follow-through work on runnable package-facing ingress examples.
+The practical contract and runnable customer-facing examples for that surface live in `/guides`, `/examples`, and the main README rather than in the conceptual wiki pages.
+For the fastest package-facing entry point by workload shape, start with `/guides/quick-start-scenarios.md`.
+For operational strictness and late-arrival choices, see `/guides/policy-guidance.md`.
 
 ## Start Here
 
@@ -61,6 +63,7 @@ That includes both:
 * the explicit streaming model for day-to-day live processing, delayed reconnect, and resync flows
 * the narrow synchronous ingress path for translating raw user-space records into the event envelope without pulling file, CLI, or transport glue into the core package
 * the machine-readable diagnostics and strictness-policy surface that explain why raw-record translation failed
+* runnable examples that use the public `causal-order` package surface rather than repo-internal imports so copied code still looks like real consumer code
 
 So the project is not only about explaining distributed timelines after the fact.
 It is about giving real systems an event-integrity model designed to work without treating global clock sync as the source of truth.

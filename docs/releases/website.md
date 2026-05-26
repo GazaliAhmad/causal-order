@@ -27,7 +27,7 @@ The website docs surface now also reflects the published `0.4.0` line more direc
 
 * renaming the developer-experience docs surface from `0.4.x` to `0.4.0` in navigation and docs registry
 * using `guides/devex/` as the live repository path for that material, with the old short-name path retired
-* surfacing only the `0.4.0` developer-experience overview in website guides navigation while keeping the `0.4.0` and `0.4.1` implementation guides as repo-only historical notes and the `0.4.2` implementation guide as the remaining repo-only planning note
+* surfacing only the `0.4.0` developer-experience overview in website guides navigation while keeping the `0.4.0`, `0.4.1`, and `0.4.2` implementation guides as repo-only historical notes for the completed ingress follow-through track
 
 ## Artwork
 

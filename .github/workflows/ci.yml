@@ -16,6 +16,7 @@ jobs:
       pull-requests: read
     outputs:
       code: ${{ steps.filter.outputs.code }}
+      docs_sync: ${{ steps.filter.outputs.docs_sync }}
 
     steps:
       - name: Check out repository
@@ -36,6 +37,17 @@ jobs:
               - 'test/**'
               - 'perf/**'
               - 'examples/**/*.mjs'
+            docs_sync:
+              - '.github/workflows/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'README.md'
+              - 'docs/**'
+              - 'guides/**'
+              - 'wiki/**'
+              - 'examples/**'
+              - 'src/**'
+              - 'website/**'
 
   test:
     needs: changes
@@ -70,3 +82,24 @@ jobs:
 
       - name: Test
         run: npm test
+
+  docs-sync:
+    needs: changes
+    if: ${{ needs.changes.outputs.docs_sync == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run docs synchronization checks
+        run: npm run docs:sync:check

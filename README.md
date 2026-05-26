@@ -346,6 +346,8 @@ Start here:
 
 * [Wiki Home](https://github.com/GazaliAhmad/causal-order/wiki)
 * [What This Library Is](https://github.com/GazaliAhmad/causal-order/wiki/What-This-Library-Is)
+* [Quick Start Scenarios](https://github.com/GazaliAhmad/causal-order/blob/main/guides/quick-start-scenarios.md)
+* [Policy Guidance](https://github.com/GazaliAhmad/causal-order/blob/main/guides/policy-guidance.md)
 * [Mental Model](https://github.com/GazaliAhmad/causal-order/blob/main/guides/mental-model.md)
 * [Clocks, Causality, And Why HLC](https://github.com/GazaliAhmad/causal-order/blob/main/guides/clocks-causality-and-why-hlc.md)
 
@@ -384,6 +386,7 @@ Published developer-experience docs:
 Continuing follow-through notes:
 
 * [Implementation Guide `0.4.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/devex/implementation-guide-0.4.2.md)
+* [Release Notes `0.4.2`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.4.2.md)
 
 Additional operational reading:
 
@@ -402,21 +405,34 @@ The `0.3.2` hardening story is now explicit:
 Runnable examples:
 
 * [Examples Index](https://github.com/GazaliAhmad/causal-order/blob/main/examples/README.md)
+* [Minimal Ingress Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/ingress-minimal.mjs)
+* [Ingress Replay Pipeline Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/ingress-replay-pipeline.mjs)
+* [False Audit Timeline Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/false-audit-timeline.mjs)
+* [Offline Sync Anomalies Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/offline-sync-anomalies.mjs)
 * [Streaming Recovery And Resync Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/streaming-recovery-resync.mjs)
+
+The runnable examples are written from the package consumer point of view.
+They use the public `causal-order` package surface so copied example code still looks like the right starting point in a real project.
 
 ## Status
 
-`causal-order` is now at `0.4.1`.
+`causal-order` is now at `0.4.2`.
 
-`0.4.1` release shape:
+`0.4.2` release shape:
 
 * `0.3.2` established the current production-gate hardening baseline
 * `0.3.3` broadened the streaming hardening and pressure release story after that production-gate milestone
 * `0.3.4` hardened prolonged and constrained-runtime streaming stability
 * `0.4.0` adds the first narrow raw-record ingress contract through `translateBatch()`
 * `0.4.1` makes translation diagnostics safer to inspect and control without widening the ingress boundary
+* `0.4.2` makes that same package surface easier to evaluate through runnable ingress examples, package-facing policy guidance, and docs synchronization enforcement
 
-`0.4.1` is centered on:
+For the current operational decision layer, see:
+
+* [Policy Guidance](https://github.com/GazaliAhmad/causal-order/blob/main/guides/policy-guidance.md)
+* [Release Notes `0.4.2`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.4.2.md)
+
+`0.4.2` is centered on:
 
 * the existing `0.3.x` hardening and runtime-stability foundation
 * a top-level synchronous raw-record ingress surface via `translateBatch()`
@@ -427,6 +443,9 @@ Runnable examples:
 * deterministic diagnostic ordering metadata
 * shallow immutability guarantees for translated envelopes with payload preservation by reference
 * additive focused subpath exports for narrower package entrypoints
+* runnable ingress examples through the real public package surface
+* package-facing quick-start and policy guidance for the current contract
+* docs synchronization enforcement that keeps examples and top-level docs aligned
 
 Current deployment posture:
 
