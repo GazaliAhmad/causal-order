@@ -137,5 +137,7 @@ If events keep arriving and lateness is part of the operational model, move to `
 After you pick a scenario and run the example, the next follow-through guide is:
 
 * [Implementation Guide `0.4.2`](./devex/implementation-guide-0.4.2.md)
+* [Policy Guidance](./policy-guidance.md)
+* [Release Notes `0.4.2`](../docs/releases/0.4.2.md)
 
-That note tracks the remaining `0.4.2` work around policy guidance and docs synchronization.
+Those notes track the current `0.4.2` follow-through around operational policy choices and docs synchronization.

@@ -112,4 +112,4 @@ At the published `0.4.1` stopping point, the package now has:
 * deterministic diagnostic output rules
 * evidence that the anomaly-heavy path is more allocation-disciplined than the earlier implementation
 
-The next developer-experience follow-through release is `0.4.2`, focused on examples and documentation synchronization rather than further widening the core package surface.
+The `0.4.2` developer-experience follow-through now serves as the next historical step in that same track, focused on runnable examples, package-facing guidance, and documentation synchronization rather than further widening the core package surface.

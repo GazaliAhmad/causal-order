@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.4.2] Unreleased
+## [0.4.2]
 
 ### Changed
 
@@ -15,6 +15,9 @@ All notable changes to this project will be documented in this file.
 * established a standing `0.4.2` example rule that runnable package-facing examples should use `causal-order` or public subpath imports so copied code looks like real consumer usage
 * aligned the examples, guides, and wiki entry points around the new package-facing ingress examples and consumer-oriented documentation posture
 * added quick-start scenario guidance for audit reconstruction, replay pipelines, distributed debugging, and offline sync inspection, with direct links to the matching runnable examples and deeper guides
+* added package-facing policy guidance for choosing `strict` mode and `lateArrivalPolicy` by operational context, and linked that guide from the README, guides, quick-start layer, and wiki entry point
+* added docs synchronization enforcement through a dedicated docs-sync check, release verification wiring, and CI coverage for docs-only and example-facing changes
+* added dedicated `0.4.2` release notes and aligned the top-level docs so the follow-through now reads as a completed repo-state release line rather than only as planning notes
 
 ## [0.4.1]
 

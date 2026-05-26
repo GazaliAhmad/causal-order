@@ -870,10 +870,19 @@ Release chunks:
 * the current `0.4.2` repo-state follow-through now has the second chunk in place:
   * a package-facing quick-start scenarios guide exists for audit reconstruction, replay pipelines, distributed debugging, and offline sync inspection
   * the quick-start layer routes readers from each scenario into the matching runnable examples and deeper operational guides
-* the remaining meaningful `0.4.2` work is now narrower:
-  * add strict-mode and late-arrival policy guidance
-  * add synchronization checks that keep docs and runnable examples aligned
-  * finish release wording after those package-facing checks and guidance settle
+* the current `0.4.2` repo-state follow-through now has the third chunk in place:
+  * a package-facing policy guide exists for choosing `strict: true` versus `strict: false`
+  * the same guide now gives direct operational guidance for `lateArrivalPolicy: "flag"`, `"drop"`, `"emit_correction"`, and `"fail"`
+  * the README, guides index, quick-start guide, and wiki entry point now route readers toward that policy layer
+* the current `0.4.2` repo-state follow-through now has the fourth chunk in place:
+  * a docs-sync check now verifies the current package-facing docs and example entry points stay aligned
+  * the sync check also enforces that runnable examples do not fall back to repo-internal `../dist/...` imports
+  * pull requests now run docs synchronization checks on docs-only and example-facing changes instead of skipping CI entirely
+* the current `0.4.2` repo-state follow-through now has the fifth chunk in place:
+  * a dedicated `0.4.2` release note now summarizes the runnable examples, policy guidance, and synchronization enforcement work
+  * the README, guides, and follow-through entry points now link to that release wording directly
+* there is no remaining meaningful `0.4.2` repo-state follow-through work inside the current scoped boundary:
+  * the remaining step is the actual version bump and release/publication decision, not more API or DX scoping
 
 `0.4.1` outcome:
 
