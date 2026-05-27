@@ -14,8 +14,12 @@ export function getStaticPaths() {
 }
 
 const { page } = Astro.props;
+const replacementPage = page.deprecated?.replacementName
+  ? apiPages[page.deprecated.replacementName] ?? null
+  : null;
 
 const toc = [
+  ...(page.deprecated ? [{ id: "deprecation", text: "Deprecated", depth: 2 }] : []),
   { id: "signature", text: "Signature", depth: 2 },
   ...(page.usage ? [{ id: "usage", text: "Usage", depth: 2 }] : []),
   ...(page.bullets.length > 0 ? [{ id: "details", text: "Details", depth: 2 }] : []),
@@ -30,6 +34,24 @@ const toc = [
   navigation={apiNavigation}
   currentPath={page.href}
 >
+  {page.deprecated && (
+    <>
+      <h2 id="deprecation">Deprecated</h2>
+      <div class="api-callout api-callout-warning">
+        <p>
+          <span class="api-status api-status-deprecated">Deprecated</span>
+          {` Published deprecation since ${page.deprecated.since}.`}
+        </p>
+        <p set:html={page.deprecated.message} />
+        {replacementPage && (
+          <p>
+            Prefer <a href={replacementPage.href}><code>{page.deprecated.replacementLabel}</code></a>.
+          </p>
+        )}
+      </div>
+    </>
+  )}
+
   <h2 id="signature">Signature</h2>
   {page.signatures.map((signature) => (
     <pre><code>{signature}</code></pre>

@@ -8,6 +8,7 @@ It is a working inventory of the public package surface that `1.0.0` may need to
 For the milestone frame, see:
 
 * [Implementation Guide `0.5.0`](./implementation-guide-0.5.0.md)
+* [Decision Record: API Clarity `0.5.0`](./decision-record-api-clarity-0.5.0.md)
 * [ROADMAP `0.5.x`](../../ROADMAP.md)
 
 ## Audit Scope
@@ -296,6 +297,32 @@ If `0.5.0` wants a narrow first pass, the most urgent likely decisions are:
 3. pick one clearly primary deterministic-comparison helper name
 
 Those three decisions would remove more ambiguity than a broad naming sweep across every exported type.
+
+## Initial Recommendation Table
+
+These are the current recommended `0.5.0` decisions for the first three review items.
+
+| Item | Recommendation | Why |
+| --- | --- | --- |
+| `compareByHlc()` versus `compareClocks()` | keep `compareByHlc()` as the primary long-term name; deprecate or compatibility-retain `compareClocks()` | `compareByHlc()` is more explicit about mechanism, while `compareClocks()` is broader-sounding without adding distinct behavior |
+| `applyTieBreaker()` versus `compareDeterministically()` versus `compareWithTieBreaker()` | keep `compareDeterministically()` as the primary user-facing helper; treat `applyTieBreaker()` as lower-level and review whether `compareWithTieBreaker()` should survive as a separate public alias | the current trio overlaps heavily; one clearly primary deterministic helper would reduce confusion |
+| `orderValidatedEvents()` public `internal` parameter | keep `orderValidatedEvents()` as a public concept, but narrow the public signature before `1.0.0` so `internal` plumbing is not part of the stable contract | the function is useful, but the `internal` bag exposes implementation detail more than domain contract |
+
+In shorter form, the current recommendation is:
+
+* `compareByHlc()`: keep
+* `compareClocks()`: deprecate or compatibility-retain
+* `compareDeterministically()`: keep as primary
+* `applyTieBreaker()`: keep only if the lower-level role is intentional
+* `compareWithTieBreaker()`: strong review candidate for deprecation or alias removal
+* `orderValidatedEvents()`: keep the function, narrow the signature
+
+These are still audit recommendations, not yet binding release decisions.
+The point is to make the next `0.5.0` chunk argue from a concrete default position instead of reopening the same naming question from scratch.
+
+Those recommendations are now carried forward in:
+
+* [Decision Record: API Clarity `0.5.0`](./decision-record-api-clarity-0.5.0.md)
 
 ## Good Stopping Point For This Chunk
 

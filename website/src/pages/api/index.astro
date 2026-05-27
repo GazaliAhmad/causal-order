@@ -79,7 +79,9 @@ const toc = [
             ) : (
               <code>{item.label}</code>
             )}
+            {item.deprecated && <span class="api-status api-status-deprecated">Deprecated</span>}
             {item.description ? ` - ${item.description}` : ""}
+            {item.deprecated?.replacementLabel ? ` Prefer ${item.deprecated.replacementLabel}.` : ""}
           </li>
         ))}
       </ul>

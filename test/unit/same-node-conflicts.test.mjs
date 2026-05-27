@@ -31,6 +31,35 @@ test("orderEvents reports same-node sequence conflicts for duplicate sequence nu
   ))
 })
 
+test("orderEvents keeps same-node conflicts visible without inventing causal proof", () => {
+  const events = [
+    makeEvent({
+      id: "evt-a",
+      nodeId: "node-a",
+      sequence: 1n,
+      physicalTimeMs: 1_000n,
+    }),
+    makeEvent({
+      id: "evt-b",
+      nodeId: "node-a",
+      sequence: 1n,
+      physicalTimeMs: 1_001n,
+    }),
+  ]
+
+  const result = orderEvents(events, {
+    strict: false,
+    detectAnomalies: true,
+  })
+
+  assert.ok(result.anomalies.some((anomaly) =>
+    anomaly.type === "same_node_sequence_conflict" &&
+    anomaly.event?.id === "evt-b",
+  ))
+  assert.ok(result.ordered.every((entry) => entry.confidence !== "proven"))
+  assert.ok(result.ordered.every((entry) => entry.causalEvidence === undefined))
+})
+
 test("orderEvents reports same-node sequence regressions when arrival order goes backward", () => {
   const events = [
     makeEvent({

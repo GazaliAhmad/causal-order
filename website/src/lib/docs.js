@@ -260,6 +260,7 @@ function parseGuidesNavigation(bySource) {
     }
 
     const [, label, href] = match;
+    const cleanLabel = cleanInlineText(label);
     const target = resolveMarkdownHref(readme.absolutePath, href, bySource);
     if (!target?.doc) {
       continue;
@@ -284,7 +285,7 @@ function parseGuidesNavigation(bySource) {
     }
 
     currentSection.items.push({
-      title: label,
+      title: cleanLabel,
       href: target.doc.sitePath,
     });
   }
@@ -312,7 +313,7 @@ function parseWikiNavigation(bySource) {
     }
 
     items.push({
-      title: label,
+      title: cleanInlineText(label),
       href: target.doc.sitePath,
     });
   }

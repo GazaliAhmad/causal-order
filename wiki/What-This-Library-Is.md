@@ -59,11 +59,17 @@ The published `0.4.2` follow-through completed the package-facing evaluation wor
 
 That ingress work is intentionally kept payload-agnostic and environment-free rather than growing into file parsing, CLI tooling, or transport adapters inside the core package.
 
-The active `0.5.x` line now focuses on a different question:
+The published `0.5.0` line then focuses on a different question:
 
 * which exported names and defaults are stable enough to preserve into `1.0.0`?
 * which domain-semantic behaviors belong in the payload-agnostic core?
 * which domain-semantic behaviors should live behind extension points or remain out of scope?
+
+That release made the answers explicit enough to publish:
+
+* preferred helper names now have migration direction
+* warning-visible defaults now have compatibility direction
+* contradiction handling, entity forks, and semantic dedupe now have explicit core-versus-extension boundaries
 
 That means this library has become more than a nicer sort function.
 It is now a deployment-oriented event-integrity layer for event pipelines that need to survive drift, replay, late sync, and partial causal evidence without falling back to fake global-clock certainty.

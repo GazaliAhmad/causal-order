@@ -5,9 +5,10 @@ They explain how to use `causal-order`, how the main deployment patterns work, a
 
 For the deeper conceptual layer, mental-model pages, and explanatory write-ups that are less tied to operational walkthroughs, see the wiki.
 
-Alongside the current ordering and streaming surfaces, the published `0.4.2` line now covers the narrow raw-record ingress path via `translateBatch()`, its machine-readable diagnostics follow-through, and the package-facing DX layer around runnable examples and docs synchronization.
-The active `0.5.x` line is the next contract-shaping pass, focused on stability review, compatibility notes, and explicit core-versus-extension decisions before `1.0.0`.
-For the current published contract, start with the developer-experience guide, the `0.4.2` implementation note, the README's raw-record translation example, and the runnable ingress examples under `/examples`.
+Alongside the current ordering and streaming surfaces, the published `0.5.0` line now includes the narrow raw-record ingress path via `translateBatch()`, its machine-readable diagnostics follow-through, the package-facing DX layer around runnable examples and docs synchronization, and the released stability-and-contract-design pass before `1.0.0`.
+The active `0.6.x` line is the next tooling-and-integration pass, built on top of the explicit `0.5.0` core-versus-extension boundary.
+For the current published contract, start with the `0.5.0` release notes, the stability implementation guide, the README's raw-record translation example, and the runnable ingress examples under `/examples`.
+For helper-level pairwise comparison, prefer `compareByHlc()` and `compareDeterministically()` over compatibility aliases.
 
 Start here:
 
@@ -35,11 +36,19 @@ Developer experience:
 * [Implementation Guide `0.4.2`](./devex/implementation-guide-0.4.2.md)
 * [Policy Guidance](./policy-guidance.md)
 * [Release Notes `0.4.2`](../docs/releases/0.4.2.md)
+* [Release Notes `0.5.0`](../docs/releases/0.5.0.md)
 
-Stability candidate:
+Published stability line:
 
 * [Implementation Guide `0.5.0`](./stability/implementation-guide-0.5.0.md)
 * [Exported Surface Inventory `0.5.0`](./stability/exported-surface-inventory-0.5.0.md)
+* [Decision Record: API Clarity `0.5.0`](./stability/decision-record-api-clarity-0.5.0.md)
+* [Default-Behavior Compatibility Inventory `0.5.0`](./stability/default-behavior-compatibility-inventory-0.5.0.md)
+* [Decision Record: Default Behavior `0.5.0`](./stability/decision-record-default-behavior-0.5.0.md)
+* [Domain-Semantic Design Notes `0.5.0`](./stability/domain-semantic-design-notes-0.5.0.md)
+* [Decision Record: Core Boundaries `0.5.0`](./stability/decision-record-core-boundaries-0.5.0.md)
+* [Migration Notes `0.5.0`](./stability/migration-notes-0.5.0.md)
+* [Milestone Summary `0.5.0`](./stability/release-prep-0.5.0.md)
 
 Runnable examples:
 

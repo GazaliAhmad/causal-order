@@ -1,0 +1,38 @@
+name: Manual 250k Confidence
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: manual-250k-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  confidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version:
+          - 20
+          - 24
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run 250k batch and stream confidence validation
+        run: npm run bench:confidence:250k

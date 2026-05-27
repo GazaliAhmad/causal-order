@@ -8,26 +8,39 @@
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-  gap: 28px;
+  width: var(--shell);
+  grid-template-columns: minmax(0, 1.28fr) minmax(320px, 380px);
+  gap: 32px;
   padding: 72px 0 36px;
   align-items: center;
 }
 
+.hero-copy {
+  max-width: 58rem;
+}
+
 .hero-copy h1 {
   margin: 0 0 18px;
-  max-width: 15ch;
-  font-size: clamp(2.8rem, 4vw, 5.2rem);
+  max-width: 19.8ch;
+  font-size: clamp(2.8rem, 4vw, 4.9rem);
   line-height: 1.02;
   letter-spacing: -0.05em;
-  text-wrap: balance;
+  text-wrap: pretty;
 }
 
 .hero-copy p {
-  max-width: 60ch;
+  max-width: 66ch;
   margin: 0;
   color: var(--muted);
   font-size: 1.08rem;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.hero-panel {
+  width: 100%;
+  max-width: 380px;
+  justify-self: end;
 }
 
 .hero-install {
@@ -163,6 +176,11 @@
 
   .hero {
     padding-top: 42px;
+  }
+
+  .hero-panel {
+    max-width: none;
+    justify-self: stretch;
   }
 
   .install-command {

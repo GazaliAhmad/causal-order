@@ -60,6 +60,12 @@ The failure-mode and streaming examples add:
 * confidence labels
 * causal evidence where available
 
+For pairwise helper usage outside the runnable scenario files, prefer:
+
+```ts
+import { compareByHlc, compareDeterministically } from "causal-order"
+```
+
 The streaming recovery example adds:
 
 * reconnect/resync behavior

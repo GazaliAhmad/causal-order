@@ -344,6 +344,108 @@ export type OrderOptions<T> = {
   maxClockDriftMs?: bigint
 }
 
+export type PolicyVisibilityKind = "anomaly" | "telemetry"
+
+/**
+ * Draft operator-visible audit output for future extension-policy decisions.
+ *
+ * These records intentionally describe what happened without mutating payloads
+ * or silently erasing the underlying events from operator view.
+ */
+export interface PolicyVisibilityRecord {
+  readonly kind: PolicyVisibilityKind
+  readonly code: string
+  readonly message: string
+  readonly eventIds: readonly EventId[]
+}
+
+export type ExtensionPolicyAction = "flag" | "reject" | "defer"
+
+/**
+ * Draft payload-agnostic contradiction candidate for future `0.6.x` policy
+ * hooks. The core engine can supply the implicated events and causal evidence
+ * without assuming domain-specific merge semantics.
+ */
+export interface CausalContradictionCandidate<T = unknown> {
+  readonly kind: string
+  readonly events: readonly EventEnvelope<T>[]
+  readonly evidence?: readonly CausalEvidence[]
+}
+
+export interface CausalContradictionPolicyResult {
+  readonly action: ExtensionPolicyAction
+  readonly visibility: readonly PolicyVisibilityRecord[]
+}
+
+export interface CausalContradictionPolicy<T = unknown, TContext = unknown> {
+  evaluateContradiction(
+    candidate: CausalContradictionCandidate<T>,
+    context: TContext,
+  ): CausalContradictionPolicyResult
+}
+
+/**
+ * Draft payload-agnostic fork candidate. Identity is supplied by the caller or
+ * a higher layer rather than inferred from payload internals inside the core.
+ */
+export interface EntityForkCandidate<T = unknown, TIdentity = unknown> {
+  readonly identity: TIdentity
+  readonly branches: readonly (readonly EventEnvelope<T>[])[]
+  readonly evidence?: readonly CausalEvidence[]
+}
+
+export type ForkResolutionAction =
+  | "flag"
+  | "reject"
+  | "defer"
+  | "select_branch"
+
+export interface ForkResolutionPolicyResult {
+  readonly action: ForkResolutionAction
+  readonly selectedBranchIndex?: number
+  readonly visibility: readonly PolicyVisibilityRecord[]
+}
+
+export interface ForkResolutionPolicy<
+  T = unknown,
+  TIdentity = unknown,
+  TContext = unknown,
+> {
+  resolveFork(
+    candidate: EntityForkCandidate<T, TIdentity>,
+    context: TContext,
+  ): ForkResolutionPolicyResult
+}
+
+/**
+ * Draft semantic-dedupe candidate for future policy hooks. Any suppression or
+ * retention decision must stay operator-visible through the returned
+ * visibility records rather than silently rewriting history.
+ */
+export interface SemanticDedupeCandidate<T = unknown> {
+  readonly events: readonly EventEnvelope<T>[]
+  readonly evidence: readonly string[]
+}
+
+export type SemanticDedupeAction =
+  | "keep_all"
+  | "suppress_secondary"
+  | "defer"
+
+export interface SemanticDedupePolicyResult {
+  readonly action: SemanticDedupeAction
+  readonly retainedEventIds: readonly EventId[]
+  readonly suppressedEventIds: readonly EventId[]
+  readonly visibility: readonly PolicyVisibilityRecord[]
+}
+
+export interface SemanticDedupePolicy<T = unknown, TContext = unknown> {
+  evaluateDuplicates(
+    candidate: SemanticDedupeCandidate<T>,
+    context: TContext,
+  ): SemanticDedupePolicyResult
+}
+
 export type CorrectionScope = "all_non_final_output"
 
 export type CorrectionNotice = {

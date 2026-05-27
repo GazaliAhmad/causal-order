@@ -52,6 +52,19 @@ const exportDescriptions = {
     "Builds a processing-time watermark helper for more aggressive stream progress.",
 };
 const pageEnhancements = {
+  compareByHlc: {
+    summary:
+      "Use this when you want a direct HLC-to-HLC comparison without inferring broader causal semantics.",
+    usage: `import { compareByHlc } from "causal-order"
+
+const relation = compareByHlc(eventA.clock, eventB.clock)
+
+console.log(relation)`,
+    bullets: [
+      "This is the preferred direct HLC comparison helper in the published <code>0.5.0</code> release line.",
+      "Possible results are <code>before</code>, <code>after</code>, <code>equal</code>, and <code>unknown</code> for invalid input.",
+    ],
+  },
   translateBatch: {
     primary: true,
     summary:
@@ -201,6 +214,35 @@ if (relation === "before") {
       "Supported evidence includes <code>parentEventId</code>, <code>dependencyEventIds</code>, and same-node monotonic <code>sequence</code>.",
     ],
   },
+  compareDeterministically: {
+    summary:
+      "Use this when stronger causal proof is unavailable but you still need deterministic fallback ordering over event envelopes.",
+    usage: `import { compareDeterministically } from "causal-order"
+
+const result = compareDeterministically(eventA, eventB, "event_id")
+
+console.log(result)`,
+    bullets: [
+      "This is the preferred public deterministic fallback helper in the published <code>0.5.0</code> release line.",
+      "The return value is a comparator-style number suitable for deterministic ordering decisions.",
+    ],
+  },
+};
+const deprecatedPages = {
+  compareClocks: {
+    since: "0.5.0",
+    replacementName: "compareByHlc",
+    replacementLabel: "compareByHlc()",
+    message:
+      "This compatibility alias remains exported in the published <code>0.5.0</code> line, but new code should prefer the explicit HLC-specific helper.",
+  },
+  compareWithTieBreaker: {
+    since: "0.5.0",
+    replacementName: "compareDeterministically",
+    replacementLabel: "compareDeterministically()",
+    message:
+      "This compatibility alias remains exported in the published <code>0.5.0</code> line, but new code should prefer the primary deterministic fallback helper.",
+  },
 };
 const typeDescriptions = {
   NodeId: "Branded node identifier used to separate same-node and cross-node reasoning.",
@@ -263,6 +305,31 @@ const typeDescriptions = {
   OrderResult: "Top-level bounded ordering result containing ordered events, anomalies, and stats.",
   TieBreaker: "Deterministic comparison function used when stronger ordering is absent.",
   OrderOptions: "Options controlling bounded ordering behavior and anomaly handling.",
+  PolicyVisibilityKind: "Draft audit-output category for future extension-policy decisions.",
+  PolicyVisibilityRecord:
+    "Draft operator-visible audit record describing what an extension policy did without mutating payloads silently.",
+  ExtensionPolicyAction: "Draft contradiction-policy action shared across payload-agnostic extension hooks.",
+  CausalContradictionCandidate:
+    "Draft payload-agnostic contradiction candidate for future policy hooks.",
+  CausalContradictionPolicyResult:
+    "Draft result shape for contradiction-policy evaluation with explicit operator visibility.",
+  CausalContradictionPolicy:
+    "Draft policy interface for contradiction handling outside the core payload contract.",
+  EntityForkCandidate:
+    "Draft payload-agnostic entity-fork candidate supplied by higher-layer identity logic.",
+  ForkResolutionAction: "Draft fork-policy action set that avoids implicit payload merging.",
+  ForkResolutionPolicyResult:
+    "Draft result shape for fork-resolution decisions with explicit visibility output.",
+  ForkResolutionPolicy:
+    "Draft policy interface for entity-fork handling outside the core payload contract.",
+  SemanticDedupeCandidate:
+    "Draft semantic-dedupe candidate for future policy hooks across different identifiers.",
+  SemanticDedupeAction:
+    "Draft dedupe-policy action set that preserves explicit operator-facing visibility.",
+  SemanticDedupePolicyResult:
+    "Draft result shape for semantic-dedupe decisions including retained and suppressed IDs.",
+  SemanticDedupePolicy:
+    "Draft policy interface for semantic dedupe without forcing payload-aware merge logic into the core.",
   CorrectionScope: "Indicates whether a stream correction is local to a batch or broader in scope.",
   CorrectionNotice: "Structured notice attached to correction-capable stream batches.",
   StreamAnomalyHorizon: "Anomaly carry model for stream windows and emitted history.",
@@ -371,6 +438,25 @@ const types = {
       ],
     },
     {
+      title: "Extension-policy draft types",
+      items: [
+        typeItem("PolicyVisibilityKind"),
+        typeItem("PolicyVisibilityRecord"),
+        typeItem("ExtensionPolicyAction"),
+        typeItem("CausalContradictionCandidate", "CausalContradictionCandidate<T = unknown>"),
+        typeItem("CausalContradictionPolicyResult"),
+        typeItem("CausalContradictionPolicy", "CausalContradictionPolicy<T = unknown, TContext = unknown>"),
+        typeItem("EntityForkCandidate", "EntityForkCandidate<T = unknown, TIdentity = unknown>"),
+        typeItem("ForkResolutionAction"),
+        typeItem("ForkResolutionPolicyResult"),
+        typeItem("ForkResolutionPolicy", "ForkResolutionPolicy<T = unknown, TIdentity = unknown, TContext = unknown>"),
+        typeItem("SemanticDedupeCandidate", "SemanticDedupeCandidate<T = unknown>"),
+        typeItem("SemanticDedupeAction"),
+        typeItem("SemanticDedupePolicyResult"),
+        typeItem("SemanticDedupePolicy", "SemanticDedupePolicy<T = unknown, TContext = unknown>"),
+      ],
+    },
+    {
       title: "Streaming types",
       items: [
         typeItem("CorrectionScope"),
@@ -473,9 +559,10 @@ function extractExports(source) {
   const classes = new Set(
     Array.from(source.matchAll(/^export class (\w+)/gm), ([, name]) => name),
   );
-  const types = new Set(
-    Array.from(source.matchAll(/^export type (\w+)/gm), ([, name]) => name),
-  );
+  const types = new Set([
+    ...Array.from(source.matchAll(/^export type (\w+)/gm), ([, name]) => name),
+    ...Array.from(source.matchAll(/^export interface (\w+)/gm), ([, name]) => name),
+  ]);
 
   return { functions, consts, classes, types };
 }
@@ -592,6 +679,7 @@ function symbolItem(name, sourcePath, options = {}) {
     kind,
     label: kind === "function" ? `${name}()` : name,
     description: exportDescriptions[name] ?? "",
+    deprecated: deprecatedPages[name] ?? null,
     sourcePath,
     sourceUrl: toSourceUrl(sourcePath),
   };
@@ -658,6 +746,7 @@ function buildApiFunctionPages() {
           summary: enhancements.summary ?? null,
           usage: enhancements.usage ?? null,
           bullets: enhancements.bullets ?? [],
+          deprecated: deprecatedPages[name] ?? null,
         },
       ];
     }),

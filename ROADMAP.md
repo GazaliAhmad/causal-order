@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap describes how `causal-order` should mature from the published `0.4.2` release and the active `0.5.x` development line into a stable `1.0.0` npm package.
+This roadmap describes how `causal-order` should mature from the published `0.5.0` release and the active `0.6.x` development line into a stable `1.0.0` npm package.
 
 The goal is not to rush publication.
 The goal is to make sure the semantics are trustworthy before the package becomes a long-term contract.
@@ -121,11 +121,11 @@ Current status snapshot:
 
 | Checklist Item | Status | Notes |
 | --- | --- | --- |
-| Top-level API names and exported result types feel stable enough to support long-term | Mostly | The published `0.4.2` surface is now narrow, explicit, directly export-tested, and split into focused subpath entrypoints, but the project is still intentionally reserving room for pre-`1.0` contract cleanup. |
+| Top-level API names and exported result types feel stable enough to support long-term | Mostly | The published `0.5.0` surface is now narrow, explicit, directly export-tested, and backed by explicit API-clarity, default-behavior, and core-boundary notes, but the project is still intentionally reserving room for pre-`1.0` contract cleanup. |
 | Confidence semantics are crisp and no longer expected to change materially | Partial | The `proven` / `derived` / `fallback` / `unknown` model is coherent and well-tested, but the roadmap still treats semantic freeze as a later milestone rather than as already complete. |
 | `orderBasis`, `causalEvidence`, anomaly types, and strict-mode behavior feel intentional rather than exploratory | Mostly | The current runtime surface is much more deliberate across ordering, validation, translation anomalies, and strict-mode behavior, including machine-readable diagnostics, policy controls, and deterministic translation anomaly ordering, though some remaining `1.0` contract-shaping work still exists around broader semantics and naming. |
 | The difference between `orderEvents()` and `orderEventStream()` is clear in both code and docs | Mostly | The batch, stream, and raw-record ingress split is now much clearer across the README, guides, examples, tests, and website API reference, though the stream boundary can still be taught more simply before `1.0`. |
-| The README describes the real shipped package, not a still-evolving intended shape | Mostly | The README now reflects the published `0.4.2` package surface, including `translateBatch()`, the current diagnostic contract, current Node support, the runnable package-facing examples, and the real batch-versus-stream posture, even though the wider docs set still has room to settle further. |
+| The README describes the real shipped package, not a still-evolving intended shape | Mostly | The README now reflects the published `0.5.0` package surface, including `translateBatch()`, the current diagnostic contract, current Node support, the runnable package-facing examples, the released stability notes, and the real batch-versus-stream posture, even though the wider docs set still has room to settle further. |
 | Examples clearly show why this library is safer than naive timestamp sorting | Partial | The repo has good scenario coverage for replay corruption, offline sync, false audit timelines, drift, and streaming recovery, but those examples can still be made more central and easier to discover for first-time evaluators. |
 | Performance guidance is honest about routine workloads, heavier batch workloads, and when streaming is the better model | Mostly | The current guidance is explicit about routine `10k` and `100k` guardrails, stronger `150k` hardening bands, and operational `250k` batch and stream validation runs without pretending every heavier path belongs in the default guard loop. |
 | Large-batch behavior has been benchmarked and pressure-tested enough that major surprises are unlikely in realistic use | Mostly | The repo now has meaningful `100k` guardrails, `150k` hardening coverage, and operational `250k` batch and stream runs, though more repeated history would still make the `1.0` confidence story stronger. |
@@ -930,13 +930,16 @@ Exit criteria:
 * common use cases are obvious from docs alone
 * the current core package is easier to adopt without violating its zero-dependency, payload-agnostic boundary
 
-## `0.5.x` Stability Candidate And Domain-Semantic Contract Design
+## `0.5.x` Published Stability And Domain-Semantic Contract Design
+
+Status:
+Published as `0.5.0`.
 
 Goal:
-Decide whether the public contract is truly ready to stabilize, and explicitly design the domain-semantic extension areas that `1.0.0` must either support clearly or leave out of scope clearly.
+`0.5.0` decided which parts of the public contract were ready to preserve, and explicitly designed the domain-semantic extension areas that `1.0.0` must either support clearly or leave out of scope clearly.
 
-This milestone should not pretend that all important semantics belong in the payload-agnostic core.
-Instead, it should decide which semantics are core, which belong behind extension points or policies, and which should remain intentionally unsupported for `1.0`.
+This milestone does not pretend that all important semantics belong in the payload-agnostic core.
+Instead, it records which semantics are core, which belong behind extension points or policies, and which remain intentionally unsupported for `1.0`.
 
 Focus:
 
@@ -947,9 +950,9 @@ Focus:
 * add compatibility and migration notes
 * expand test coverage around public surface area
 
-`0.5.0` should open this line by turning the milestone into explicit contract-design work rather than leaving it as a single catch-all stability checkpoint.
+`0.5.0` turned this line into explicit contract-design work rather than leaving it as a single catch-all stability checkpoint.
 
-The intended first chunk order is:
+The published chunk order was:
 
 1. exported-surface and naming audit
 2. default-behavior and compatibility inventory
@@ -957,27 +960,30 @@ The intended first chunk order is:
 4. explicit decisions on core versus extension-hook versus out-of-scope behavior
 5. targeted public-surface tests and migration notes for the behaviors the project intends to preserve
 
-The first release in this line should prefer design clarity over scope growth.
-If a behavior is not ready to preserve, `0.5.0` should not quietly encode it behind a partial helper, vague anomaly wording, or one-off domain-specific shortcut.
+This release preferred design clarity over scope growth.
+If a behavior was not ready to preserve, `0.5.0` did not quietly encode it behind a partial helper, vague anomaly wording, or one-off domain-specific shortcut.
 
-In addition, explicitly scope the domain-semantic design work that is not fully handled by the current payload-agnostic core:
+In addition, `0.5.0` explicitly scoped the domain-semantic design work that is not fully handled by the current payload-agnostic core:
 
 * contradictory events:
   * define whether contradiction handling belongs in the core runtime, an extension hook, or a higher-layer policy model
   * define what contradiction output should look like
   * define strict versus non-strict behavior for contradiction detection
+  * do not turn contradiction handling into default domain-object merge behavior inside the payload-agnostic core
 * entity forks:
   * define how logical entity identity is supplied
   * define when two histories count as a fork
   * define what unresolved fork output should look like
   * define where human or domain-policy resolution begins
+  * keep fork resolution in user-defined policy layers rather than assuming field-level domain invariants in the core package
 * semantic duplicate detection for different IDs:
   * define whether this is detection-only or merge-capable
   * define what evidence a dedupe policy can use
   * define replay-safe behavior
   * define how operator visibility is preserved so semantic dedupe does not become silent history rewriting
+  * preserve explicit audit-facing visibility whenever policies suppress, merge, or rewrite records
 
-Questions to answer before `1.0.0`:
+Questions this line answered or framed explicitly before `1.0.0`:
 
 * are confidence semantics stable enough to preserve?
 * are the current anomaly types sufficient for real debugging and audit work?
@@ -986,22 +992,22 @@ Questions to answer before `1.0.0`:
 * which domain-semantic behaviors require extension hooks or policy interfaces?
 * what should the library explicitly not claim before `1.0.0`?
 
-Why this belongs here:
+Why this belonged here:
 
 * these questions affect the long-term public contract more than they affect short-term developer ergonomics
 * they are not just implementation tasks:
   * they influence anomaly types
   * they influence extension points
   * they influence what the library is allowed to claim publicly
-* doing this work here reduces the risk of last-minute semantic churn near `1.0.0`
+* doing this work here reduced the risk of last-minute semantic churn near `1.0.0`
 
 Exit criteria:
 
-* the team would feel comfortable supporting the API long-term
-* major semantic churn is no longer expected in the core release line
+* the team now has an explicit released baseline for the API-clarity, default-behavior, and core-boundary decisions made in `0.5.0`
+* major semantic churn is no longer expected inside the published `0.5.0` line
 * the boundary between core semantics and domain-semantic extension behavior is explicit
 * contradictory-event handling, entity-fork handling, and semantic dedupe across different IDs are each either:
-  * designed clearly enough to implement before `1.0.0`, or
+  * designed clearly enough to guide later implementation, or
   * explicitly declared out of the `1.0.0` core claim surface
 
 ## `0.6.x` Operational Tooling And Integrations

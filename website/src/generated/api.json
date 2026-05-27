@@ -77,6 +77,7 @@
           "kind": "function",
           "label": "createHlcClock()",
           "description": "Creates a monotonic hybrid logical clock for a single node.",
+          "deprecated": null,
           "sourcePath": "src/clock/hlc.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/clock/hlc.ts"
         },
@@ -85,6 +86,7 @@
           "kind": "function",
           "label": "parseHlc()",
           "description": "Parses a serialized HLC string into its structured parts.",
+          "deprecated": null,
           "sourcePath": "src/clock/parse.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/clock/parse.ts"
         },
@@ -93,6 +95,7 @@
           "kind": "function",
           "label": "serializeHlc()",
           "description": "Serializes an HLC value into the canonical string form.",
+          "deprecated": null,
           "sourcePath": "src/clock/serialize.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/clock/serialize.ts"
         }
@@ -106,6 +109,7 @@
           "kind": "function",
           "label": "compareByHlc()",
           "description": "Compares two events by their HLC values only.",
+          "deprecated": null,
           "sourcePath": "src/compare/hlcCompare.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/hlcCompare.ts"
         },
@@ -114,6 +118,12 @@
           "kind": "function",
           "label": "compareClocks()",
           "description": "Compares two validated HLC timestamps directly.",
+          "deprecated": {
+            "since": "0.5.0",
+            "replacementName": "compareByHlc",
+            "replacementLabel": "compareByHlc()",
+            "message": "This compatibility alias remains exported in the published <code>0.5.0</code> line, but new code should prefer the explicit HLC-specific helper."
+          },
           "sourcePath": "src/compare/hlcCompare.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/hlcCompare.ts"
         },
@@ -122,6 +132,7 @@
           "kind": "function",
           "label": "compareByCausality()",
           "description": "Performs pairwise causal comparison without inventing evidence.",
+          "deprecated": null,
           "sourcePath": "src/compare/causalCompare.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/causalCompare.ts"
         },
@@ -130,6 +141,7 @@
           "kind": "function",
           "label": "compareValidatedByCausality()",
           "description": "Performs pairwise causal comparison on already validated events.",
+          "deprecated": null,
           "sourcePath": "src/compare/causalCompare.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/causalCompare.ts"
         },
@@ -138,6 +150,7 @@
           "kind": "function",
           "label": "applyTieBreaker()",
           "description": "Applies the active deterministic tie-breaker when stronger ordering is absent.",
+          "deprecated": null,
           "sourcePath": "src/compare/deterministicCompare.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/deterministicCompare.ts"
         },
@@ -146,6 +159,7 @@
           "kind": "function",
           "label": "compareDeterministically()",
           "description": "Deterministically compares two events when causal proof is insufficient.",
+          "deprecated": null,
           "sourcePath": "src/compare/deterministicCompare.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/deterministicCompare.ts"
         },
@@ -154,6 +168,7 @@
           "kind": "function",
           "label": "compareValidatedDeterministically()",
           "description": "Deterministically compares two already validated events using the current tie-breaker.",
+          "deprecated": null,
           "sourcePath": "src/compare/deterministicCompare.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/deterministicCompare.ts"
         }
@@ -167,6 +182,7 @@
           "kind": "class",
           "label": "TranslateBatchPolicyError",
           "description": "Error raised when translateBatch() policy configuration chooses fail-fast handling for a structured translation anomaly.",
+          "deprecated": null,
           "sourcePath": "src/translate/translateBatch.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/translate/translateBatch.ts"
         },
@@ -175,6 +191,7 @@
           "kind": "function",
           "label": "translateBatch()",
           "description": "Translates raw user-space records into event envelopes and structured translation anomalies.",
+          "deprecated": null,
           "sourcePath": "src/translate/translateBatch.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/translate/translateBatch.ts"
         }
@@ -188,6 +205,7 @@
           "kind": "function",
           "label": "validateClock()",
           "description": "Validates an HLC clock value and reports structured failures or warnings.",
+          "deprecated": null,
           "sourcePath": "src/validate/validateClock.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/validate/validateClock.ts"
         },
@@ -196,6 +214,7 @@
           "kind": "function",
           "label": "validateEvent()",
           "description": "Validates an event envelope and returns a branded validated value on success.",
+          "deprecated": null,
           "sourcePath": "src/validate/validateEvent.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/validate/validateEvent.ts"
         }
@@ -209,6 +228,7 @@
           "kind": "function",
           "label": "detectAnomalies()",
           "description": "Detects structured anomalies across a bounded event set.",
+          "deprecated": null,
           "sourcePath": "src/anomalies/detectAnomalies.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/anomalies/detectAnomalies.ts"
         },
@@ -217,6 +237,7 @@
           "kind": "function",
           "label": "detectSingleEventAnomalies()",
           "description": "Detects anomalies that can be inferred from one event in isolation.",
+          "deprecated": null,
           "sourcePath": "src/anomalies/detectAnomalies.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/anomalies/detectAnomalies.ts"
         }
@@ -230,6 +251,7 @@
           "kind": "const",
           "label": "DEFAULT_TIE_BREAKER",
           "description": "Default deterministic tie-breaker used when stronger ordering is unavailable.",
+          "deprecated": null,
           "sourcePath": "src/order/tieBreakers.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/tieBreakers.ts"
         },
@@ -238,6 +260,12 @@
           "kind": "function",
           "label": "compareWithTieBreaker()",
           "description": "Compares two events with the configured deterministic tie-breaker.",
+          "deprecated": {
+            "since": "0.5.0",
+            "replacementName": "compareDeterministically",
+            "replacementLabel": "compareDeterministically()",
+            "message": "This compatibility alias remains exported in the published <code>0.5.0</code> line, but new code should prefer the primary deterministic fallback helper."
+          },
           "sourcePath": "src/order/tieBreakers.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/tieBreakers.ts"
         },
@@ -246,6 +274,7 @@
           "kind": "function",
           "label": "getTieBreaker()",
           "description": "Resolves the tie-breaker function from the current ordering options.",
+          "deprecated": null,
           "sourcePath": "src/order/tieBreakers.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/tieBreakers.ts"
         },
@@ -254,6 +283,7 @@
           "kind": "function",
           "label": "orderEvents()",
           "description": "Orders a bounded event set and returns ordered output, anomalies, and stats.",
+          "deprecated": null,
           "sourcePath": "src/order/orderEvents.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/orderEvents.ts"
         },
@@ -262,6 +292,7 @@
           "kind": "function",
           "label": "orderValidatedEvents()",
           "description": "Orders already validated events without re-running validation.",
+          "deprecated": null,
           "sourcePath": "src/order/orderEvents.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/orderEvents.ts"
         },
@@ -270,6 +301,7 @@
           "kind": "function",
           "label": "orderEventStream()",
           "description": "Consumes an async event source and emits watermark-aware ordered batches.",
+          "deprecated": null,
           "sourcePath": "src/order/orderEventStream.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/orderEventStream.ts"
         },
@@ -278,6 +310,7 @@
           "kind": "function",
           "label": "createProcessingTimeWatermark()",
           "description": "Builds a processing-time watermark helper for more aggressive stream progress.",
+          "deprecated": null,
           "sourcePath": "src/order/watermarkStrategies.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/watermarkStrategies.ts"
         },
@@ -286,6 +319,7 @@
           "kind": "function",
           "label": "eventTimeWatermark()",
           "description": "Advances stream readiness from event-time timestamps.",
+          "deprecated": null,
           "sourcePath": "src/order/watermarkStrategies.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/watermarkStrategies.ts"
         },
@@ -294,6 +328,7 @@
           "kind": "function",
           "label": "ingestedAtWatermark()",
           "description": "Advances stream readiness from ingestion-time metadata.",
+          "deprecated": null,
           "sourcePath": "src/order/watermarkStrategies.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/watermarkStrategies.ts"
         }
@@ -314,7 +349,8 @@
       "primary": false,
       "summary": null,
       "usage": null,
-      "bullets": []
+      "bullets": [],
+      "deprecated": null
     },
     "compareByCausality": {
       "title": "compareByCausality()",
@@ -333,7 +369,8 @@
         "Possible results are <code>before</code>, <code>after</code>, <code>equal</code>, and <code>unknown</code>.",
         "The current exported pairwise contract does not promote unsupported cross-node cases into a first-class <code>concurrent</code> result.",
         "Supported evidence includes <code>parentEventId</code>, <code>dependencyEventIds</code>, and same-node monotonic <code>sequence</code>."
-      ]
+      ],
+      "deprecated": null
     },
     "compareByHlc": {
       "title": "compareByHlc()",
@@ -346,9 +383,13 @@
       "href": "/api/compare-by-hlc/",
       "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/hlcCompare.ts",
       "primary": false,
-      "summary": null,
-      "usage": null,
-      "bullets": []
+      "summary": "Use this when you want a direct HLC-to-HLC comparison without inferring broader causal semantics.",
+      "usage": "import { compareByHlc } from \"causal-order\"\n\nconst relation = compareByHlc(eventA.clock, eventB.clock)\n\nconsole.log(relation)",
+      "bullets": [
+        "This is the preferred direct HLC comparison helper in the published <code>0.5.0</code> release line.",
+        "Possible results are <code>before</code>, <code>after</code>, <code>equal</code>, and <code>unknown</code> for invalid input."
+      ],
+      "deprecated": null
     },
     "compareClocks": {
       "title": "compareClocks()",
@@ -363,7 +404,13 @@
       "primary": false,
       "summary": null,
       "usage": null,
-      "bullets": []
+      "bullets": [],
+      "deprecated": {
+        "since": "0.5.0",
+        "replacementName": "compareByHlc",
+        "replacementLabel": "compareByHlc()",
+        "message": "This compatibility alias remains exported in the published <code>0.5.0</code> line, but new code should prefer the explicit HLC-specific helper."
+      }
     },
     "compareDeterministically": {
       "title": "compareDeterministically()",
@@ -376,9 +423,13 @@
       "href": "/api/compare-deterministically/",
       "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/deterministicCompare.ts",
       "primary": false,
-      "summary": null,
-      "usage": null,
-      "bullets": []
+      "summary": "Use this when stronger causal proof is unavailable but you still need deterministic fallback ordering over event envelopes.",
+      "usage": "import { compareDeterministically } from \"causal-order\"\n\nconst result = compareDeterministically(eventA, eventB, \"event_id\")\n\nconsole.log(result)",
+      "bullets": [
+        "This is the preferred public deterministic fallback helper in the published <code>0.5.0</code> release line.",
+        "The return value is a comparator-style number suitable for deterministic ordering decisions."
+      ],
+      "deprecated": null
     },
     "compareValidatedByCausality": {
       "title": "compareValidatedByCausality()",
@@ -393,7 +444,8 @@
       "primary": false,
       "summary": null,
       "usage": null,
-      "bullets": []
+      "bullets": [],
+      "deprecated": null
     },
     "compareValidatedDeterministically": {
       "title": "compareValidatedDeterministically()",
@@ -408,7 +460,8 @@
       "primary": false,
       "summary": null,
       "usage": null,
-      "bullets": []
+      "bullets": [],
+      "deprecated": null
     },
     "compareWithTieBreaker": {
       "title": "compareWithTieBreaker()",
@@ -423,7 +476,13 @@
       "primary": false,
       "summary": null,
       "usage": null,
-      "bullets": []
+      "bullets": [],
+      "deprecated": {
+        "since": "0.5.0",
+        "replacementName": "compareDeterministically",
+        "replacementLabel": "compareDeterministically()",
+        "message": "This compatibility alias remains exported in the published <code>0.5.0</code> line, but new code should prefer the primary deterministic fallback helper."
+      }
     },
     "createHlcClock": {
       "title": "createHlcClock()",
@@ -438,7 +497,8 @@
       "primary": false,
       "summary": null,
       "usage": null,
-      "bullets": []
+      "bullets": [],
+      "deprecated": null
     },
     "createProcessingTimeWatermark": {
       "title": "createProcessingTimeWatermark()",
@@ -453,7 +513,8 @@
       "primary": false,
       "summary": null,
       "usage": null,
-      "bullets": []
+      "bullets": [],
+      "deprecated": null
     },
     "detectAnomalies": {
       "title": "detectAnomalies()",
@@ -468,7 +529,8 @@
       "primary": false,
       "summary": null,
       "usage": null,
-      "bullets": []
+      "bullets": [],
+      "deprecated": null
     },
     "detectSingleEventAnomalies": {
       "title": "detectSingleEventAnomalies()",
@@ -483,7 +545,8 @@
       "primary": false,
       "summary": null,
       "usage": null,
-      "bullets": []
+      "bullets": [],
+      "deprecated": null
     },
     "eventTimeWatermark": {
       "title": "eventTimeWatermark()",
@@ -498,7 +561,8 @@
       "primary": false,
       "summary": null,
       "usage": null,
-      "bullets": []
+      "bullets": [],
+      "deprecated": null
     },
     "getTieBreaker": {
       "title": "getTieBreaker()",
@@ -513,7 +577,8 @@
       "primary": false,
       "summary": null,
       "usage": null,
-      "bullets": []
+      "bullets": [],
+      "deprecated": null
     },
     "ingestedAtWatermark": {
       "title": "ingestedAtWatermark()",
@@ -528,7 +593,8 @@
       "primary": false,
       "summary": null,
       "usage": null,
-      "bullets": []
+      "bullets": [],
+      "deprecated": null
     },
     "orderEvents": {
       "title": "orderEvents()",
@@ -552,7 +618,8 @@
         "<code>detectAnomalies</code>: include anomaly detection in the returned batch result.",
         "<code>allowUnknownOrder</code>: permit unresolved ordering to remain explicit in non-strict mode.",
         "<code>maxClockDriftMs</code>: validation bound for future clock drift checks."
-      ]
+      ],
+      "deprecated": null
     },
     "orderEventStream": {
       "title": "orderEventStream()",
@@ -571,7 +638,8 @@
         "Consumes an async iterable of event envelopes.",
         "Emits watermark-aware ordered batches.",
         "Supports explicit late-arrival policies and correction-capable output."
-      ]
+      ],
+      "deprecated": null
     },
     "orderValidatedEvents": {
       "title": "orderValidatedEvents()",
@@ -579,14 +647,15 @@
       "sourcePath": "src/order/orderEvents.ts",
       "kind": "function",
       "signatures": [
-        "function orderValidatedEvents<T>(\n  validEvents: ValidatedEventEnvelope<T>[],\n  options?: OrderOptions<T>,\n  internal?: {\n    sourceEvents?: EventEnvelope<T>[]\n    validations?: EventValidationRecord<T>[]\n    anomalies?: EventAnomaly<T>[]\n    invalidEvents?: number\n  },\n): OrderResult<T>"
+        "function orderValidatedEvents<T>(\n  validEvents: ValidatedEventEnvelope<T>[],\n  options?: OrderOptions<T>,\n  internal?: OrderValidatedEventsInternalOptions<T>,\n): OrderResult<T>"
       ],
       "href": "/api/order-validated-events/",
       "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/orderEvents.ts",
       "primary": false,
       "summary": null,
       "usage": null,
-      "bullets": []
+      "bullets": [],
+      "deprecated": null
     },
     "parseHlc": {
       "title": "parseHlc()",
@@ -601,7 +670,8 @@
       "primary": false,
       "summary": null,
       "usage": null,
-      "bullets": []
+      "bullets": [],
+      "deprecated": null
     },
     "serializeHlc": {
       "title": "serializeHlc()",
@@ -616,7 +686,8 @@
       "primary": false,
       "summary": null,
       "usage": null,
-      "bullets": []
+      "bullets": [],
+      "deprecated": null
     },
     "translateBatch": {
       "title": "translateBatch()",
@@ -638,7 +709,8 @@
         "Timestamps accept <code>bigint</code>, safe integer <code>number</code>, and canonical integer <code>string</code>.",
         "<code>Date</code>, ISO timestamp strings, decimals, exponent notation, and unsafe integers are rejected deterministically.",
         "The returned envelope shell is shallowly frozen, while <code>payload</code> remains by reference."
-      ]
+      ],
+      "deprecated": null
     },
     "TranslateBatchPolicyError": {
       "title": "TranslateBatchPolicyError",
@@ -657,7 +729,8 @@
         "Extends <code>Error</code> and carries the triggering structured <code>anomaly</code>.",
         "Raised only when the configured translation policy chooses <code>fail</code> for the encountered anomaly class.",
         "Available from both <code>causal-order</code> and the narrower <code>causal-order/translate</code> entrypoint."
-      ]
+      ],
+      "deprecated": null
     },
     "validateClock": {
       "title": "validateClock()",
@@ -674,7 +747,8 @@
       "primary": false,
       "summary": null,
       "usage": null,
-      "bullets": []
+      "bullets": [],
+      "deprecated": null
     },
     "validateEvent": {
       "title": "validateEvent()",
@@ -698,7 +772,8 @@
         "<code>event.nodeId</code> must be a non-empty string.",
         "<code>event.clock</code> must pass HLC validation.",
         "<code>event.sequence</code>, when present, must be a non-negative <code>bigint</code>."
-      ]
+      ],
+      "deprecated": null
     },
     "types": {
       "title": "Types",
@@ -1076,6 +1151,109 @@
             "name": "OrderOptions",
             "label": "OrderOptions<T>",
             "description": "Options controlling bounded ordering behavior and anomaly handling.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          }
+        ]
+      },
+      {
+        "title": "Extension-policy draft types",
+        "items": [
+          {
+            "name": "PolicyVisibilityKind",
+            "label": "PolicyVisibilityKind",
+            "description": "Draft audit-output category for future extension-policy decisions.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "PolicyVisibilityRecord",
+            "label": "PolicyVisibilityRecord",
+            "description": "Draft operator-visible audit record describing what an extension policy did without mutating payloads silently.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "ExtensionPolicyAction",
+            "label": "ExtensionPolicyAction",
+            "description": "Draft contradiction-policy action shared across payload-agnostic extension hooks.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "CausalContradictionCandidate",
+            "label": "CausalContradictionCandidate<T = unknown>",
+            "description": "Draft payload-agnostic contradiction candidate for future policy hooks.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "CausalContradictionPolicyResult",
+            "label": "CausalContradictionPolicyResult",
+            "description": "Draft result shape for contradiction-policy evaluation with explicit operator visibility.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "CausalContradictionPolicy",
+            "label": "CausalContradictionPolicy<T = unknown, TContext = unknown>",
+            "description": "Draft policy interface for contradiction handling outside the core payload contract.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "EntityForkCandidate",
+            "label": "EntityForkCandidate<T = unknown, TIdentity = unknown>",
+            "description": "Draft payload-agnostic entity-fork candidate supplied by higher-layer identity logic.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "ForkResolutionAction",
+            "label": "ForkResolutionAction",
+            "description": "Draft fork-policy action set that avoids implicit payload merging.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "ForkResolutionPolicyResult",
+            "label": "ForkResolutionPolicyResult",
+            "description": "Draft result shape for fork-resolution decisions with explicit visibility output.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "ForkResolutionPolicy",
+            "label": "ForkResolutionPolicy<T = unknown, TIdentity = unknown, TContext = unknown>",
+            "description": "Draft policy interface for entity-fork handling outside the core payload contract.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "SemanticDedupeCandidate",
+            "label": "SemanticDedupeCandidate<T = unknown>",
+            "description": "Draft semantic-dedupe candidate for future policy hooks across different identifiers.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "SemanticDedupeAction",
+            "label": "SemanticDedupeAction",
+            "description": "Draft dedupe-policy action set that preserves explicit operator-facing visibility.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "SemanticDedupePolicyResult",
+            "label": "SemanticDedupePolicyResult",
+            "description": "Draft result shape for semantic-dedupe decisions including retained and suppressed IDs.",
+            "sourcePath": "src/types.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          },
+          {
+            "name": "SemanticDedupePolicy",
+            "label": "SemanticDedupePolicy<T = unknown, TContext = unknown>",
+            "description": "Draft policy interface for semantic dedupe without forcing payload-aware merge logic into the core.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           }
