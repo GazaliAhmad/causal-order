@@ -7,9 +7,11 @@ These notes track docs-site and website refinements that do not map cleanly to a
 Recent website work includes:
 
 * docs navigation cleanup across guides, wiki, and API surfaces
+* sidebar label cleanup so navigation titles strip inline Markdown formatting such as visible backticks
 * mobile docs polish, including return-to-top behavior and tighter footer grouping
 * shared SEO metadata, `robots.txt`, `sitemap.xml`, and PWA metadata improvements
 * generated API reference improvements and reduced generated-snapshot churn
+* homepage hero typography and measure tuning so the main title and intro copy wrap more naturally instead of breaking in awkward places
 
 ## API Reference
 
@@ -32,3 +34,11 @@ The website docs surface now also reflects the published `0.4.0` line more direc
 ## Artwork
 
 The README banner artwork was adjusted so the subtitle no longer collides with the plotted lines in rendered website and GitHub contexts.
+
+## Homepage Formatting
+
+Recent homepage polish also includes:
+
+* rebalancing the hero copy width so the main title wraps as a cleaner two-line statement
+* widening the intro paragraph measure so the opening description reads as flowing prose rather than a cramped narrow block
+* keeping the right-side output-contract panel in place while letting the left-side copy breathe more naturally

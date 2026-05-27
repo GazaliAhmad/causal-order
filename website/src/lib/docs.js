@@ -247,12 +247,20 @@ function parseGuidesNavigation(bySource) {
       continue;
     }
 
+    if (trimmed === "Stability candidate:") {
+      sections.push(currentSection);
+      currentSection = createSection("Stability");
+      currentSectionKey = "stability";
+      continue;
+    }
+
     const match = trimmed.match(/^\* \[(.+?)\]\((.+?)\)$/);
     if (!match) {
       continue;
     }
 
     const [, label, href] = match;
+    const cleanLabel = cleanInlineText(label);
     const target = resolveMarkdownHref(readme.absolutePath, href, bySource);
     if (!target?.doc) {
       continue;
@@ -277,7 +285,7 @@ function parseGuidesNavigation(bySource) {
     }
 
     currentSection.items.push({
-      title: label,
+      title: cleanLabel,
       href: target.doc.sitePath,
     });
   }
@@ -305,7 +313,7 @@ function parseWikiNavigation(bySource) {
     }
 
     items.push({
-      title: label,
+      title: cleanInlineText(label),
       href: target.doc.sitePath,
     });
   }

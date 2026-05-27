@@ -7,6 +7,11 @@ export function getTieBreaker<T>(tieBreaker?: TieBreaker<T>): TieBreaker<T> {
   return tieBreaker ?? DEFAULT_TIE_BREAKER
 }
 
+/**
+ * @deprecated Prefer `compareDeterministically()` for public deterministic
+ * fallback comparison. This helper remains for compatibility during the
+ * published `0.5.0` release line.
+ */
 export function compareWithTieBreaker<T>(
   a: EventEnvelope<T>,
   b: EventEnvelope<T>,

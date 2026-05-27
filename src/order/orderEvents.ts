@@ -8,6 +8,7 @@ import type {
   ValidationResult,
   ValidatedEventEnvelope,
 } from "../types.js"
+import type { OrderValidatedEventsInternalOptions } from "./internalOrderValidatedEvents.js"
 import {
   applyTieBreaker,
 } from "../compare/deterministicCompare.js"
@@ -33,11 +34,6 @@ type GraphNode<T> = {
   readyOrder: number
   hasSequenceEvidence: boolean
   isUnresolved: boolean
-}
-
-type EventValidationRecord<T> = {
-  event: EventEnvelope<T>
-  validation: ValidationResult<ValidatedEventEnvelope<T>>
 }
 
 type SameTimeState = {
@@ -297,15 +293,17 @@ function buildOrderedMetadata<T>(
   }
 }
 
+/**
+ * Orders already-validated events without re-running validation.
+ *
+ * The third `internal` parameter exists for current repo coordination and
+ * advanced usage, but it should not yet be treated as stable long-term public
+ * contract even after the published `0.5.0` API review.
+ */
 export function orderValidatedEvents<T>(
   validEvents: ValidatedEventEnvelope<T>[],
   options?: OrderOptions<T>,
-  internal?: {
-    sourceEvents?: EventEnvelope<T>[]
-    validations?: EventValidationRecord<T>[]
-    anomalies?: EventAnomaly<T>[]
-    invalidEvents?: number
-  },
+  internal?: OrderValidatedEventsInternalOptions<T>,
 ): OrderResult<T> {
   const validationOptions: { maxClockDriftMs?: bigint; includeWarnings?: boolean } = {
     includeWarnings: false,
@@ -572,11 +570,7 @@ export function orderEvents<T>(
     validEvents.push(validation.value)
   }
 
-  const internalOptions: {
-    sourceEvents: EventEnvelope<T>[]
-    anomalies: EventAnomaly<T>[]
-    invalidEvents: number
-  } = {
+  const internalOptions: OrderValidatedEventsInternalOptions<T> = {
     sourceEvents: events,
     anomalies: anomalyCollector?.anomalies ?? anomalies,
     invalidEvents: events.length - validEvents.length,
