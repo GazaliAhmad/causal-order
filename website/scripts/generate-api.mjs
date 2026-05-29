@@ -39,6 +39,16 @@ const exportDescriptions = {
     "Error raised when translateBatch() policy configuration chooses fail-fast handling for a structured translation anomaly.",
   detectSingleEventAnomalies: "Detects anomalies that can be inferred from one event in isolation.",
   detectAnomalies: "Detects structured anomalies across a bounded event set.",
+  summarizeEventAnomalies:
+    "Summarizes emitted event anomalies by type and severity for operator-facing inspection.",
+  summarizeTranslationAnomalies:
+    "Summarizes translation anomalies by code, field, mapper, stage, and policy action.",
+  explainOrderedEvent:
+    "Builds a compact human-readable explanation of why one ordered event landed where it did.",
+  inspectOrderResult:
+    "Builds a payload-agnostic inspection snapshot for a bounded orderEvents() result.",
+  inspectOrderBatch:
+    "Builds a payload-agnostic inspection snapshot for one emitted orderEventStream() batch.",
   DEFAULT_TIE_BREAKER: "Default deterministic tie-breaker used when stronger ordering is unavailable.",
   getTieBreaker: "Resolves the tie-breaker function from the current ordering options.",
   compareWithTieBreaker: "Compares two events with the configured deterministic tie-breaker.",

@@ -31,6 +31,18 @@ const includedGuidesHardeningFiles = new Set([
   "hardening/runtime-stability-0.3.4.md",
   "hardening/streaming-hardening-0.3.3.md",
 ]);
+const hiddenGuidesDirectories = ["devex/"];
+const hiddenGuidesFiles = new Set([
+  "operations/implementation-guide-0.6.0.md",
+  "stability/decision-record-api-clarity-0.5.0.md",
+  "stability/decision-record-core-boundaries-0.5.0.md",
+  "stability/decision-record-default-behavior-0.5.0.md",
+  "stability/default-behavior-compatibility-inventory-0.5.0.md",
+  "stability/domain-semantic-design-notes-0.5.0.md",
+  "stability/exported-surface-inventory-0.5.0.md",
+  "stability/migration-notes-0.5.0.md",
+  "stability/release-prep-0.5.0.md",
+]);
 const hardeningTitleOverrides = new Map([
   ["hardening/anomaly-surface-0.3.2.md", "Anomaly Surface Audit"],
   ["hardening/fuzz-testing-0.3.2.md", "Fuzz Testing"],
@@ -140,11 +152,12 @@ function normalizeRepoUrl(value) {
 function createDocRecord(collection, rootDir, absolutePath, relativePath) {
   const raw = fs.readFileSync(absolutePath, "utf8");
   const parsed = matter(raw);
-  const tokens = marked.lexer(parsed.content, { gfm: true });
+  const normalizedRelativePath = relativePath.replace(/\\/g, "/");
+  const body = prepareDocBody(collection, normalizedRelativePath, parsed.content);
+  const tokens = marked.lexer(body, { gfm: true });
   const hasExplicitDescription =
     typeof parsed.data.description === "string" &&
     parsed.data.description.trim().length > 0;
-  const normalizedRelativePath = relativePath.replace(/\\/g, "/");
   const fallbackTitle =
     parsed.data.title ?? extractTitle(tokens) ?? humanizeTitle(relativePath);
   const title = resolveDisplayTitle(
@@ -167,7 +180,7 @@ function createDocRecord(collection, rootDir, absolutePath, relativePath) {
     sourceUrl: `${repoUrl}/blob/main/${sourcePath}`,
     title,
     description,
-    body: parsed.content,
+    body,
     tokens,
     hasExplicitDescription,
     headings: extractHeadings(tokens),
@@ -537,16 +550,30 @@ function humanizeTitle(relativePath) {
     .join(" ");
 }
 
+function prepareDocBody(collection, relativePath, body) {
+  if (collection === "guides" && relativePath === "README.md") {
+    return body.replace(
+      /\nActive `0\.6\.x` line:\r?\n\r?\n\* \[Implementation Guide `0\.6\.0`\]\(\.\/operations\/implementation-guide-0\.6\.0\.md\)\r?\n/g,
+      "\n",
+    );
+  }
+
+  return body;
+}
+
 function shouldExcludeDoc(collection, relativePath) {
   const normalizedRelativePath = relativePath.replace(/\\/g, "/");
 
   if (
     collection === "guides" &&
-    (
-      normalizedRelativePath.startsWith("devex/") ||
-      normalizedRelativePath.startsWith("stability/")
+    hiddenGuidesDirectories.some((prefix) =>
+      normalizedRelativePath.startsWith(prefix),
     )
   ) {
+    return true;
+  }
+
+  if (collection === "guides" && hiddenGuidesFiles.has(normalizedRelativePath)) {
     return true;
   }
 

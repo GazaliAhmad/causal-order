@@ -3,6 +3,12 @@
 All notable changes to this project are summarized here.
 Detailed release write-ups live in `docs/releases/`.
 
+## [0.6.0] - Unreleased
+
+* Added a chunked `0.6.0` implementation guide as repo-local planning material.
+* Tightened the website docs filter so only explicitly hidden guide files stay off the public guides surface.
+* Added the first `inspect` helper layer with anomaly summaries, compact order-result and stream-batch inspection snapshots, and minimal ordered-event explanation helpers.
+
 ## [0.5.1] - Unreleased
 
 * This version is not published to npm.

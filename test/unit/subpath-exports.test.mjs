@@ -14,6 +14,13 @@ import {
   detectAnomalies,
 } from "causal-order/anomalies"
 import {
+  explainOrderedEvent,
+  inspectOrderBatch,
+  inspectOrderResult,
+  summarizeEventAnomalies,
+  summarizeTranslationAnomalies,
+} from "causal-order/inspect"
+import {
   orderEvents,
   orderEventStream,
   createProcessingTimeWatermark,
@@ -43,6 +50,7 @@ test("package subpath exports expose focused runtime entrypoints", () => {
     compareByHlc,
     compareDeterministically,
     detectAnomalies,
+    explainOrderedEvent,
     orderEvents,
     orderEventStream,
     createProcessingTimeWatermark,
@@ -52,6 +60,10 @@ test("package subpath exports expose focused runtime entrypoints", () => {
     streamingOrderEventStream,
     createProcessingTimeWatermarkOnly,
     eventTimeWatermark,
+    inspectOrderBatch,
+    inspectOrderResult,
+    summarizeEventAnomalies,
+    summarizeTranslationAnomalies,
     translateBatch,
     validateClock,
     validateEvent,

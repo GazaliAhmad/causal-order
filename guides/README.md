@@ -38,6 +38,10 @@ Developer experience:
 * [Release Notes `0.4.2`](../docs/releases/0.4.2.md)
 * [Release Notes `0.5.0`](../docs/releases/0.5.0.md)
 
+Active `0.6.x` line:
+
+* [Implementation Guide `0.6.0`](./operations/implementation-guide-0.6.0.md)
+
 Published stability line:
 
 * [Implementation Guide `0.5.0`](./stability/implementation-guide-0.5.0.md)

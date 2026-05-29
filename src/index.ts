@@ -14,6 +14,8 @@ export * from "./validate/validateEvent.js"
 export * from "./anomalies/types.js"
 export * from "./anomalies/detectAnomalies.js"
 
+export * from "./inspect.js"
+
 export * from "./order/tieBreakers.js"
 export * from "./order/orderEvents.js"
 export * from "./order/orderEventStream.js"
