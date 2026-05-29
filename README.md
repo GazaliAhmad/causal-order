@@ -455,6 +455,7 @@ Failure modes and case studies:
 * [False Audit Timelines](https://github.com/GazaliAhmad/causal-order/blob/main/guides/false-audit-timeline.md)
 * [Offline Sync Anomalies](https://github.com/GazaliAhmad/causal-order/blob/main/guides/offline-sync-anomalies.md)
 * [Causal Inversion](https://github.com/GazaliAhmad/causal-order/blob/main/guides/causal-inversion.md)
+* [AWS-Inspired DynamoDB Outage Exercise](https://github.com/GazaliAhmad/causal-order/blob/main/guides/aws-inspired-dynamodb-outage.md)
 
 Workloads and hardening:
 

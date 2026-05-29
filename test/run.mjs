@@ -25,6 +25,7 @@ import "./scenarios/offline-sync-anomalies.test.mjs"
 import "./scenarios/streaming-recovery-resync.test.mjs"
 import "./scenarios/causal-inversion.test.mjs"
 import "./scenarios/trace-and-partition-noncausal.test.mjs"
+import "./scenarios/aws-inspired-dynamodb-us-east-2015.test.mjs"
 
 import { run } from "./helpers/harness.mjs"
 

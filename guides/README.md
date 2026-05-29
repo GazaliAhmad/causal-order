@@ -66,6 +66,7 @@ Failure-mode guides:
 * [False Audit Timelines](./false-audit-timeline.md)
 * [Offline Sync Anomalies](./offline-sync-anomalies.md)
 * [Causal Inversion](./causal-inversion.md)
+* [AWS-Inspired DynamoDB Outage Exercise](./aws-inspired-dynamodb-outage.md)
 
 The point of this section is not only to explain the API.
 It is to show why the API exists.
