@@ -647,14 +647,17 @@
       "sourcePath": "src/order/orderEvents.ts",
       "kind": "function",
       "signatures": [
-        "function orderValidatedEvents<T>(\n  validEvents: ValidatedEventEnvelope<T>[],\n  options?: OrderOptions<T>,\n  internal?: OrderValidatedEventsInternalOptions<T>,\n): OrderResult<T>"
+        "function orderValidatedEvents<T>(\n  validEvents: ValidatedEventEnvelope<T>[],\n  options?: OrderOptions<T>,\n): OrderResult<T>"
       ],
       "href": "/api/order-validated-events/",
       "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/orderEvents.ts",
       "primary": false,
-      "summary": null,
+      "summary": "Use this when you already hold validated events and want the public ordering step without re-running validation.",
       "usage": null,
-      "bullets": [],
+      "bullets": [
+        "The website reference shows the stable public shape only.",
+        "The repo still uses an extra coordination parameter internally, but that support path is intentionally not presented as long-term public contract."
+      ],
       "deprecated": null
     },
     "parseHlc": {

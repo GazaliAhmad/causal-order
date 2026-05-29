@@ -227,6 +227,20 @@ console.log(result)`,
       "The return value is a comparator-style number suitable for deterministic ordering decisions.",
     ],
   },
+  orderValidatedEvents: {
+    summary:
+      "Use this when you already hold validated events and want the public ordering step without re-running validation.",
+    signatures: [
+      `function orderValidatedEvents<T>(
+  validEvents: ValidatedEventEnvelope<T>[],
+  options?: OrderOptions<T>,
+): OrderResult<T>`,
+    ],
+    bullets: [
+      "The website reference shows the stable public shape only.",
+      "The repo still uses an extra coordination parameter internally, but that support path is intentionally not presented as long-term public contract.",
+    ],
+  },
 };
 const deprecatedPages = {
   compareClocks: {
@@ -737,9 +751,11 @@ function buildApiFunctionPages() {
           description: exportDescriptions[name] ?? `Public ${kind} exported by causal-order.`,
           sourcePath,
           kind,
-          signatures: kind === "class"
-            ? extractAllClassDeclarations(readSource(sourcePath), name)
-            : extractAllFunctionDeclarations(readSource(sourcePath), name),
+          signatures: enhancements.signatures ?? (
+            kind === "class"
+              ? extractAllClassDeclarations(readSource(sourcePath), name)
+              : extractAllFunctionDeclarations(readSource(sourcePath), name)
+          ),
           href,
           sourceUrl: toSourceUrl(sourcePath),
           primary: enhancements.primary ?? false,
