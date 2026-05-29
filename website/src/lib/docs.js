@@ -31,9 +31,6 @@ const includedGuidesHardeningFiles = new Set([
   "hardening/runtime-stability-0.3.4.md",
   "hardening/streaming-hardening-0.3.3.md",
 ]);
-const includedGuidesDevexFiles = new Set([
-  "devex/developer-experience-0.4.0.md",
-]);
 const hardeningTitleOverrides = new Map([
   ["hardening/anomaly-surface-0.3.2.md", "Anomaly Surface Audit"],
   ["hardening/fuzz-testing-0.3.2.md", "Fuzz Testing"],
@@ -291,7 +288,9 @@ function parseGuidesNavigation(bySource) {
   }
 
   sections.push(currentSection);
-  return sections.filter((section) => section.items.length > 0);
+  return collapseGuideNavigationSections(
+    sections.filter((section) => section.items.length > 0),
+  );
 }
 
 function parseWikiNavigation(bySource) {
@@ -543,16 +542,18 @@ function shouldExcludeDoc(collection, relativePath) {
 
   if (
     collection === "guides" &&
-    normalizedRelativePath.startsWith("hardening/") &&
-    !includedGuidesHardeningFiles.has(normalizedRelativePath)
+    (
+      normalizedRelativePath.startsWith("devex/") ||
+      normalizedRelativePath.startsWith("stability/")
+    )
   ) {
     return true;
   }
 
   if (
     collection === "guides" &&
-    normalizedRelativePath.startsWith("devex/") &&
-    !includedGuidesDevexFiles.has(normalizedRelativePath)
+    normalizedRelativePath.startsWith("hardening/") &&
+    !includedGuidesHardeningFiles.has(normalizedRelativePath)
   ) {
     return true;
   }
@@ -600,6 +601,32 @@ function normalizeRoutePath(value = "/") {
 
 function createSection(title) {
   return { title, items: [] };
+}
+
+function collapseGuideNavigationSections(sections) {
+  const collapsed = [];
+
+  for (const section of sections) {
+    const shouldFoldIntoStartHere =
+      section.title === "Developer Experience" &&
+      section.items.length === 1 &&
+      section.items[0]?.title === "Policy Guidance";
+
+    if (shouldFoldIntoStartHere) {
+      const startHereSection = collapsed.find(
+        (entry) => entry.title === "Start Here",
+      );
+
+      if (startHereSection) {
+        startHereSection.items.push(...section.items);
+        continue;
+      }
+    }
+
+    collapsed.push(section);
+  }
+
+  return collapsed;
 }
 
 function escapeAttribute(value) {

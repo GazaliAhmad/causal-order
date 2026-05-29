@@ -3,6 +3,13 @@
 All notable changes to this project are summarized here.
 Detailed release write-ups live in `docs/releases/`.
 
+## [0.5.1] - Unreleased
+
+* This version is not published to npm.
+* Polished post-`0.5.0` release artifacts and clarified that the exported-surface inventory is historical audit context, not an active release gate.
+* Removed implementation-oriented and build-oriented internal guides from the public website docs surface and simplified the guide navigation.
+* Refined README badge posture around CI labeling and package-size reporting.
+
 ## [0.5.0]
 
 * Published the stability-and-contract-design release line.

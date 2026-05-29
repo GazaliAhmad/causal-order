@@ -1,15 +1,20 @@
 # `0.5.0` Exported Surface Inventory
 
-This note is the first concrete audit artifact for the `0.5.0` stability-candidate line.
+This note is the first concrete audit artifact from the now-published `0.5.0` stability line.
 
 It is not a release note.
-It is a working inventory of the public package surface that `1.0.0` may need to preserve, rename, narrow, or document more explicitly.
+It is a preserved audit inventory of the public package surface that `1.0.0` may need to preserve, rename, narrow, or document more explicitly.
 
 For the milestone frame, see:
 
 * [Implementation Guide `0.5.0`](./implementation-guide-0.5.0.md)
 * [Decision Record: API Clarity `0.5.0`](./decision-record-api-clarity-0.5.0.md)
 * [ROADMAP `0.5.x`](../../ROADMAP.md)
+
+The body below intentionally keeps the original audit framing that fed the released
+decision records.
+Where it still uses future-looking `0.5.0` review language, read it as historical
+context rather than as an open release-status question.
 
 ## Audit Scope
 
@@ -125,7 +130,7 @@ These names look strong enough that `0.5.0` should treat them as preserve-by-def
 These names are not perfect because they are short.
 They are strong because they map cleanly to the package mental model and already have real docs and examples behind them.
 
-## Keep-Or-Rename Review Candidates
+## Historical Keep-Or-Rename Review Candidates
 
 These names feel soft enough that `0.5.0` should make an explicit keep-or-rename decision.
 
@@ -276,7 +281,7 @@ These should stay together as a reviewed cluster during `0.5.0`.
 The key question is not whether they exist.
 It is whether their wording and scope are precise enough for long-term preservation.
 
-## Explicit Review List For `0.5.0`
+## Historical Review List For `0.5.0`
 
 The first chunk should therefore treat these as named review items:
 
@@ -317,8 +322,8 @@ In shorter form, the current recommendation is:
 * `compareWithTieBreaker()`: strong review candidate for deprecation or alias removal
 * `orderValidatedEvents()`: keep the function, narrow the signature
 
-These are still audit recommendations, not yet binding release decisions.
-The point is to make the next `0.5.0` chunk argue from a concrete default position instead of reopening the same naming question from scratch.
+At the time of this audit, these were still recommendations rather than binding release decisions.
+The point was to let the next `0.5.0` chunk argue from a concrete default position instead of reopening the same naming question from scratch.
 
 Those recommendations are now carried forward in:
 
@@ -326,10 +331,10 @@ Those recommendations are now carried forward in:
 
 ## Good Stopping Point For This Chunk
 
-This first audit chunk is in a good place when the repo can say:
+This first audit chunk was in a good place once the repo could say:
 
 * which names are preserve-by-default
 * which names require explicit keep-or-rename decisions before `1.0.0`
 * which currently public signatures expose too much implementation detail
 
-That would give the next `0.5.0` chunk a concrete compatibility inventory instead of a vague sense that the API should probably feel more stable.
+That gave the next `0.5.0` chunk a concrete compatibility inventory instead of a vague sense that the API should probably feel more stable.
