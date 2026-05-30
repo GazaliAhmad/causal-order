@@ -47,8 +47,32 @@
         "description": "Full top-level surface for users who prefer one import path."
       },
       {
-        "path": "causal-order/translate",
-        "description": "Raw-record translation surface, including translateBatch() and TranslateBatchPolicyError."
+        "path": "causal-order/types",
+        "description": "Type-only entrypoint for the published public type surface."
+      },
+      {
+        "path": "causal-order/clock",
+        "description": "Clock helpers for creating, parsing, and serializing HLC values."
+      },
+      {
+        "path": "causal-order/compare",
+        "description": "Pairwise comparison helpers for HLC and causal reasoning."
+      },
+      {
+        "path": "causal-order/validate",
+        "description": "Validation helpers for clocks and event envelopes."
+      },
+      {
+        "path": "causal-order/anomalies",
+        "description": "Structured anomaly detection and anomaly-facing runtime types."
+      },
+      {
+        "path": "causal-order/inspect",
+        "description": "Operational inspection helpers for summaries, explanations, and compact result snapshots."
+      },
+      {
+        "path": "causal-order/order",
+        "description": "Combined ordering barrel for users who want batch, stream, tie-breakers, and watermarks together."
       },
       {
         "path": "causal-order/batch",
@@ -63,8 +87,8 @@
         "description": "Watermark helpers only."
       },
       {
-        "path": "causal-order/order",
-        "description": "Combined ordering barrel for users who want batch, stream, tie-breakers, and watermarks together."
+        "path": "causal-order/translate",
+        "description": "Raw-record translation surface, including translateBatch() and TranslateBatchPolicyError."
       }
     ]
   },
@@ -240,6 +264,56 @@
           "deprecated": null,
           "sourcePath": "src/anomalies/detectAnomalies.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/anomalies/detectAnomalies.ts"
+        }
+      ]
+    },
+    {
+      "title": "Inspection",
+      "items": [
+        {
+          "name": "explainOrderedEvent",
+          "kind": "function",
+          "label": "explainOrderedEvent()",
+          "description": "Builds a compact human-readable explanation of why one ordered event landed where it did.",
+          "deprecated": null,
+          "sourcePath": "src/inspect/explainOrderedEvent.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/explainOrderedEvent.ts"
+        },
+        {
+          "name": "inspectOrderBatch",
+          "kind": "function",
+          "label": "inspectOrderBatch()",
+          "description": "Builds a payload-agnostic inspection snapshot for one emitted orderEventStream() batch.",
+          "deprecated": null,
+          "sourcePath": "src/inspect/inspectOutputs.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/inspectOutputs.ts"
+        },
+        {
+          "name": "inspectOrderResult",
+          "kind": "function",
+          "label": "inspectOrderResult()",
+          "description": "Builds a payload-agnostic inspection snapshot for a bounded orderEvents() result.",
+          "deprecated": null,
+          "sourcePath": "src/inspect/inspectOutputs.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/inspectOutputs.ts"
+        },
+        {
+          "name": "summarizeEventAnomalies",
+          "kind": "function",
+          "label": "summarizeEventAnomalies()",
+          "description": "Summarizes emitted event anomalies by type and severity for operator-facing inspection.",
+          "deprecated": null,
+          "sourcePath": "src/inspect/summarizeAnomalies.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/summarizeAnomalies.ts"
+        },
+        {
+          "name": "summarizeTranslationAnomalies",
+          "kind": "function",
+          "label": "summarizeTranslationAnomalies()",
+          "description": "Summarizes translation anomalies by code, field, mapper, stage, and policy action.",
+          "deprecated": null,
+          "sourcePath": "src/inspect/summarizeAnomalies.ts",
+          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/summarizeAnomalies.ts"
         }
       ]
     },
@@ -564,6 +638,22 @@
       "bullets": [],
       "deprecated": null
     },
+    "explainOrderedEvent": {
+      "title": "explainOrderedEvent()",
+      "description": "Builds a compact human-readable explanation of why one ordered event landed where it did.",
+      "sourcePath": "src/inspect/explainOrderedEvent.ts",
+      "kind": "function",
+      "signatures": [
+        "function explainOrderedEvent<T>(\n  orderedEvent: Readonly<OrderedEvent<T>>,\n): OrderedEventExplanation<T>"
+      ],
+      "href": "/api/explain-ordered-event/",
+      "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/explainOrderedEvent.ts",
+      "primary": false,
+      "summary": null,
+      "usage": null,
+      "bullets": [],
+      "deprecated": null
+    },
     "getTieBreaker": {
       "title": "getTieBreaker()",
       "description": "Resolves the tie-breaker function from the current ordering options.",
@@ -590,6 +680,38 @@
       ],
       "href": "/api/ingested-at-watermark/",
       "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/watermarkStrategies.ts",
+      "primary": false,
+      "summary": null,
+      "usage": null,
+      "bullets": [],
+      "deprecated": null
+    },
+    "inspectOrderBatch": {
+      "title": "inspectOrderBatch()",
+      "description": "Builds a payload-agnostic inspection snapshot for one emitted orderEventStream() batch.",
+      "sourcePath": "src/inspect/inspectOutputs.ts",
+      "kind": "function",
+      "signatures": [
+        "function inspectOrderBatch<T>(\n  batch: Readonly<OrderBatch<T>>,\n): OrderBatchInspection<T>"
+      ],
+      "href": "/api/inspect-order-batch/",
+      "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/inspectOutputs.ts",
+      "primary": false,
+      "summary": null,
+      "usage": null,
+      "bullets": [],
+      "deprecated": null
+    },
+    "inspectOrderResult": {
+      "title": "inspectOrderResult()",
+      "description": "Builds a payload-agnostic inspection snapshot for a bounded orderEvents() result.",
+      "sourcePath": "src/inspect/inspectOutputs.ts",
+      "kind": "function",
+      "signatures": [
+        "function inspectOrderResult<T>(\n  result: Readonly<OrderResult<T>>,\n): OrderResultInspection<T>"
+      ],
+      "href": "/api/inspect-order-result/",
+      "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/inspectOutputs.ts",
       "primary": false,
       "summary": null,
       "usage": null,
@@ -686,6 +808,38 @@
       ],
       "href": "/api/serialize-hlc/",
       "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/clock/serialize.ts",
+      "primary": false,
+      "summary": null,
+      "usage": null,
+      "bullets": [],
+      "deprecated": null
+    },
+    "summarizeEventAnomalies": {
+      "title": "summarizeEventAnomalies()",
+      "description": "Summarizes emitted event anomalies by type and severity for operator-facing inspection.",
+      "sourcePath": "src/inspect/summarizeAnomalies.ts",
+      "kind": "function",
+      "signatures": [
+        "function summarizeEventAnomalies<T>(\n  anomalies: readonly EventAnomaly<T>[],\n): EventAnomalySummary"
+      ],
+      "href": "/api/summarize-event-anomalies/",
+      "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/summarizeAnomalies.ts",
+      "primary": false,
+      "summary": null,
+      "usage": null,
+      "bullets": [],
+      "deprecated": null
+    },
+    "summarizeTranslationAnomalies": {
+      "title": "summarizeTranslationAnomalies()",
+      "description": "Summarizes translation anomalies by code, field, mapper, stage, and policy action.",
+      "sourcePath": "src/inspect/summarizeAnomalies.ts",
+      "kind": "function",
+      "signatures": [
+        "function summarizeTranslationAnomalies<TInput>(\n  anomalies: readonly TranslationAnomaly<TInput>[],\n): TranslationAnomalySummary"
+      ],
+      "href": "/api/summarize-translation-anomalies/",
+      "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/summarizeAnomalies.ts",
       "primary": false,
       "summary": null,
       "usage": null,
@@ -1156,6 +1310,67 @@
             "description": "Options controlling bounded ordering behavior and anomaly handling.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
+          }
+        ]
+      },
+      {
+        "title": "Inspection types",
+        "items": [
+          {
+            "name": "OrderedEventExplanation",
+            "label": "OrderedEventExplanation<T = unknown>",
+            "description": "Compact explanation payload describing why an ordered event landed where it did.",
+            "sourcePath": "src/inspect/explainOrderedEvent.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/explainOrderedEvent.ts"
+          },
+          {
+            "name": "OrderedEventInspection",
+            "label": "OrderedEventInspection<T = unknown>",
+            "description": "Compact event-level inspection snapshot derived from an ordered result entry.",
+            "sourcePath": "src/inspect/inspectOutputs.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/inspectOutputs.ts"
+          },
+          {
+            "name": "InspectedEventAnomaly",
+            "label": "InspectedEventAnomaly<T = unknown>",
+            "description": "Compact anomaly view used by inspection helpers for operator-facing output.",
+            "sourcePath": "src/inspect/inspectOutputs.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/inspectOutputs.ts"
+          },
+          {
+            "name": "OrderedEventCounts",
+            "label": "OrderedEventCounts<T = unknown>",
+            "description": "Grouped inspection counts by order basis and confidence level.",
+            "sourcePath": "src/inspect/inspectOutputs.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/inspectOutputs.ts"
+          },
+          {
+            "name": "OrderResultInspection",
+            "label": "OrderResultInspection<T = unknown>",
+            "description": "Payload-agnostic inspection snapshot returned by inspectOrderResult().",
+            "sourcePath": "src/inspect/inspectOutputs.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/inspectOutputs.ts"
+          },
+          {
+            "name": "OrderBatchInspection",
+            "label": "OrderBatchInspection<T = unknown>",
+            "description": "Payload-agnostic inspection snapshot returned by inspectOrderBatch().",
+            "sourcePath": "src/inspect/inspectOutputs.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/inspectOutputs.ts"
+          },
+          {
+            "name": "EventAnomalySummary",
+            "label": "EventAnomalySummary",
+            "description": "Grouped event-anomaly totals by type and severity.",
+            "sourcePath": "src/inspect/summarizeAnomalies.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/summarizeAnomalies.ts"
+          },
+          {
+            "name": "TranslationAnomalySummary",
+            "label": "TranslationAnomalySummary",
+            "description": "Grouped translation-anomaly totals by code, field, mapper, stage, and policy action.",
+            "sourcePath": "src/inspect/summarizeAnomalies.ts",
+            "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/summarizeAnomalies.ts"
           }
         ]
       },
