@@ -4,7 +4,7 @@
   <tr style="border:none;">
     <td style="border:none; padding-right:8px;"><a href="https://github.com/GazaliAhmad/causal-order/actions"><img src="https://img.shields.io/github/actions/workflow/status/GazaliAhmad/causal-order/ci.yml?branch=main&style=flat-square&label=CI&color=blue&badgev=20260529" alt="CI Status"></a></td>
     <td style="border:none; padding-right:8px;"><a href="https://github.com/GazaliAhmad/causal-order"><img src="https://img.shields.io/badge/Dependencies-0%20%2F%20Zero-black?style=flat-square" alt="Zero Dependencies Unified"></a></td>
-    <td style="border:none; padding-right:8px;"><a href="https://bundlephobia.com/package/causal-order"><img src="https://img.shields.io/badge/minified-7.4%20kB-blue?style=flat-square" alt="Bundle Size Minified"></a></td>
+    <td style="border:none; padding-right:8px;"><a href="https://www.npmjs.com/package/causal-order"><img src="./website/public/package-footprint-badge.svg" alt="Package Footprint"></a></td>
     <td style="border:none; padding-right:8px;"><a href="https://github.com/GazaliAhmad/causal-order"><img src="https://img.shields.io/badge/Node.js-v24%20LTS%20Ready-green?style=flat-square" alt="Node Runtime"></a></td>
     <td style="border:none; padding:0;"><a href="https://github.com/GazaliAhmad/causal-order"><img src="https://img.shields.io/badge/150k%20Stress%20Profile-Passed%20%E2%9C%93-orange?style=flat-square" alt="Stress Profile"></a></td>
   </tr>
