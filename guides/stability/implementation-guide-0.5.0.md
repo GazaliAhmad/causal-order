@@ -3,7 +3,7 @@
 `0.5.0` is the published stability-and-contract-design release after the `0.4.2` developer-experience follow-through.
 
 This guide now serves as the implementation record for how that release line was shaped.
-The next active milestone has moved on to `0.6.x`.
+The next published release line is now `0.6.0`.
 
 For the broader milestone intent, see:
 
@@ -100,7 +100,7 @@ When the repo considers one of those behaviors before `1.0.0`, it first states w
 
 ## Architectural Guardrails
 
-The published `0.5.0` line and the active `0.6.x` line both actively defend the payload-agnostic boundary instead of only describing it.
+The published `0.5.0` and `0.6.0` lines both actively defend the payload-agnostic boundary instead of only describing it.
 
 That means:
 

@@ -133,4 +133,4 @@ This note does not yet decide:
 * exact replacement signature for `orderValidatedEvents()`
 * broader semantic questions around contradiction handling, forks, or semantic dedupe
 
-Those are handled by the rest of the published `0.5.0` documentation set or by later `0.6.x` work.
+Those are handled by the rest of the published `0.5.0` documentation set or by the published `0.6.0` operational follow-through and later pre-`1.0.0` work.

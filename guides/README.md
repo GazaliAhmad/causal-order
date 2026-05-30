@@ -6,7 +6,8 @@ They explain how to use `causal-order`, how the main deployment patterns work, a
 For the deeper conceptual layer, mental-model pages, and explanatory write-ups that are less tied to operational walkthroughs, see the wiki.
 
 Alongside the current ordering and streaming surfaces, the published `0.5.0` line now includes the narrow raw-record ingress path via `translateBatch()`, its machine-readable diagnostics follow-through, the package-facing DX layer around runnable examples and docs synchronization, and the released stability-and-contract-design pass before `1.0.0`.
-The active `0.6.x` line is the next tooling-and-integration pass, built on top of the explicit `0.5.0` core-versus-extension boundary.
+The published `0.6.0` line is the next tooling-and-integration pass, built on top of the explicit `0.5.0` core-versus-extension boundary.
+That line includes additive inspection helpers, replay and reconciliation workflow guides, a first integration-shaped replay example, and a first operator metrics guide.
 For the current published contract, start with the `0.5.0` release notes, the stability implementation guide, the README's raw-record translation example, and the runnable ingress examples under `/examples`.
 For helper-level pairwise comparison, prefer `compareByHlc()` and `compareDeterministically()` over compatibility aliases.
 
@@ -38,9 +39,16 @@ Developer experience:
 * [Release Notes `0.4.2`](../docs/releases/0.4.2.md)
 * [Release Notes `0.5.0`](../docs/releases/0.5.0.md)
 
-Active `0.6.x` line:
+Published `0.6.0` operational line:
 
 * [Implementation Guide `0.6.0`](./operations/implementation-guide-0.6.0.md)
+* [Release Notes `0.6.0`](../docs/releases/0.6.0.md)
+
+Operational workflows:
+
+* [Replay Inspection Workflow](./operations/replay-inspection-workflow.md)
+* [Streaming Reconciliation Workflow](./operations/streaming-reconciliation-workflow.md)
+* [Operator Metrics Guide](./operations/operator-metrics-guide.md)
 
 Published stability line:
 
@@ -59,6 +67,7 @@ Runnable examples:
 * [Examples Index](../examples/README.md)
 * [Minimal Ingress Example](../examples/ingress-minimal.mjs)
 * [Ingress Replay Pipeline Example](../examples/ingress-replay-pipeline.mjs)
+* [Local Durable Buffer Replay Example](../examples/local-durable-buffer-replay.mjs)
 * [False Audit Timeline Example](../examples/false-audit-timeline.mjs)
 * [Offline Sync Anomalies Example](../examples/offline-sync-anomalies.mjs)
 * [Streaming Recovery Resync Example](../examples/streaming-recovery-resync.mjs)

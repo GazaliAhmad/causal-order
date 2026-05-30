@@ -153,4 +153,4 @@ This note does not yet decide:
 * final telemetry field names for future policy actions
 * whether all current draft policy interfaces are the final `1.0.0` names
 
-Those remain later `0.6.x` and pre-`1.0.0` work.
+Those remain published `0.6.0` follow-through context and later pre-`1.0.0` work.

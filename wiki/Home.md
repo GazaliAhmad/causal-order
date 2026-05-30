@@ -9,11 +9,21 @@ For the practical, repository-coupled layer with operational walkthroughs, deplo
 
 If the README is the quick path, this wiki is the deeper explanation.
 
-For the repo-coupled usage side, that now includes the published `0.4.x` ingress-and-diagnostics surface around synchronous `translateBatch()` translation before ordering, plus the published `0.5.0` stability-and-contract-design release that clarifies what the package intends to preserve before `1.0.0`.
+For the repo-coupled usage side, the package now has three published layers:
+
+* `0.4.x` ingress and diagnostics around synchronous `translateBatch()` translation before ordering
+* `0.5.0` stability-and-contract-design guidance for what the package intends to preserve before `1.0.0`
+* `0.6.0` operational-tooling follow-through around inspection helpers, replay and reconciliation workflows, integration-shaped examples, and operator metrics
+
 The practical contract and runnable customer-facing examples for that surface live in `/guides`, `/examples`, and the main README rather than in the conceptual wiki pages.
-For the fastest package-facing entry point by workload shape, start with `/guides/quick-start-scenarios.md`.
-For operational strictness and late-arrival choices, see `/guides/policy-guidance.md`.
-For the published `0.5.0` stability line, see `/guides/stability/implementation-guide-0.5.0.md` and `/docs/releases/0.5.0.md`.
+
+For the fastest package-facing entry points:
+
+* start with `/guides/quick-start-scenarios.md`
+* see `/guides/policy-guidance.md` for operational strictness and late-arrival choices
+* see `/guides/operations/replay-inspection-workflow.md`, `/guides/operations/streaming-reconciliation-workflow.md`, and `/guides/operations/operator-metrics-guide.md` for replay, reconciliation, and metrics follow-through
+* see `/guides/stability/implementation-guide-0.5.0.md` and `/docs/releases/0.5.0.md` for the published `0.5.0` stability line
+* see `/docs/releases/0.6.0.md` for the published `0.6.0` operational release shape
 
 ## Start Here
 

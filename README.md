@@ -364,6 +364,43 @@ Policy meanings:
 If you are unsure, keep the default warning-visible posture first.
 Choose `"continue"` only when omission is genuinely acceptable, and choose `"fail"` only when the ingress contract should reject the batch immediately.
 
+## Operational Inspection Helpers
+
+For operational review, replay audits, or emitted-batch inspection, `0.6.0` adds a small additive helper layer on top of the core runtime output:
+
+```ts
+import {
+  inspectOrderResult,
+  orderEvents,
+  summarizeTranslationAnomalies,
+  translateBatch,
+} from "causal-order"
+
+const translated = translateBatch(records, config)
+const translationSummary = summarizeTranslationAnomalies(translated.anomalies)
+
+const ordered = orderEvents(translated.translated, {
+  strict: false,
+  detectAnomalies: true,
+})
+
+const inspection = inspectOrderResult(ordered)
+
+console.log(translationSummary)
+console.log(inspection)
+```
+
+The current helper layer is intentionally narrow:
+
+* `summarizeEventAnomalies()`
+* `summarizeTranslationAnomalies()`
+* `explainOrderedEvent()`
+* `inspectOrderResult()`
+* `inspectOrderBatch()`
+
+These helpers summarize or explain existing package output.
+They do not hide anomalies, rewrite ordered state, or invent stronger causal claims than the runtime already supports.
+
 ## Streaming Overview
 
 For large or unbounded event flows, use `orderEventStream()` instead of assuming everything belongs in one in-memory batch.
@@ -447,6 +484,12 @@ Streaming:
 * [Streaming Finality](https://github.com/GazaliAhmad/causal-order/wiki/Streaming-Finality)
 * [Streaming Recovery and Resync Wiki](https://github.com/GazaliAhmad/causal-order/wiki/Streaming-Recovery-and-Resync)
 
+Operational workflows:
+
+* [Replay Inspection Workflow](https://github.com/GazaliAhmad/causal-order/blob/main/guides/operations/replay-inspection-workflow.md)
+* [Streaming Reconciliation Workflow](https://github.com/GazaliAhmad/causal-order/blob/main/guides/operations/streaming-reconciliation-workflow.md)
+* [Operator Metrics Guide](https://github.com/GazaliAhmad/causal-order/blob/main/guides/operations/operator-metrics-guide.md)
+
 Failure modes and case studies:
 
 * [Case Studies](https://github.com/GazaliAhmad/causal-order/blob/main/guides/case-studies.md)
@@ -503,6 +546,7 @@ Runnable examples:
 * [Examples Index](https://github.com/GazaliAhmad/causal-order/blob/main/examples/README.md)
 * [Minimal Ingress Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/ingress-minimal.mjs)
 * [Ingress Replay Pipeline Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/ingress-replay-pipeline.mjs)
+* [Local Durable Buffer Replay Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/local-durable-buffer-replay.mjs)
 * [False Audit Timeline Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/false-audit-timeline.mjs)
 * [Offline Sync Anomalies Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/offline-sync-anomalies.mjs)
 * [Streaming Recovery And Resync Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/streaming-recovery-resync.mjs)
@@ -512,10 +556,9 @@ They use the public `causal-order` package surface so copied example code still 
 
 ## Status
 
-`causal-order` is published at `0.5.0`.
-The active repository implementation line is now `0.6.x`.
+`causal-order` is published at `0.6.0`.
 
-`0.5.0` release shape:
+`0.6.0` release shape:
 
 * `0.3.2` established the current production-gate hardening baseline
 * `0.3.3` broadened the streaming hardening and pressure release story after that production-gate milestone
@@ -524,10 +567,15 @@ The active repository implementation line is now `0.6.x`.
 * `0.4.1` makes translation diagnostics safer to inspect and control without widening the ingress boundary
 * `0.4.2` makes that same package surface easier to evaluate through runnable ingress examples, package-facing policy guidance, and docs synchronization enforcement
 * `0.5.0` turns the next line into a published stability-and-contract-design release with explicit migration notes and payload-agnostic core-boundary decisions
+* `0.6.0` adds operational inspection helpers, replay and reconciliation workflow guides, a first integration-shaped replay example, and a first operator metrics guide
 
 For the current operational decision layer, see:
 
 * [Policy Guidance](https://github.com/GazaliAhmad/causal-order/blob/main/guides/policy-guidance.md)
+* [Replay Inspection Workflow](https://github.com/GazaliAhmad/causal-order/blob/main/guides/operations/replay-inspection-workflow.md)
+* [Streaming Reconciliation Workflow](https://github.com/GazaliAhmad/causal-order/blob/main/guides/operations/streaming-reconciliation-workflow.md)
+* [Operator Metrics Guide](https://github.com/GazaliAhmad/causal-order/blob/main/guides/operations/operator-metrics-guide.md)
+* [Release Notes `0.6.0`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.6.0.md)
 * [Release Notes `0.5.0`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.5.0.md)
 
 `0.5.0` is centered on:
@@ -566,8 +614,9 @@ Current deployment posture:
 That means:
 
 * the package is usable today
-* the API is still evolving, but `0.5.0` makes the intended contract direction much more explicit
-* the next implementation line is about tooling and integration depth more than reopening the same `0.5.0` surface questions
+* the API is still evolving, but `0.5.0` and `0.6.0` make the contract and operational posture much more explicit
+* the published `0.6.0` line adds the first helper, workflow, example, and metrics layer on top of the `0.5.0` boundary
+* the next implementation work is about follow-through and refinement more than reopening the same `0.5.0` surface questions
 * `1.0.0` is the point where the semantic contract should feel stable enough to preserve long-term
 
 ## Repository Development
