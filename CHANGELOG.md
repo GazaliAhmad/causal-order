@@ -3,6 +3,16 @@
 All notable changes to this project are summarized here.
 Detailed release write-ups live in `docs/releases/`.
 
+## [0.6.0]
+
+* Added a repo-local `0.6.0` implementation guide that records the shipped operational-tooling scope and release boundary.
+* Tightened the website docs filter so only explicitly hidden guide files stay off the public guides surface.
+* Added the first `inspect` helper layer with anomaly summaries, compact order-result and stream-batch inspection snapshots, and minimal ordered-event explanation helpers.
+* Added replay-inspection and streaming-reconciliation workflow guides for bounded replay review, correction-capable batch handling, and safer downstream projection follow-through.
+* Added the first integration-shaped example for local durable-buffer replay using disk-backed JSONL staging, `translateBatch()`, `orderEvents()`, and `inspectOrderResult()`.
+* Added the first operator metrics guide covering watermark progress, late-arrival frequency, anomaly-rate monitoring, and correction-rate monitoring.
+* Added `0.6.0` release notes and aligned the README, guides index, and wiki entry points around the landed operational-tooling surface.
+
 ## [0.5.1] - Unreleased
 
 * This version is not published to npm.

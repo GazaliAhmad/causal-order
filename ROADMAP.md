@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap describes how `causal-order` should mature from the published `0.5.0` release and the active `0.6.x` development line into a stable `1.0.0` npm package.
+This roadmap describes how `causal-order` should mature from the published `0.6.0` release into a stable `1.0.0` npm package.
 
 The goal is not to rush publication.
 The goal is to make sure the semantics are trustworthy before the package becomes a long-term contract.
@@ -121,11 +121,11 @@ Current status snapshot:
 
 | Checklist Item | Status | Notes |
 | --- | --- | --- |
-| Top-level API names and exported result types feel stable enough to support long-term | Mostly | The published `0.5.0` surface is now narrow, explicit, directly export-tested, and backed by explicit API-clarity, default-behavior, and core-boundary notes, but the project is still intentionally reserving room for pre-`1.0` contract cleanup. |
+| Top-level API names and exported result types feel stable enough to support long-term | Mostly | The published `0.5.0` and `0.6.0` surfaces are now narrow, explicit, directly export-tested, and backed by explicit API-clarity, default-behavior, core-boundary, and operational follow-through notes, but the project is still intentionally reserving room for pre-`1.0` contract cleanup. |
 | Confidence semantics are crisp and no longer expected to change materially | Partial | The `proven` / `derived` / `fallback` / `unknown` model is coherent and well-tested, but the roadmap still treats semantic freeze as a later milestone rather than as already complete. |
 | `orderBasis`, `causalEvidence`, anomaly types, and strict-mode behavior feel intentional rather than exploratory | Mostly | The current runtime surface is much more deliberate across ordering, validation, translation anomalies, and strict-mode behavior, including machine-readable diagnostics, policy controls, and deterministic translation anomaly ordering, though some remaining `1.0` contract-shaping work still exists around broader semantics and naming. |
 | The difference between `orderEvents()` and `orderEventStream()` is clear in both code and docs | Mostly | The batch, stream, and raw-record ingress split is now much clearer across the README, guides, examples, tests, and website API reference, though the stream boundary can still be taught more simply before `1.0`. |
-| The README describes the real shipped package, not a still-evolving intended shape | Mostly | The README now reflects the published `0.5.0` package surface, including `translateBatch()`, the current diagnostic contract, current Node support, the runnable package-facing examples, the released stability notes, and the real batch-versus-stream posture, even though the wider docs set still has room to settle further. |
+| The README describes the real shipped package, not a still-evolving intended shape | Mostly | The README now reflects the published `0.5.0` and `0.6.0` package surface, including `translateBatch()`, the current diagnostic contract, current Node support, the runnable package-facing examples, the released stability notes, the operational inspection layer, and the real batch-versus-stream posture, even though the wider docs set still has room to settle further. |
 | Examples clearly show why this library is safer than naive timestamp sorting | Partial | The repo has good scenario coverage for replay corruption, offline sync, false audit timelines, drift, and streaming recovery, but those examples can still be made more central and easier to discover for first-time evaluators. |
 | Performance guidance is honest about routine workloads, heavier batch workloads, and when streaming is the better model | Mostly | The current guidance is explicit about routine `10k` and `100k` guardrails, stronger `150k` hardening bands, and operational `250k` batch and stream validation runs without pretending every heavier path belongs in the default guard loop. |
 | Large-batch behavior has been benchmarked and pressure-tested enough that major surprises are unlikely in realistic use | Mostly | The repo now has meaningful `100k` guardrails, `150k` hardening coverage, and operational `250k` batch and stream runs, though more repeated history would still make the `1.0` confidence story stronger. |
@@ -1010,37 +1010,35 @@ Exit criteria:
   * designed clearly enough to guide later implementation, or
   * explicitly declared out of the `1.0.0` core claim surface
 
-## `0.6.x` Operational Tooling And Integrations
+## `0.6.0` Operational Tooling And Integrations
 
 Goal:
 Make the library easier to operate inside real event pipelines, not just easier to understand in isolation.
 
-Focus:
+Delivered in `0.6.0`:
 
-* add operational tooling around the core package without weakening the core semantics:
+* added operational tooling around the core package without weakening the core semantics:
   * replay inspection helpers
   * anomaly summary helpers
   * explain-why-this-order debugging output
-* add reference integration patterns for common deployment shapes:
+* added reference integration patterns for common deployment shapes:
   * local durable queue to later replay batch
   * immediate streaming plus periodic reconciliation
   * append-only downstream projections
   * mutable downstream projections
-* add more concrete examples for:
-  * database-backed event storage
-  * broker or queue consumption
+* added more concrete examples for:
   * local file or disk-backed buffering
-* add metrics-oriented guidance for:
+* added metrics-oriented guidance for:
   * watermark progress
   * late-arrival frequency
   * anomaly-rate monitoring
   * correction-rate monitoring
 
-Exit criteria:
+Release result:
 
 * the project includes practical patterns for fitting `causal-order` into real operational pipelines
 * users can see how the same event model supports bounded replay, live streaming, and hybrid reconciliation
-* maintainers have clearer tooling hooks for debugging and operator visibility
+* maintainers now have clearer tooling hooks for debugging and operator visibility
 
 ## `0.7.x` Ecosystem And Transferability
 

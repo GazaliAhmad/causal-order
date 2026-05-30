@@ -33,7 +33,8 @@ const toc = [
   <p>
     The package exports a full top-level surface from <code>src/index.ts</code>, plus focused npm
     subpath entrypoints for narrower import shapes. The API is grouped around translation, event
-    ordering, streaming, validation, causality comparison, clocks, anomalies, and types.
+    ordering, streaming, validation, causality comparison, clocks, anomalies, inspection helpers,
+    and types.
   </p>
 
   <h2 id="where-to-start">Where to start</h2>
@@ -41,7 +42,8 @@ const toc = [
     If your data is not already in the event-envelope shape, start with <code>translateBatch()</code>.
     Use <code>orderEvents()</code> for bounded replay or audit slices, and move to
     <code>orderEventStream()</code> when you need watermark, late-arrival, and correction-capable
-    behavior.
+    behavior. Use <code>inspectOrderResult()</code> or <code>inspectOrderBatch()</code> when you
+    want compact operational summaries without writing your own result-shaping layer first.
   </p>
 
   <h2 id="focused-entrypoints">Focused entrypoints</h2>

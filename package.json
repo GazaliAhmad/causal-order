@@ -1,6 +1,6 @@
 {
   "name": "causal-order",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "An event integrity library for ordering and analyzing distributed events without false certainty.",
   "keywords": [
     "distributed-systems",
@@ -53,6 +53,10 @@
     "./anomalies": {
       "types": "./dist/anomalies.d.ts",
       "import": "./dist/anomalies.js"
+    },
+    "./inspect": {
+      "types": "./dist/inspect.d.ts",
+      "import": "./dist/inspect.js"
     },
     "./order": {
       "types": "./dist/order.d.ts",

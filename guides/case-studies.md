@@ -214,6 +214,8 @@ Across all four case studies, the pattern is the same:
 
 That is the core discipline behind `causal-order`.
 
+For a streaming outage analog with delayed reconnect waves, correction churn, named dependent services, and a million-record scaling exercise, see [AWS-Inspired DynamoDB Outage Exercise](./aws-inspired-dynamodb-outage.md).
+
 ## Stress-Hardening Follow-Up
 
 These case studies also map cleanly onto the `0.2.2` corrupted-dataset stress plan:

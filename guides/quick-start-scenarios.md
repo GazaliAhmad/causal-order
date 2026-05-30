@@ -50,6 +50,7 @@ Start here:
 ```bash
 npm run build
 node examples/ingress-replay-pipeline.mjs
+node examples/local-durable-buffer-replay.mjs
 node examples/replay-corruption.mjs
 ```
 
@@ -57,12 +58,14 @@ Read next:
 
 * [Replay Corruption](./replay-corruption.md)
 * [After-Hours Batch Processing](./after-hours-batch-processing.md)
+* [Replay Inspection Workflow](./operations/replay-inspection-workflow.md)
 
 What to look for:
 
 * translation anomalies for rejected raw rows
 * `duplicate_event` and `causal_inversion`
 * replay effects staying visible instead of being silently normalized away
+* replay inspection before downstream writeback
 
 ### Distributed Debugging
 

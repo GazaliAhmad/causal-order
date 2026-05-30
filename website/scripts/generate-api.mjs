@@ -18,6 +18,29 @@ const repoUrl = normalizeRepoUrl(
 const sourceBaseUrl = `${repoUrl}/blob/main`;
 
 const fileCache = new Map();
+const apiGroupDefinitions = [
+  { title: "Clocks", prefix: "src/clock/" },
+  { title: "Comparison", prefix: "src/compare/" },
+  { title: "Translation", prefix: "src/translate/" },
+  { title: "Validation", prefix: "src/validate/" },
+  { title: "Anomalies", prefix: "src/anomalies/" },
+  { title: "Inspection", prefix: "src/inspect/" },
+  { title: "Ordering", prefix: "src/order/" },
+];
+const subpathDescriptions = {
+  ".": "Full top-level surface for users who prefer one import path.",
+  "./types": "Type-only entrypoint for the published public type surface.",
+  "./clock": "Clock helpers for creating, parsing, and serializing HLC values.",
+  "./compare": "Pairwise comparison helpers for HLC and causal reasoning.",
+  "./validate": "Validation helpers for clocks and event envelopes.",
+  "./anomalies": "Structured anomaly detection and anomaly-facing runtime types.",
+  "./inspect": "Operational inspection helpers for summaries, explanations, and compact result snapshots.",
+  "./order": "Combined ordering barrel for users who want batch, stream, tie-breakers, and watermarks together.",
+  "./batch": "Bounded batch ordering plus tie-breaker helpers.",
+  "./stream": "Streaming ordering surface through orderEventStream().",
+  "./watermarks": "Watermark helpers only.",
+  "./translate": "Raw-record translation surface, including translateBatch() and TranslateBatchPolicyError.",
+};
 const exportDescriptions = {
   HlcClock: "Monotonic hybrid logical clock interface for local send and remote merge operations.",
   createHlcClock: "Creates a monotonic hybrid logical clock for a single node.",
@@ -39,6 +62,16 @@ const exportDescriptions = {
     "Error raised when translateBatch() policy configuration chooses fail-fast handling for a structured translation anomaly.",
   detectSingleEventAnomalies: "Detects anomalies that can be inferred from one event in isolation.",
   detectAnomalies: "Detects structured anomalies across a bounded event set.",
+  summarizeEventAnomalies:
+    "Summarizes emitted event anomalies by type and severity for operator-facing inspection.",
+  summarizeTranslationAnomalies:
+    "Summarizes translation anomalies by code, field, mapper, stage, and policy action.",
+  explainOrderedEvent:
+    "Builds a compact human-readable explanation of why one ordered event landed where it did.",
+  inspectOrderResult:
+    "Builds a payload-agnostic inspection snapshot for a bounded orderEvents() result.",
+  inspectOrderBatch:
+    "Builds a payload-agnostic inspection snapshot for one emitted orderEventStream() batch.",
   DEFAULT_TIE_BREAKER: "Default deterministic tie-breaker used when stronger ordering is unavailable.",
   getTieBreaker: "Resolves the tie-breaker function from the current ordering options.",
   compareWithTieBreaker: "Compares two events with the configured deterministic tie-breaker.",
@@ -315,6 +348,21 @@ const typeDescriptions = {
   AnomalyType: "Stable anomaly category emitted by ordering and analysis helpers.",
   EventAnomaly: "Structured anomaly record tied to one or more events.",
   OrderedEvent: "Ordered event entry with confidence, basis, and optional causal evidence.",
+  OrderedEventExplanation:
+    "Compact explanation payload describing why an ordered event landed where it did.",
+  OrderedEventInspection:
+    "Compact event-level inspection snapshot derived from an ordered result entry.",
+  InspectedEventAnomaly:
+    "Compact anomaly view used by inspection helpers for operator-facing output.",
+  OrderedEventCounts:
+    "Grouped inspection counts by order basis and confidence level.",
+  OrderResultInspection:
+    "Payload-agnostic inspection snapshot returned by inspectOrderResult().",
+  OrderBatchInspection:
+    "Payload-agnostic inspection snapshot returned by inspectOrderBatch().",
+  EventAnomalySummary: "Grouped event-anomaly totals by type and severity.",
+  TranslationAnomalySummary:
+    "Grouped translation-anomaly totals by code, field, mapper, stage, and policy action.",
   OrderStats: "Summary counts describing the outcome of a bounded ordering run.",
   OrderResult: "Top-level bounded ordering result containing ordered events, anomalies, and stats.",
   TieBreaker: "Deterministic comparison function used when stronger ordering is absent.",
@@ -354,11 +402,13 @@ const typeDescriptions = {
   OrderBatch: "Structured batch emitted by streaming ordering.",
 };
 
-const exportedModules = extractExportedModules(readSource("src/index.ts"));
+const exportedModules = [...collectExportedModules("src/index.ts")]
+  .filter((sourcePath) => sourcePath !== "src/index.ts");
 const exportsByPath = new Map(
   exportedModules.map((sourcePath) => [sourcePath, extractExports(readSource(sourcePath))]),
 );
 const publicFunctions = collectPublicFunctions();
+const publicTypes = collectPublicTypes();
 const apiFunctionPages = buildApiFunctionPages();
 const navigationItems = buildNavigationItems(apiFunctionPages);
 const apiPages = {
@@ -376,8 +426,6 @@ const apiPages = {
 const overviewGroups = [
   ...buildOverviewGroups(),
 ];
-
-const exportedTypes = exportsByPath.get("src/types.ts")?.types ?? new Set();
 
 const types = {
   groups: [
@@ -452,6 +500,19 @@ const types = {
       ],
     },
     {
+      title: "Inspection types",
+      items: [
+        typeItem("OrderedEventExplanation", "OrderedEventExplanation<T = unknown>"),
+        typeItem("OrderedEventInspection", "OrderedEventInspection<T = unknown>"),
+        typeItem("InspectedEventAnomaly", "InspectedEventAnomaly<T = unknown>"),
+        typeItem("OrderedEventCounts", "OrderedEventCounts<T = unknown>"),
+        typeItem("OrderResultInspection", "OrderResultInspection<T = unknown>"),
+        typeItem("OrderBatchInspection", "OrderBatchInspection<T = unknown>"),
+        typeItem("EventAnomalySummary"),
+        typeItem("TranslationAnomalySummary"),
+      ],
+    },
+    {
       title: "Extension-policy draft types",
       items: [
         typeItem("PolicyVisibilityKind"),
@@ -496,32 +557,7 @@ const apiData = {
     description: "The public API surface exported by causal-order today.",
     sourcePath: "src/index.ts",
     sourceUrl: toSourceUrl("src/index.ts"),
-    focusedEntrypoints: [
-      {
-        path: "causal-order",
-        description: "Full top-level surface for users who prefer one import path.",
-      },
-      {
-        path: "causal-order/translate",
-        description: "Raw-record translation surface, including translateBatch() and TranslateBatchPolicyError.",
-      },
-      {
-        path: "causal-order/batch",
-        description: "Bounded batch ordering plus tie-breaker helpers.",
-      },
-      {
-        path: "causal-order/stream",
-        description: "Streaming ordering surface through orderEventStream().",
-      },
-      {
-        path: "causal-order/watermarks",
-        description: "Watermark helpers only.",
-      },
-      {
-        path: "causal-order/order",
-        description: "Combined ordering barrel for users who want batch, stream, tie-breakers, and watermarks together.",
-      },
-    ],
+    focusedEntrypoints: buildFocusedEntrypoints(),
   },
   exportsByGroup: overviewGroups,
   pages: apiPages,
@@ -553,11 +589,42 @@ function readSource(relativePath) {
   return source;
 }
 
-function extractExportedModules(indexSource) {
+function collectExportedModules(entryPath, visited = new Set()) {
+  const normalizedEntryPath = normalizeSourcePath(entryPath);
+  if (visited.has(normalizedEntryPath)) {
+    return visited;
+  }
+
+  visited.add(normalizedEntryPath);
+
+  for (const specifier of extractReExportSpecifiers(readSource(normalizedEntryPath))) {
+    const sourcePath = resolveReExportSourcePath(normalizedEntryPath, specifier);
+    collectExportedModules(sourcePath, visited);
+  }
+
+  return visited;
+}
+
+function extractReExportSpecifiers(source) {
   return Array.from(
-    indexSource.matchAll(/^export \* from "(.+?)"/gm),
-    ([, specifier]) => `src/${specifier.replace(/^\.\//, "").replace(/\.js$/, ".ts")}`,
+    source.matchAll(/^export\s+(?:\*|{[^}]+})\s+from\s+"(.+?)"/gm),
+    ([, specifier]) => specifier,
   );
+}
+
+function resolveReExportSourcePath(fromSourcePath, specifier) {
+  const fromDir = path.posix.dirname(normalizeSourcePath(fromSourcePath));
+  const tsSpecifier = specifier.endsWith(".js")
+    ? specifier.replace(/\.js$/, ".ts")
+    : specifier.endsWith(".ts")
+      ? specifier
+      : `${specifier}.ts`;
+
+  return normalizeSourcePath(path.posix.join(fromDir, tsSpecifier));
+}
+
+function normalizeSourcePath(sourcePath) {
+  return sourcePath.replaceAll("\\", "/");
 }
 
 function extractExports(source) {
@@ -700,16 +767,17 @@ function symbolItem(name, sourcePath, options = {}) {
 }
 
 function typeItem(name, label = name) {
-  if (!exportedTypes.has(name)) {
-    throw new Error(`Expected exported type ${name} in src/types.ts`);
+  const sourcePath = publicTypes.get(name);
+  if (sourcePath === undefined) {
+    throw new Error(`Expected exported type ${name} in the public API surface`);
   }
 
   return {
     name,
     label,
     description: typeDescriptions[name] ?? "",
-    sourcePath: "src/types.ts",
-    sourceUrl: toSourceUrl("src/types.ts"),
+    sourcePath,
+    sourceUrl: toSourceUrl(sourcePath),
   };
 }
 
@@ -736,6 +804,25 @@ function collectPublicFunctions() {
   }
 
   return functions.sort((left, right) => left.name.localeCompare(right.name));
+}
+
+function collectPublicTypes() {
+  const types = new Map();
+
+  for (const sourcePath of exportedModules) {
+    const exports = exportsByPath.get(sourcePath);
+    if (!exports) {
+      continue;
+    }
+
+    for (const name of sortSet(exports.types)) {
+      if (!types.has(name)) {
+        types.set(name, sourcePath);
+      }
+    }
+  }
+
+  return types;
 }
 
 function buildApiFunctionPages() {
@@ -792,14 +879,7 @@ function buildNavigationItems(apiFunctionPages) {
 function buildOverviewGroups() {
   const groups = [];
 
-  for (const group of [
-    { title: "Clocks", prefix: "src/clock/" },
-    { title: "Comparison", prefix: "src/compare/" },
-    { title: "Translation", prefix: "src/translate/" },
-    { title: "Validation", prefix: "src/validate/" },
-    { title: "Anomalies", prefix: "src/anomalies/" },
-    { title: "Ordering", prefix: "src/order/" },
-  ]) {
+  for (const group of apiGroupDefinitions) {
     const items = [];
 
     for (const sourcePath of exportedModules.filter((value) => value.startsWith(group.prefix))) {
@@ -827,6 +907,21 @@ function buildOverviewGroups() {
   }
 
   return groups;
+}
+
+function buildFocusedEntrypoints() {
+  return Object.keys(repoPackage.exports).map((subpath) => ({
+    path: formatPackageEntrypoint(subpath),
+    description:
+      subpathDescriptions[subpath] ??
+      `Focused public entrypoint exported by ${repoPackage.name}.`,
+  }));
+}
+
+function formatPackageEntrypoint(subpath) {
+  return subpath === "."
+    ? repoPackage.name
+    : `${repoPackage.name}/${subpath.replace(/^\.\//, "")}`;
 }
 
 function functionSlug(name) {

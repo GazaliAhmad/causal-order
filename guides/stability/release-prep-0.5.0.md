@@ -77,4 +77,4 @@ As a published repo milestone, `0.5.0` is now coherently scoped and documented.
 
 The next decision is no longer "what does `0.5.0` mean?"
 The next decision is no longer whether to publish it.
-The next decision is how to begin the `0.6.x` implementation line from the now-explicit extension boundaries.
+The next decision is how to carry the now-published `0.6.0` operational line forward from the now-explicit extension boundaries.

@@ -21,6 +21,7 @@ Run one ingress example directly:
 npm run build
 node examples/ingress-minimal.mjs
 node examples/ingress-replay-pipeline.mjs
+node examples/local-durable-buffer-replay.mjs
 ```
 
 Run one failure-mode example directly:
@@ -53,6 +54,12 @@ The ingress examples add:
 * the real `translateBatch()` to `orderEvents()` path
 * translated-versus-rejected record visibility
 * a runnable starting point for the published ingress contract
+
+The first integration-shaped example adds:
+
+* local durable JSONL buffering before replay
+* replay inspection via `inspectOrderResult()`
+* a package-facing example of bounded replay review before downstream writeback
 
 The failure-mode and streaming examples add:
 
