@@ -94,7 +94,7 @@ const relation = compareByHlc(eventA.clock, eventB.clock)
 
 console.log(relation)`,
     bullets: [
-      "This is the preferred direct HLC comparison helper in the published <code>0.5.0</code> release line.",
+      "Use this when you want direct HLC comparison without broader causal inference.",
       "Possible results are <code>before</code>, <code>after</code>, <code>equal</code>, and <code>unknown</code> for invalid input.",
     ],
   },
@@ -256,8 +256,54 @@ const result = compareDeterministically(eventA, eventB, "event_id")
 
 console.log(result)`,
     bullets: [
-      "This is the preferred public deterministic fallback helper in the published <code>0.5.0</code> release line.",
+      "Use this when stronger causal proof is unavailable but you still need stable fallback ordering.",
       "The return value is a comparator-style number suitable for deterministic ordering decisions.",
+    ],
+  },
+  inspectOrderResult: {
+    primary: true,
+    summary:
+      "Use this when you want a compact operational snapshot of one bounded <code>orderEvents()</code> result without writing custom result-shaping code first.",
+    usage: `import { inspectOrderResult, orderEvents } from "causal-order"
+
+const result = orderEvents(events, {
+  strict: false,
+  detectAnomalies: true,
+})
+
+const inspection = inspectOrderResult(result)
+
+console.log(inspection.stats)
+console.log(inspection.anomalySummary)
+console.log(inspection.ordered)`,
+    bullets: [
+      "Summarizes ordered-event counts by <code>orderBasis</code> and <code>confidence</code>.",
+      "Produces an anomaly summary without hiding the original <code>result.anomalies</code> array.",
+      "Keeps the output payload-agnostic so it works as a lightweight operator-facing snapshot.",
+    ],
+  },
+  inspectOrderBatch: {
+    primary: true,
+    summary:
+      "Use this when you want the same compact inspection layer for one emitted <code>orderEventStream()</code> batch, including watermark and correction metadata.",
+    usage: `import { inspectOrderBatch, orderEventStream } from "causal-order"
+
+for await (const batch of orderEventStream(source(), {
+  batchSize: 100,
+  maxLateArrivalMs: 30_000n,
+  lateArrivalPolicy: "emit_correction",
+  strict: false,
+})) {
+  const inspection = inspectOrderBatch(batch)
+
+  console.log(inspection.watermark)
+  console.log(inspection.correction)
+  console.log(inspection.anomalySummary)
+}`,
+    bullets: [
+      "Preserves emitted <code>watermark</code>, <code>isFinal</code>, and correction metadata in the inspection output.",
+      "Summarizes emitted events by <code>orderBasis</code> and <code>confidence</code>.",
+      "Helps operators inspect correction-capable stream output without flattening the underlying batch contract.",
     ],
   },
   orderValidatedEvents: {
@@ -270,8 +316,8 @@ console.log(result)`,
 ): OrderResult<T>`,
     ],
     bullets: [
-      "The website reference shows the stable public shape only.",
-      "The repo still uses an extra coordination parameter internally, but that support path is intentionally not presented as long-term public contract.",
+      "This page shows the supported call shape for already validated events.",
+      "Use <code>orderEvents()</code> instead when you want validation included in the same step.",
     ],
   },
 };
@@ -281,14 +327,14 @@ const deprecatedPages = {
     replacementName: "compareByHlc",
     replacementLabel: "compareByHlc()",
     message:
-      "This compatibility alias remains exported in the published <code>0.5.0</code> line, but new code should prefer the explicit HLC-specific helper.",
+      "This compatibility alias remains exported for older code, but new code should prefer the explicit HLC-specific helper.",
   },
   compareWithTieBreaker: {
     since: "0.5.0",
     replacementName: "compareDeterministically",
     replacementLabel: "compareDeterministically()",
     message:
-      "This compatibility alias remains exported in the published <code>0.5.0</code> line, but new code should prefer the primary deterministic fallback helper.",
+      "This compatibility alias remains exported for older code, but new code should prefer the primary deterministic fallback helper.",
   },
 };
 const typeDescriptions = {
@@ -554,7 +600,8 @@ const apiData = {
   navigation: navigationItems,
   overview: {
     title: "API Overview",
-    description: "The public API surface exported by causal-order today.",
+    description:
+      "Public entry points for translation, validation, ordering, streaming, inspection, and the supporting type surface.",
     sourcePath: "src/index.ts",
     sourceUrl: toSourceUrl("src/index.ts"),
     focusedEntrypoints: buildFocusedEntrypoints(),
@@ -857,23 +904,50 @@ function buildApiFunctionPages() {
 }
 
 function buildNavigationItems(apiFunctionPages) {
-  const primaryFunctionPages = Object.values(apiFunctionPages)
-    .filter((page) => page.primary)
-    .sort((left, right) => left.title.localeCompare(right.title));
-
-  return [
+  const sectionDefinitions = [
+    {
+      title: "Start",
+      entries: [{ title: "Overview", href: "/api/" }],
+    },
+    {
+      title: "Core Flow",
+      pageNames: ["translateBatch", "orderEvents", "orderEventStream"],
+    },
+    {
+      title: "Inspection",
+      pageNames: ["inspectOrderResult", "inspectOrderBatch"],
+    },
+    {
+      title: "Targeted Helpers",
+      pageNames: ["validateEvent", "compareByCausality"],
+    },
     {
       title: "Reference",
-      items: [
-        { title: "Overview", href: "/api/" },
-        ...primaryFunctionPages.map((page) => ({
-          title: page.title,
-          href: page.href,
-        })),
-        { title: "Types", href: "/api/types/" },
-      ],
+      entries: [{ title: "Types", href: "/api/types/" }],
     },
   ];
+
+  return sectionDefinitions
+    .map((section) => {
+      const items = [
+        ...(section.entries ?? []),
+        ...((section.pageNames ?? [])
+          .map((name) => apiFunctionPages[name])
+          .filter(Boolean)
+          .map((page) => ({
+            title: page.title,
+            href: page.href,
+          }))),
+      ];
+
+      return items.length > 0
+        ? {
+            title: section.title,
+            items,
+          }
+        : null;
+    })
+    .filter(Boolean);
 }
 
 function buildOverviewGroups() {

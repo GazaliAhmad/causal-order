@@ -1,0 +1,435 @@
+{
+  "package": "causal-order",
+  "version": "0.6.0",
+  "fileCount": 69,
+  "totals": {
+    "rawBytes": 136833,
+    "gzipBytes": 38893,
+    "brotliBytes": 32929,
+    "raw": "136.8 kB",
+    "gzip": "38.9 kB",
+    "brotli": "32.9 kB"
+  },
+  "badge": {
+    "schemaVersion": 1,
+    "label": "publish size",
+    "message": "38.9 kB (gzip) | 32.9 kB (brotli)",
+    "color": "blue"
+  },
+  "files": [
+    {
+      "path": "dist/anomalies.d.ts",
+      "size": 86,
+      "gzip": 72,
+      "brotli": 66
+    },
+    {
+      "path": "dist/anomalies.js",
+      "size": 86,
+      "gzip": 72,
+      "brotli": 66
+    },
+    {
+      "path": "dist/anomalies/detectAnomalies.d.ts",
+      "size": 609,
+      "gzip": 270,
+      "brotli": 231
+    },
+    {
+      "path": "dist/anomalies/detectAnomalies.js",
+      "size": 1071,
+      "gzip": 377,
+      "brotli": 328
+    },
+    {
+      "path": "dist/anomalies/internalAnomalyCollector.d.ts",
+      "size": 484,
+      "gzip": 228,
+      "brotli": 187
+    },
+    {
+      "path": "dist/anomalies/internalAnomalyCollector.js",
+      "size": 5545,
+      "gzip": 1372,
+      "brotli": 1166
+    },
+    {
+      "path": "dist/anomalies/types.d.ts",
+      "size": 63,
+      "gzip": 76,
+      "brotli": 67
+    },
+    {
+      "path": "dist/anomalies/types.js",
+      "size": 11,
+      "gzip": 31,
+      "brotli": 15
+    },
+    {
+      "path": "dist/batch.d.ts",
+      "size": 80,
+      "gzip": 71,
+      "brotli": 53
+    },
+    {
+      "path": "dist/batch.js",
+      "size": 80,
+      "gzip": 71,
+      "brotli": 53
+    },
+    {
+      "path": "dist/clock.d.ts",
+      "size": 104,
+      "gzip": 72,
+      "brotli": 64
+    },
+    {
+      "path": "dist/clock.js",
+      "size": 104,
+      "gzip": 72,
+      "brotli": 64
+    },
+    {
+      "path": "dist/clock/hlc.d.ts",
+      "size": 322,
+      "gzip": 199,
+      "brotli": 162
+    },
+    {
+      "path": "dist/clock/hlc.js",
+      "size": 2735,
+      "gzip": 667,
+      "brotli": 617
+    },
+    {
+      "path": "dist/clock/parse.d.ts",
+      "size": 112,
+      "gzip": 115,
+      "brotli": 91
+    },
+    {
+      "path": "dist/clock/parse.js",
+      "size": 894,
+      "gzip": 366,
+      "brotli": 293
+    },
+    {
+      "path": "dist/clock/serialize.d.ts",
+      "size": 116,
+      "gzip": 119,
+      "brotli": 95
+    },
+    {
+      "path": "dist/clock/serialize.js",
+      "size": 218,
+      "gzip": 168,
+      "brotli": 131
+    },
+    {
+      "path": "dist/compare.d.ts",
+      "size": 136,
+      "gzip": 82,
+      "brotli": 70
+    },
+    {
+      "path": "dist/compare.js",
+      "size": 136,
+      "gzip": 82,
+      "brotli": 70
+    },
+    {
+      "path": "dist/compare/causalCompare.d.ts",
+      "size": 327,
+      "gzip": 165,
+      "brotli": 129
+    },
+    {
+      "path": "dist/compare/causalCompare.js",
+      "size": 1618,
+      "gzip": 406,
+      "brotli": 343
+    },
+    {
+      "path": "dist/compare/deterministicCompare.d.ts",
+      "size": 497,
+      "gzip": 184,
+      "brotli": 158
+    },
+    {
+      "path": "dist/compare/deterministicCompare.js",
+      "size": 2435,
+      "gzip": 538,
+      "brotli": 460
+    },
+    {
+      "path": "dist/compare/hlcCompare.d.ts",
+      "size": 441,
+      "gzip": 262,
+      "brotli": 194
+    },
+    {
+      "path": "dist/compare/hlcCompare.js",
+      "size": 1044,
+      "gzip": 432,
+      "brotli": 347
+    },
+    {
+      "path": "dist/index.d.ts",
+      "size": 694,
+      "gzip": 209,
+      "brotli": 178
+    },
+    {
+      "path": "dist/index.js",
+      "size": 694,
+      "gzip": 209,
+      "brotli": 178
+    },
+    {
+      "path": "dist/inspect.d.ts",
+      "size": 144,
+      "gzip": 103,
+      "brotli": 86
+    },
+    {
+      "path": "dist/inspect.js",
+      "size": 144,
+      "gzip": 103,
+      "brotli": 86
+    },
+    {
+      "path": "dist/inspect/explainOrderedEvent.d.ts",
+      "size": 465,
+      "gzip": 242,
+      "brotli": 195
+    },
+    {
+      "path": "dist/inspect/explainOrderedEvent.js",
+      "size": 1598,
+      "gzip": 524,
+      "brotli": 435
+    },
+    {
+      "path": "dist/inspect/inspectOutputs.d.ts",
+      "size": 1673,
+      "gzip": 530,
+      "brotli": 467
+    },
+    {
+      "path": "dist/inspect/inspectOutputs.js",
+      "size": 2341,
+      "gzip": 636,
+      "brotli": 580
+    },
+    {
+      "path": "dist/inspect/summarizeAnomalies.d.ts",
+      "size": 1196,
+      "gzip": 367,
+      "brotli": 313
+    },
+    {
+      "path": "dist/inspect/summarizeAnomalies.js",
+      "size": 1055,
+      "gzip": 334,
+      "brotli": 290
+    },
+    {
+      "path": "dist/internal/utils.d.ts",
+      "size": 1145,
+      "gzip": 382,
+      "brotli": 328
+    },
+    {
+      "path": "dist/internal/utils.js",
+      "size": 2329,
+      "gzip": 675,
+      "brotli": 578
+    },
+    {
+      "path": "dist/order.d.ts",
+      "size": 173,
+      "gzip": 100,
+      "brotli": 75
+    },
+    {
+      "path": "dist/order.js",
+      "size": 173,
+      "gzip": 100,
+      "brotli": 75
+    },
+    {
+      "path": "dist/order/internalOrderValidatedEvents.d.ts",
+      "size": 721,
+      "gzip": 381,
+      "brotli": 298
+    },
+    {
+      "path": "dist/order/internalOrderValidatedEvents.js",
+      "size": 11,
+      "gzip": 31,
+      "brotli": 15
+    },
+    {
+      "path": "dist/order/orderEvents.d.ts",
+      "size": 779,
+      "gzip": 380,
+      "brotli": 291
+    },
+    {
+      "path": "dist/order/orderEvents.js",
+      "size": 14800,
+      "gzip": 3247,
+      "brotli": 2885
+    },
+    {
+      "path": "dist/order/orderEventStream.d.ts",
+      "size": 231,
+      "gzip": 170,
+      "brotli": 149
+    },
+    {
+      "path": "dist/order/orderEventStream.js",
+      "size": 10101,
+      "gzip": 2315,
+      "brotli": 2041
+    },
+    {
+      "path": "dist/order/tieBreakers.d.ts",
+      "size": 522,
+      "gzip": 307,
+      "brotli": 245
+    },
+    {
+      "path": "dist/order/tieBreakers.js",
+      "size": 522,
+      "gzip": 303,
+      "brotli": 240
+    },
+    {
+      "path": "dist/order/watermarkStrategies.d.ts",
+      "size": 405,
+      "gzip": 217,
+      "brotli": 179
+    },
+    {
+      "path": "dist/order/watermarkStrategies.js",
+      "size": 1199,
+      "gzip": 389,
+      "brotli": 330
+    },
+    {
+      "path": "dist/stream.d.ts",
+      "size": 45,
+      "gzip": 60,
+      "brotli": 49
+    },
+    {
+      "path": "dist/stream.js",
+      "size": 45,
+      "gzip": 60,
+      "brotli": 49
+    },
+    {
+      "path": "dist/translate.d.ts",
+      "size": 47,
+      "gzip": 58,
+      "brotli": 51
+    },
+    {
+      "path": "dist/translate.js",
+      "size": 47,
+      "gzip": 58,
+      "brotli": 51
+    },
+    {
+      "path": "dist/translate/translateBatch.d.ts",
+      "size": 469,
+      "gzip": 247,
+      "brotli": 209
+    },
+    {
+      "path": "dist/translate/translateBatch.js",
+      "size": 18889,
+      "gzip": 3358,
+      "brotli": 2928
+    },
+    {
+      "path": "dist/types.d.ts",
+      "size": 14499,
+      "gzip": 3702,
+      "brotli": 3214
+    },
+    {
+      "path": "dist/types.js",
+      "size": 11,
+      "gzip": 31,
+      "brotli": 15
+    },
+    {
+      "path": "dist/validate.d.ts",
+      "size": 90,
+      "gzip": 68,
+      "brotli": 59
+    },
+    {
+      "path": "dist/validate.js",
+      "size": 90,
+      "gzip": 68,
+      "brotli": 59
+    },
+    {
+      "path": "dist/validate/validateClock.d.ts",
+      "size": 477,
+      "gzip": 205,
+      "brotli": 163
+    },
+    {
+      "path": "dist/validate/validateClock.js",
+      "size": 2286,
+      "gzip": 669,
+      "brotli": 554
+    },
+    {
+      "path": "dist/validate/validateEvent.d.ts",
+      "size": 510,
+      "gzip": 222,
+      "brotli": 182
+    },
+    {
+      "path": "dist/validate/validateEvent.js",
+      "size": 2047,
+      "gzip": 618,
+      "brotli": 515
+    },
+    {
+      "path": "dist/watermarks.d.ts",
+      "size": 48,
+      "gzip": 68,
+      "brotli": 52
+    },
+    {
+      "path": "dist/watermarks.js",
+      "size": 48,
+      "gzip": 68,
+      "brotli": 52
+    },
+    {
+      "path": "LICENSE",
+      "size": 1069,
+      "gzip": 658,
+      "brotli": 471
+    },
+    {
+      "path": "package.json",
+      "size": 5059,
+      "gzip": 1201,
+      "brotli": 1047
+    },
+    {
+      "path": "README.md",
+      "size": 28588,
+      "gzip": 8651,
+      "brotli": 7152
+    }
+  ]
+}

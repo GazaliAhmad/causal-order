@@ -14,7 +14,7 @@ Without stress work, a library can look correct while still hiding problems such
 * large-batch failure modes that never appear on tiny fixtures
 
 For `causal-order`, the point of stress hardening is not abstract number chasing.
-It is to pressure-test realistic failure shapes at a size where implementation weaknesses become visible.
+It is to pressure-test realistic failure shapes at a size where weak spots become visible.
 
 ## The Conceptual Rule
 
@@ -29,7 +29,7 @@ In practice, that means the stress suite should help answer questions like:
 
 * does weak evidence still remain weak under pressure?
 * do anomalies stay visible instead of being flattened away?
-* does the implementation remain usable when corruption is dense?
+* does the package remain usable when corruption is dense?
 
 ## Why The `150k` Band Matters
 
@@ -45,7 +45,7 @@ So the scale matters because it makes the corruption patterns operationally mean
 
 ## Current Extended Validation
 
-The current repo posture is no longer limited to `100k` routine guards and `150k` hardening language alone.
+The current package guidance is no longer limited to `100k` routine guards and `150k` hardening language alone.
 
 Named `250k` profiles are already in place for both:
 
@@ -53,13 +53,13 @@ Named `250k` profiles are already in place for both:
 * heavier stream validation
 
 Those `250k` runs are best understood as operational extended-validation surfaces.
-They are heavier than the default lightweight guard path, but they are real runnable checks in the repository today rather than only tentative future ideas.
+They are heavier than the default lightweight guard path, but they are real runnable checks rather than only tentative future ideas.
 
 ## Where To Go Next
 
 For the canonical operational guide, profile shapes, commands, and benchmark interpretation, see:
 
-* [Stress Hardening guide](../guides/stress-hardening.md)
+* [Stress Hardening guide](/guides/stress-hardening/)
 
 For the workload-shaping discussion around `100k`, `150k`, and when streaming becomes the more honest model, see:
 

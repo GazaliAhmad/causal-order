@@ -3,15 +3,20 @@
   "sourceBaseUrl": "https://github.com/GazaliAhmad/causal-order/blob/main",
   "navigation": [
     {
-      "title": "Reference",
+      "title": "Start",
       "items": [
         {
           "title": "Overview",
           "href": "/api/"
-        },
+        }
+      ]
+    },
+    {
+      "title": "Core Flow",
+      "items": [
         {
-          "title": "compareByCausality()",
-          "href": "/api/compare-by-causality/"
+          "title": "translateBatch()",
+          "href": "/api/translate-batch/"
         },
         {
           "title": "orderEvents()",
@@ -20,15 +25,38 @@
         {
           "title": "orderEventStream()",
           "href": "/api/order-event-stream/"
+        }
+      ]
+    },
+    {
+      "title": "Inspection",
+      "items": [
+        {
+          "title": "inspectOrderResult()",
+          "href": "/api/inspect-order-result/"
         },
         {
-          "title": "translateBatch()",
-          "href": "/api/translate-batch/"
-        },
+          "title": "inspectOrderBatch()",
+          "href": "/api/inspect-order-batch/"
+        }
+      ]
+    },
+    {
+      "title": "Targeted Helpers",
+      "items": [
         {
           "title": "validateEvent()",
           "href": "/api/validate-event/"
         },
+        {
+          "title": "compareByCausality()",
+          "href": "/api/compare-by-causality/"
+        }
+      ]
+    },
+    {
+      "title": "Reference",
+      "items": [
         {
           "title": "Types",
           "href": "/api/types/"
@@ -38,7 +66,7 @@
   ],
   "overview": {
     "title": "API Overview",
-    "description": "The public API surface exported by causal-order today.",
+    "description": "Public entry points for translation, validation, ordering, streaming, inspection, and the supporting type surface.",
     "sourcePath": "src/index.ts",
     "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/index.ts",
     "focusedEntrypoints": [
@@ -146,7 +174,7 @@
             "since": "0.5.0",
             "replacementName": "compareByHlc",
             "replacementLabel": "compareByHlc()",
-            "message": "This compatibility alias remains exported in the published <code>0.5.0</code> line, but new code should prefer the explicit HLC-specific helper."
+            "message": "This compatibility alias remains exported for older code, but new code should prefer the explicit HLC-specific helper."
           },
           "sourcePath": "src/compare/hlcCompare.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/hlcCompare.ts"
@@ -338,7 +366,7 @@
             "since": "0.5.0",
             "replacementName": "compareDeterministically",
             "replacementLabel": "compareDeterministically()",
-            "message": "This compatibility alias remains exported in the published <code>0.5.0</code> line, but new code should prefer the primary deterministic fallback helper."
+            "message": "This compatibility alias remains exported for older code, but new code should prefer the primary deterministic fallback helper."
           },
           "sourcePath": "src/order/tieBreakers.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/tieBreakers.ts"
@@ -460,7 +488,7 @@
       "summary": "Use this when you want a direct HLC-to-HLC comparison without inferring broader causal semantics.",
       "usage": "import { compareByHlc } from \"causal-order\"\n\nconst relation = compareByHlc(eventA.clock, eventB.clock)\n\nconsole.log(relation)",
       "bullets": [
-        "This is the preferred direct HLC comparison helper in the published <code>0.5.0</code> release line.",
+        "Use this when you want direct HLC comparison without broader causal inference.",
         "Possible results are <code>before</code>, <code>after</code>, <code>equal</code>, and <code>unknown</code> for invalid input."
       ],
       "deprecated": null
@@ -483,7 +511,7 @@
         "since": "0.5.0",
         "replacementName": "compareByHlc",
         "replacementLabel": "compareByHlc()",
-        "message": "This compatibility alias remains exported in the published <code>0.5.0</code> line, but new code should prefer the explicit HLC-specific helper."
+        "message": "This compatibility alias remains exported for older code, but new code should prefer the explicit HLC-specific helper."
       }
     },
     "compareDeterministically": {
@@ -500,7 +528,7 @@
       "summary": "Use this when stronger causal proof is unavailable but you still need deterministic fallback ordering over event envelopes.",
       "usage": "import { compareDeterministically } from \"causal-order\"\n\nconst result = compareDeterministically(eventA, eventB, \"event_id\")\n\nconsole.log(result)",
       "bullets": [
-        "This is the preferred public deterministic fallback helper in the published <code>0.5.0</code> release line.",
+        "Use this when stronger causal proof is unavailable but you still need stable fallback ordering.",
         "The return value is a comparator-style number suitable for deterministic ordering decisions."
       ],
       "deprecated": null
@@ -555,7 +583,7 @@
         "since": "0.5.0",
         "replacementName": "compareDeterministically",
         "replacementLabel": "compareDeterministically()",
-        "message": "This compatibility alias remains exported in the published <code>0.5.0</code> line, but new code should prefer the primary deterministic fallback helper."
+        "message": "This compatibility alias remains exported for older code, but new code should prefer the primary deterministic fallback helper."
       }
     },
     "createHlcClock": {
@@ -696,10 +724,14 @@
       ],
       "href": "/api/inspect-order-batch/",
       "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/inspectOutputs.ts",
-      "primary": false,
-      "summary": null,
-      "usage": null,
-      "bullets": [],
+      "primary": true,
+      "summary": "Use this when you want the same compact inspection layer for one emitted <code>orderEventStream()</code> batch, including watermark and correction metadata.",
+      "usage": "import { inspectOrderBatch, orderEventStream } from \"causal-order\"\n\nfor await (const batch of orderEventStream(source(), {\n  batchSize: 100,\n  maxLateArrivalMs: 30_000n,\n  lateArrivalPolicy: \"emit_correction\",\n  strict: false,\n})) {\n  const inspection = inspectOrderBatch(batch)\n\n  console.log(inspection.watermark)\n  console.log(inspection.correction)\n  console.log(inspection.anomalySummary)\n}",
+      "bullets": [
+        "Preserves emitted <code>watermark</code>, <code>isFinal</code>, and correction metadata in the inspection output.",
+        "Summarizes emitted events by <code>orderBasis</code> and <code>confidence</code>.",
+        "Helps operators inspect correction-capable stream output without flattening the underlying batch contract."
+      ],
       "deprecated": null
     },
     "inspectOrderResult": {
@@ -712,10 +744,14 @@
       ],
       "href": "/api/inspect-order-result/",
       "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/inspectOutputs.ts",
-      "primary": false,
-      "summary": null,
-      "usage": null,
-      "bullets": [],
+      "primary": true,
+      "summary": "Use this when you want a compact operational snapshot of one bounded <code>orderEvents()</code> result without writing custom result-shaping code first.",
+      "usage": "import { inspectOrderResult, orderEvents } from \"causal-order\"\n\nconst result = orderEvents(events, {\n  strict: false,\n  detectAnomalies: true,\n})\n\nconst inspection = inspectOrderResult(result)\n\nconsole.log(inspection.stats)\nconsole.log(inspection.anomalySummary)\nconsole.log(inspection.ordered)",
+      "bullets": [
+        "Summarizes ordered-event counts by <code>orderBasis</code> and <code>confidence</code>.",
+        "Produces an anomaly summary without hiding the original <code>result.anomalies</code> array.",
+        "Keeps the output payload-agnostic so it works as a lightweight operator-facing snapshot."
+      ],
       "deprecated": null
     },
     "orderEvents": {
@@ -777,8 +813,8 @@
       "summary": "Use this when you already hold validated events and want the public ordering step without re-running validation.",
       "usage": null,
       "bullets": [
-        "The website reference shows the stable public shape only.",
-        "The repo still uses an extra coordination parameter internally, but that support path is intentionally not presented as long-term public contract."
+        "This page shows the supported call shape for already validated events.",
+        "Use <code>orderEvents()</code> instead when you want validation included in the same step."
       ],
       "deprecated": null
     },

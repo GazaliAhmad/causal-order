@@ -1,8 +1,6 @@
 # Streaming Hardening And Pressure
 
-`0.3.3` is the release where `causal-order` widens the streaming pressure envelope after the current `0.3.2` contract has already been defended as production-credible.
-
-This guide records the shipped `0.3.3` hardening step.
+This guide explains how `causal-order` widens the streaming pressure envelope after the core stream behavior is already established.
 It does not define a new semantic contract.
 
 ## Goal
@@ -33,7 +31,7 @@ It means the current streaming model has been exercised under heavier pressure a
 
 This does not mean `0.3.3` begins with a stream-architecture redesign.
 
-It means the repository should expose clearer memory-pressure truth for the current contract before it tries to:
+It means the package should expose clearer memory-pressure truth for the current contract before it tries to:
 
 * enforce memory-oriented perf guards
 * make strong bounded-memory claims
@@ -75,7 +73,7 @@ It is still a local visibility signal, not a stable CI threshold.
 `0.3.2` is the release gate.
 It proves the current core and streaming contract is credible enough to defend.
 
-`0.3.3` follows that gate so the repository can widen the pressure work without blurring the release story.
+This guide follows that gate so the package can widen the pressure work without blurring the user-facing story.
 
 That sequencing matters:
 
@@ -196,7 +194,7 @@ The goal is to show that the current correction model stays usable under heavier
 
 The question is not only whether the watermark rule is correct, but whether the current contract remains operationally understandable under heavier pressure. That includes memory behavior.
 
-For this milestone, the repo does not need to pretend memory is already a settled hard guard surface.
+At this stage, the package does not need to pretend memory is already a settled hard guard surface.
 But it should make the memory consequences of stalled or fragmented streaming behavior much more visible than they are today.
 
 ## Perf-Guard Decision Work
@@ -234,7 +232,7 @@ The milestone prefers measured evidence over assumptions.
 
 ## Verification Commands
 
-The `0.3.3` work still maps back to repository commands rather than only to prose.
+The hardening work still maps back to project commands rather than only to prose.
 
 Current commands that carry this work are:
 
@@ -247,7 +245,7 @@ npm run bench:profile
 npm run release:check
 ```
 
-With the scoped work landed, the repository now makes it easier to tell which of these commands provide:
+With this hardening in place, it is easier to tell which of these commands provide:
 
 * current release-gate proof
 * exploratory pressure evidence
@@ -265,11 +263,11 @@ For example, the current `150k` and `250k` watermark-lag profiles can now be rer
 * heap after the run
 * heap after an explicit forced GC
 
-That is useful `0.3.3` evidence even before the repo decides whether any part of it belongs in an enforced benchmark policy.
+That is useful evidence even before the project decides whether any part of it belongs in an enforced benchmark policy.
 
 ## Docs And Release Wording
 
-By the end of `0.3.3`, the repository makes one consistent claim about what this release means.
+The important outcome is one consistent user-facing claim about what this hardening means.
 
 That includes:
 

@@ -1,15 +1,12 @@
 # Guides
 
-These guides are the practical, repository-coupled layer of the documentation.
-They explain how to use `causal-order`, how the main deployment patterns work, and how the current implementation behaves in real operational shapes.
+These guides show how to use `causal-order` in real workflows.
+They focus on package-facing usage, operational choices, and the deployment shapes where the library is most useful.
 
-For the deeper conceptual layer, mental-model pages, and explanatory write-ups that are less tied to operational walkthroughs, see the wiki.
+Start with the quick-start scenarios guide, then move into policy guidance, operational workflows, failure modes, or workload hardening depending on what you are trying to do.
 
-Alongside the current ordering and streaming surfaces, the published `0.5.0` line now includes the narrow raw-record ingress path via `translateBatch()`, its machine-readable diagnostics follow-through, the package-facing DX layer around runnable examples and docs synchronization, and the released stability-and-contract-design pass before `1.0.0`.
-The published `0.6.0` line is the next tooling-and-integration pass, built on top of the explicit `0.5.0` core-versus-extension boundary.
-That line includes additive inspection helpers, replay and reconciliation workflow guides, a first integration-shaped replay example, and a first operator metrics guide.
-For the current published contract, start with the `0.5.0` release notes, the stability implementation guide, the README's raw-record translation example, and the runnable ingress examples under `/examples`.
-For helper-level pairwise comparison, prefer `compareByHlc()` and `compareDeterministically()` over compatibility aliases.
+For the deeper conceptual layer, mental-model pages, and explanatory write-ups about why the library behaves this way, see the wiki.
+For function-by-function reference, see the API docs.
 
 Start here:
 

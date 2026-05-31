@@ -86,15 +86,17 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "badge:footprint": "node test/package-footprint-badge.mjs",
+    "badge:footprint:check": "node test/package-footprint-badge.mjs --check",
     "check": "tsc -p tsconfig.json --noEmit",
     "docs:check": "node test/docs-sync.mjs",
     "examples:check": "node examples/index.mjs",
-    "docs:sync:check": "npm run build && npm run docs:check && npm run examples:check",
+    "docs:sync:check": "npm run build && npm run docs:check && npm run badge:footprint:check && npm run examples:check",
     "test": "npm run build && node test/run.mjs",
     "site:dev": "npm --prefix website run dev",
     "site:build": "npm --prefix website run build",
     "site:preview": "npm --prefix website run preview",
-    "release:check": "npm run check && npm test && npm run docs:sync:check && npm run bench:check",
+    "release:check": "npm run check && npm test && npm run badge:footprint && npm run docs:sync:check && npm run bench:check",
     "demo": "npm run build && node examples/smoke-demo.mjs",
     "examples": "npm run build && npm run examples:check",
     "bench": "npm run build && node perf/run.mjs --profile baseline-100k-shuffled",
@@ -113,7 +115,7 @@
     "bench:confidence:150k": "npm run build && node perf/run.mjs --profile baseline-150k-shuffled --profile streaming-150k-watermark-lag",
     "bench:confidence:250k": "npm run build && node perf/run.mjs --profile baseline-250k-shuffled --profile streaming-250k-watermark-lag",
     "bench:check": "npm run build && node perf/check.mjs",
-    "prepack": "npm run build"
+    "prepack": "npm run build && npm run badge:footprint"
   },
   "devDependencies": {
     "typescript": "^5.9.0"

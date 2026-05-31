@@ -56,4 +56,4 @@ If the natural workload is unbounded or too large to handle honestly as one in-m
 That is why `orderEventStream()` matters.
 It gives the project a more honest model for large or continuous flows than pretending everything should be processed in one giant sort.
 
-The repository also now has a named `streaming-250k-watermark-lag` profile in place for heavier stream validation when you want to check beyond the main routine bands.
+There is also a named `streaming-250k-watermark-lag` profile for heavier stream validation when you want to check beyond the main routine bands.

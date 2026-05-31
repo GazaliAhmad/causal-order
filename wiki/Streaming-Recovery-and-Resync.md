@@ -57,7 +57,7 @@ That is one of the reasons `causal-order` treats streaming as a first-class oper
 
 For the full operational guide, stream contract details, downstream write patterns, and reconnect example, see:
 
-* [Streaming Recovery And Resync guide](../guides/streaming-recovery-resync.md)
+* [Streaming Recovery And Resync guide](/guides/streaming-recovery-resync/)
 
 For the focused conceptual treatment of operational versus causal finality, see:
 

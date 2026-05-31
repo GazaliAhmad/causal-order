@@ -1,13 +1,11 @@
 # Fuzz Testing
 
-`0.3.2` adds a seeded fuzz layer to the production gate.
+This guide explains the seeded fuzz layer used alongside the production-oriented scenario suite.
+It shows how `causal-order` pressure-tests the current contract under randomized outage and recovery noise without giving up reproducibility.
 
-The point of this guide is not to claim that fuzzing replaces the named release-gate scenarios.
-The point is to show how the repo now pressure-tests the current contract under randomized outage and recovery noise without giving up reproducibility.
+## Why Fuzzing Belongs Here
 
-## Why Fuzzing Belongs In `0.3.2`
-
-The existing release-gate tests already cover named current-core and streaming cases directly.
+The existing scenario tests already cover named batch and streaming cases directly.
 
 Fuzzing adds something different:
 
@@ -20,7 +18,7 @@ Fuzzing adds something different:
 That matters because `causal-order` is not only trying to survive ideal fixtures.
 It is trying to stay honest when messy operational input still reaches the current batch and streaming APIs.
 
-## What `0.3.2` Covers
+## What This Fuzz Layer Covers
 
 The current fuzz layer is intentionally split into two practical surfaces:
 
@@ -92,11 +90,11 @@ It is:
 
 * this exact seed reproduced a contract problem
 * we can rerun that same seed locally and in CI
-* we can tighten either the implementation or the contract language from a concrete case
+* we can tighten either the runtime or the docs from a concrete case
 
-That is why the current fuzz layer is bounded and deterministic rather than purely random every run.
+That is why the fuzz layer is bounded and deterministic rather than purely random every run.
 
-## What `0.3.2` Fuzzing Does Not Claim
+## What This Fuzzing Does Not Claim
 
 This fuzz layer does not yet claim to solve:
 
@@ -107,7 +105,7 @@ This fuzz layer does not yet claim to solve:
 
 Those are separate questions.
 
-For `0.3.2`, the fuzz layer is only trying to defend the current payload-agnostic batch and streaming contract under realistic operational noise.
+The fuzz layer is only trying to defend the current payload-agnostic batch and streaming contract under realistic operational noise.
 
 ## How To Run It
 
@@ -125,11 +123,11 @@ npm run release:check
 
 So the current release gate already treats them as part of normal correctness verification rather than as an optional local experiment.
 
-## Relationship To `0.3.3`
+## Relationship To Broader Pressure Work
 
-`0.3.2` fuzzing is the bounded, reproducible release-gate layer.
+The fuzzing here is the bounded, reproducible correctness layer.
 
-`0.3.3` should extend this into broader exploratory campaigns:
+Broader pressure work can extend this into exploratory campaigns:
 
 * longer-running seeded runs
 * higher-cardinality workloads
@@ -138,11 +136,11 @@ So the current release gate already treats them as part of normal correctness ve
 * watermark-lag and memory-growth discovery
 * hotspot-finding pressure runs
 
-That follow-up should build on the `0.3.2` fuzz harness rather than replacing it.
+That follow-up should build on this fuzz harness rather than replacing it.
 
 ## Bottom Line
 
-The `0.3.2` fuzz suite exists to answer a narrow but important question:
+This fuzz suite exists to answer a narrow but important question:
 
 > Does the current contract stay reproducible and operationally honest when real outage, replay, drift, and reconnect noise stop looking clean?
 

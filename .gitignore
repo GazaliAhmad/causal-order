@@ -3,6 +3,7 @@ dist/
 .npm-cache*/
 website/node_modules/
 website/dist/
+website/dist-check/
 website/.astro/
 website/.vite/
 .tmp-*/

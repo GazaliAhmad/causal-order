@@ -5,25 +5,17 @@
 This wiki is the conceptual layer of the project.
 It explains the mental model behind the library, why the problem is harder than ordinary timestamp sorting, and how `causal-order` tries to stay honest without becoming unusable.
 
-For the practical, repository-coupled layer with operational walkthroughs, deployment patterns, and implementation-shaped usage guides, see `/guides`.
+If you want the quickest path into the package, start with the [README](https://github.com/GazaliAhmad/causal-order/blob/main/README.md).
+Use this wiki when you want the deeper explanation behind what the guides and API reference are doing.
+For package-facing usage, examples, and operational walkthroughs, use the [guides](/guides/), the [API reference](/api/), and the [examples folder](https://github.com/GazaliAhmad/causal-order/tree/main/examples).
 
-If the README is the quick path, this wiki is the deeper explanation.
+## How To Use These Docs
 
-For the repo-coupled usage side, the package now has three published layers:
+Use each doc surface for a different job:
 
-* `0.4.x` ingress and diagnostics around synchronous `translateBatch()` translation before ordering
-* `0.5.0` stability-and-contract-design guidance for what the package intends to preserve before `1.0.0`
-* `0.6.0` operational-tooling follow-through around inspection helpers, replay and reconciliation workflows, integration-shaped examples, and operator metrics
-
-The practical contract and runnable customer-facing examples for that surface live in `/guides`, `/examples`, and the main README rather than in the conceptual wiki pages.
-
-For the fastest package-facing entry points:
-
-* start with `/guides/quick-start-scenarios.md`
-* see `/guides/policy-guidance.md` for operational strictness and late-arrival choices
-* see `/guides/operations/replay-inspection-workflow.md`, `/guides/operations/streaming-reconciliation-workflow.md`, and `/guides/operations/operator-metrics-guide.md` for replay, reconciliation, and metrics follow-through
-* see `/guides/stability/implementation-guide-0.5.0.md` and `/docs/releases/0.5.0.md` for the published `0.5.0` stability line
-* see `/docs/releases/0.6.0.md` for the published `0.6.0` operational release shape
+* [README](https://github.com/GazaliAhmad/causal-order/blob/main/README.md) for the shortest path to understanding the library
+* [guides](/guides/) for practical usage, workflows, and package-facing documentation
+* this wiki for concepts, terminology, and deeper explanation
 
 ## Start Here
 
@@ -36,7 +28,17 @@ If you are new to the project, read these pages first:
 5. [Streaming Finality](Streaming-Finality)
 6. [Streaming Recovery and Resync](Streaming-Recovery-and-Resync)
 
-## Conceptual Pages
+## Practical Next Steps
+
+If you already understand the concepts and want to use the package:
+
+* start with [Quick Start Scenarios](/guides/quick-start-scenarios/)
+* see [Policy Guidance](/guides/policy-guidance/) for operational strictness and late-arrival choices
+* see [Replay Inspection Workflow](/guides/operations/replay-inspection-workflow/) for bounded replay inspection
+* see [Streaming Reconciliation Workflow](/guides/operations/streaming-reconciliation-workflow/) for stream correction and reconciliation
+* see [Operator Metrics Guide](/guides/operations/operator-metrics-guide/) for operator-facing metrics and summaries
+
+## Concept Pages
 
 * [What This Library Is](What-This-Library-Is)
 * [The Problem With Distributed Timelines](The-Problem-With-Distributed-Timelines)
@@ -46,7 +48,6 @@ If you are new to the project, read these pages first:
 * [Streaming Finality](Streaming-Finality)
 * [Streaming Recovery and Resync](Streaming-Recovery-and-Resync)
 * [Realistic Workloads](Realistic-Workloads)
-* [Operational Fuzzing](Operational-Fuzzing)
 * [Stress Hardening](Stress-Hardening)
 * [Design Philosophy](Design-Philosophy)
 * [When to Use causal-order](When-to-Use-causal-order)
@@ -68,13 +69,6 @@ It is also:
 * showing when order is only derived
 * refusing to flatten concurrency into fake sequence
 * making suspicious or weak metadata visible
-
-That includes both:
-
-* the explicit streaming model for day-to-day live processing, delayed reconnect, and resync flows
-* the narrow synchronous ingress path for translating raw user-space records into the event envelope without pulling file, CLI, or transport glue into the core package
-* the machine-readable diagnostics and strictness-policy surface that explain why raw-record translation failed
-* runnable examples that use the public `causal-order` package surface rather than repo-internal imports so copied code still looks like real consumer code
 
 So the project is not only about explaining distributed timelines after the fact.
 It is about giving real systems an event-integrity model designed to work without treating global clock sync as the source of truth.

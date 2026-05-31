@@ -1040,6 +1040,31 @@ Release result:
 * users can see how the same event model supports bounded replay, live streaming, and hybrid reconciliation
 * maintainers now have clearer tooling hooks for debugging and operator visibility
 
+## `0.6.1` Public Docs And Release Polish
+
+Goal:
+Make the public package surface easier to trust, navigate, and keep current without changing the runtime behavior of the library.
+
+Delivered in `0.6.1`:
+
+* tightened the boundary between public docs and repo-only material:
+  * the website now focuses on helping users understand and use `causal-order`
+  * implementation guides, decision records, migration notes, and similar design-history artifacts stay repo-only
+* improved website consistency across the three public doc surfaces:
+  * guides, wiki, and API pages now share the same navigation and table-of-contents behavior
+  * the guides landing page now behaves like a user-facing starting point instead of a repo index
+* improved public metadata and release-surface hygiene:
+  * automated the README publish-size badge from actual package contents
+  * added sitemap and RSS support for the docs website
+  * aligned canonical-site and share-image defaults so public pages present better in search and social previews
+  * tightened checks so public-site doc leaks are caught automatically
+
+Release result:
+
+* users now get a clearer package-facing website without needing to sort through internal implementation history
+* release metadata is easier to keep accurate over time
+* `0.6.1` stays a patch-level polish line with no new runtime or API claim expansion
+
 ## `0.7.x` Ecosystem And Transferability
 
 Goal:

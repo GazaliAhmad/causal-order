@@ -6,7 +6,10 @@ import "../styles/home.css";
 const featured = getFeaturedDocs();
 ---
 
-<BaseLayout>
+<BaseLayout
+  title="causal-order | Order distributed events by justified causality"
+  description="Understand and use causal-order for distributed event ordering with practical guides, API reference, and conceptual docs built around justified causality."
+>
   <section class="hero">
     <div class="hero-copy">
       <div class="hero-badge">Distributed systems docs</div>
@@ -67,8 +70,8 @@ const featured = getFeaturedDocs();
       <span class="card-kicker">Practical layer</span>
       <h2><a href="/guides/">Guides</a></h2>
       <p>
-        Deployment patterns, operational walkthroughs, failure modes, and the current runtime
-        contract.
+        Quick starts, policy choices, replay workflows, and operator follow-through for the current
+        package surface.
       </p>
       <ul class="home-links">
         {featured.guides.map((item) => (
@@ -81,8 +84,8 @@ const featured = getFeaturedDocs();
       <span class="card-kicker">Conceptual layer</span>
       <h2><a href="/wiki/">Wiki</a></h2>
       <p>
-        Mental models, design philosophy, and the deeper reasoning behind the library’s ordering
-        choices.
+        Mental models, terminology, and deeper explanations for concurrency, uncertainty, and
+        honest ordering claims.
       </p>
       <ul class="home-links">
         {featured.wiki.map((item) => (
@@ -99,14 +102,15 @@ const featured = getFeaturedDocs();
           <span class="card-kicker">Reference layer</span>
           <h2><a href="/api/">API</a></h2>
           <p>
-            Public entry points, result types, ordering options, streaming batches, and the current
-            exported contract.
+            Translation, ordering, inspection, and the exported type surface for the package.
           </p>
         </div>
 
         <ul class="home-links home-links-compact">
+          <li><a href="/api/translate-batch/">translateBatch()</a></li>
           <li><a href="/api/order-events/">orderEvents()</a></li>
           <li><a href="/api/order-event-stream/">orderEventStream()</a></li>
+          <li><a href="/api/inspect-order-result/">inspectOrderResult()</a></li>
           <li><a href="/api/validate-event/">validateEvent()</a></li>
           <li><a href="/api/types/">Types</a></li>
         </ul>

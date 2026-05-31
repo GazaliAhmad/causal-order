@@ -8,8 +8,8 @@ This guide explains where `causal-order` sits in that landscape:
 * why Lamport clocks are useful but incomplete
 * why vector clocks are richer but heavier
 * why this library uses Hybrid Logical Clocks
-* what the current HLC implementation in this repo actually does
-* why that implementation is not Cristian's algorithm
+* what the HLC clock helper in `causal-order` actually does
+* why that helper is not Cristian's algorithm
 
 ## The Short Version
 
@@ -89,11 +89,9 @@ It does not prove that `B` observed, depended on, or was caused by `A`.
 
 That is exactly why `causal-order` treats HLC-only ordering as `derived`.
 
-## What The Current HLC Implementation Does
+## What The HLC Clock Helper Does
 
-The current runtime implementation lives in [`src/clock/hlc.ts`](../src/clock/hlc.ts).
-
-It exposes `createHlcClock()` with three practical inputs:
+`causal-order` exposes `createHlcClock()` with three practical inputs:
 
 * `nodeId`
 * optional `now()` source
@@ -109,7 +107,7 @@ That clock then exposes three operations:
 
 `now()` advances local HLC state using the local wall-clock source.
 
-In the current implementation:
+In practice:
 
 * if wall time moved forward, `physicalTimeMs` advances and `logicalCounter` resets to `0`
 * if wall time did not move forward, the clock keeps the same physical time and increments `logicalCounter`
@@ -120,7 +118,7 @@ That preserves monotonic local progress even when wall time stalls or moves too 
 
 `receive(remote)` merges a remote HLC timestamp into local state.
 
-In the current implementation:
+In practice:
 
 * the remote timestamp is validated
 * local wall time is read
@@ -139,11 +137,11 @@ That gives the node a monotonic merged timestamp without pretending either side 
 
 That is mostly an operational convenience for inspection, serialization, and testing.
 
-## What The Current HLC Implementation Does Not Do
+## What The HLC Clock Helper Does Not Do
 
 It is just as important to say what this code does not do.
 
-The current implementation does not:
+It does not:
 
 * synchronize clocks across machines
 * estimate network delay
@@ -160,9 +158,9 @@ Cristian's algorithm is a clock-synchronization protocol.
 
 Its purpose is to let a client estimate a better wall-clock time by talking to a time server and accounting for round-trip delay.
 
-That is not what [`src/clock/hlc.ts`](../src/clock/hlc.ts) does.
+That is not what `causal-order`'s HLC clock helper does.
 
-The current HLC code:
+The HLC helper:
 
 * does not contact a time server
 * does not estimate one-way or round-trip network delay
@@ -174,7 +172,7 @@ Instead, it assumes each node already has some local wall-clock source and then 
 So the honest comparison is:
 
 * Cristian's algorithm tries to improve wall-clock synchronization
-* this HLC implementation tries to preserve monotonic event timestamps despite imperfect clocks and message timing
+* the HLC helper in `causal-order` tries to preserve monotonic event timestamps despite imperfect clocks and message timing
 
 Those are related concerns, but they are not the same mechanism.
 
