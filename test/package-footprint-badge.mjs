@@ -80,6 +80,33 @@ function formatSize(bytes) {
   return `${(bytes / 1000).toFixed(1)} kB`
 }
 
+function isTextPublishedFile(relativePath) {
+  const extension = path.extname(relativePath).toLowerCase()
+  const textExtensions = new Set([
+    ".d.ts",
+    ".js",
+    ".json",
+    ".md",
+    ".svg",
+    ".txt",
+  ])
+  const textBaseNames = new Set(["LICENSE", "LICENCE", "README"])
+
+  if (textExtensions.has(extension)) {
+    return true
+  }
+
+  return textBaseNames.has(path.basename(relativePath).toUpperCase())
+}
+
+function normalizeContentForFootprint(relativePath, content) {
+  if (!isTextPublishedFile(relativePath)) {
+    return content
+  }
+
+  return Buffer.from(content.toString("utf8").replaceAll("\r\n", "\n"), "utf8")
+}
+
 async function summarizePublishedFiles(files) {
   const entries = []
   let rawBytes = 0
@@ -88,7 +115,10 @@ async function summarizePublishedFiles(files) {
 
   for (const relativePath of files) {
     const absolutePath = path.join(rootDir, relativePath)
-    const content = await readFile(absolutePath)
+    const content = normalizeContentForFootprint(
+      relativePath,
+      await readFile(absolutePath),
+    )
     const size = content.length
     const gzip = gzipSync(content).length
     const brotli = brotliCompressSync(content).length
