@@ -1070,6 +1070,38 @@ Release result:
 Goal:
 Reduce dependence on any single team member and make the package easier for a broader team to carry forward safely.
 
+## `0.7.0` Transferability Baseline
+
+Goal:
+Land the smallest useful transferability release so a new maintainer or evaluator can understand how to operate, evolve, and assess the package without relying on tribal knowledge.
+
+Proposed scope:
+
+* maintainer-facing transferability docs:
+  * maintenance guide
+  * release process guide
+  * compatibility policy
+* clearer user-facing boundaries:
+  * supported versus intentionally unsupported usage guide
+  * clearer upgrade expectations for the current preserved surface
+* better package discovery and orientation:
+  * improved examples index and entrypoint guidance
+  * lightweight architecture overview for the main core modules
+
+Not in the first `0.7.0` cut unless the scope deliberately expands:
+
+* broad case-study expansion
+* major benchmark-reporting overhaul
+* large repository reorganization
+* new runtime or API-surface expansion disguised as docs work
+
+Exit criteria:
+
+* a new maintainer can follow a documented release path without guessing at hidden steps
+* an evaluator can tell what compatibility posture the package intends to preserve
+* a user can see which usage patterns are supported, unsupported, or intentionally out of scope
+* the examples surface is easier to browse from a package-consumer point of view
+
 Focus:
 
 * strengthen transferability:
