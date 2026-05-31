@@ -1,8 +1,7 @@
 # Stress Hardening
 
-`0.2.2` is where `causal-order` stops proving its semantics only on small fixtures and starts pressure-testing them on ugly, large corrupted batches.
-
-This guide explains why that matters, what the current stress posture is, and how to run the stress tooling in the repository.
+This guide explains why large-batch stress work matters, what workload bands `causal-order`
+currently aims to handle honestly, and how to run the stress tooling yourself.
 
 ## Why This Exists
 
@@ -18,13 +17,13 @@ They do not answer:
 
 * does the library still behave honestly when corruption is repeated thousands of times?
 * does anomaly-heavy input expose hidden performance cliffs?
-* does the implementation stay usable when a batch is large and messy at the same time?
+* does the package stay usable when a batch is large and messy at the same time?
 
 That is the point of the stress suite.
 
 ## Current Workload Posture
 
-The repository now treats large-batch guidance in two bands:
+The package treats large-batch guidance in two bands:
 
 * `100k` is the routine credible batch band
 * `150k` is the corrupted-dataset stress band for hardening and visibility
@@ -65,7 +64,7 @@ They are concentrated versions of the same failure shapes already represented in
 The `0.2.2` stress pass was valuable for two reasons:
 
 * it confirmed that the semantic model still holds under large corrupted batches, not just under hand-sized examples
-* it exposed a real implementation bottleneck in the ready-queue ordering path that small tests did not make obvious
+* it exposed a real bottleneck in the ready-queue ordering path that small tests did not make obvious
 
 The important lesson is not only that the code got faster.
 It is that the stress suite made the package story more credible.
@@ -134,7 +133,7 @@ Those fields help distinguish:
 * anomaly visibility under corruption
 * performance comfort under corruption
 
-That distinction matters because a stress run can be semantically correct while still revealing an implementation bottleneck worth fixing.
+That distinction matters because a stress run can be semantically correct while still revealing a bottleneck worth fixing.
 
 ## Relationship To The Other Guides
 
@@ -148,4 +147,4 @@ That is the intended progression:
 
 1. understand the semantics
 2. understand the failure modes
-3. understand how the repo hardens those semantics under stress
+3. understand how those semantics hold up under stress

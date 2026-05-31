@@ -139,8 +139,7 @@ If events keep arriving and lateness is part of the operational model, move to `
 
 After you pick a scenario and run the example, the next follow-through guide is:
 
-* [Implementation Guide `0.5.0`](./stability/implementation-guide-0.5.0.md)
 * [Policy Guidance](./policy-guidance.md)
-* [Release Notes `0.5.0`](../docs/releases/0.5.0.md)
-
-Those notes track the current published stability line around operational policy choices, compatibility direction, and explicit core-boundary decisions.
+* [Replay Inspection Workflow](./operations/replay-inspection-workflow.md)
+* [Streaming Reconciliation Workflow](./operations/streaming-reconciliation-workflow.md)
+* [API Reference](/api/)

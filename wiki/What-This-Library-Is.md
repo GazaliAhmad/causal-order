@@ -44,32 +44,14 @@ But in distributed systems, clean-looking answers are often wrong.
 
 `causal-order` exists to make that uncertainty visible instead of hiding it.
 
-In the published `0.4.1` line, that scope includes:
+In practice, that means the library focuses on a few specific jobs:
 
-* bounded batch ordering
-* the streaming contract for late arrivals, watermarks, correction-capable output, and reconnect-heavy recovery flows
-* the narrow synchronous ingress surface for translating raw application records into the event envelope through `translateBatch()` before ordering
-* the machine-readable diagnostics and strictness-policy surface for understanding translation failures without scraping free-form text
+* bounded and streaming event ordering
+* raw-record translation into the event envelope
+* validation and anomaly visibility
+* confidence-aware outputs that distinguish proof from inference
 
-The published `0.4.2` follow-through completed the package-facing evaluation work around that shipped surface:
+That work is intentionally kept payload-agnostic and environment-free rather than growing into file parsing, CLI tooling, or transport adapters inside the core package.
 
-* runnable ingress examples that show the real `translateBatch()` to `orderEvents()` path
-* example code that uses the public `causal-order` package surface rather than repo-internal imports
-* tighter synchronization between docs and what those runnable examples actually do
-
-That ingress work is intentionally kept payload-agnostic and environment-free rather than growing into file parsing, CLI tooling, or transport adapters inside the core package.
-
-The published `0.5.0` line then focuses on a different question:
-
-* which exported names and defaults are stable enough to preserve into `1.0.0`?
-* which domain-semantic behaviors belong in the payload-agnostic core?
-* which domain-semantic behaviors should live behind extension points or remain out of scope?
-
-That release made the answers explicit enough to publish:
-
-* preferred helper names now have migration direction
-* warning-visible defaults now have compatibility direction
-* contradiction handling, entity forks, and semantic dedupe now have explicit core-versus-extension boundaries
-
-That means this library has become more than a nicer sort function.
-It is now a deployment-oriented event-integrity layer for event pipelines that need to survive drift, replay, late sync, and partial causal evidence without falling back to fake global-clock certainty.
+So this library is more than a nicer sort function.
+It is an event-integrity layer for pipelines that need to survive drift, replay, late sync, and partial causal evidence without falling back to fake global-clock certainty.

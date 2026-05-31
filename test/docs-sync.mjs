@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import { readdir, readFile } from "node:fs/promises"
 import path from "node:path"
-import { fileURLToPath } from "node:url"
+import { fileURLToPath, pathToFileURL } from "node:url"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const rootDir = path.resolve(__dirname, "..")
@@ -40,6 +40,9 @@ async function assertExampleImportsStayPackageFacing() {
 }
 
 async function main() {
+  const websiteDocs = await import(
+    pathToFileURL(path.join(rootDir, "website/src/lib/docs.js")).href
+  )
   const readme = await readRootFile("README.md")
   const examplesReadme = await readRootFile("examples/README.md")
   const guidesReadme = await readRootFile("guides/README.md")
@@ -60,6 +63,8 @@ async function main() {
   const replayInspectionWorkflow = await readRootFile("guides/operations/replay-inspection-workflow.md")
   const streamingReconciliationWorkflow = await readRootFile("guides/operations/streaming-reconciliation-workflow.md")
   const operatorMetricsGuide = await readRootFile("guides/operations/operator-metrics-guide.md")
+  const websiteGuides = websiteDocs.getDocsByCollection("guides")
+  const websiteGuidePaths = new Set(websiteGuides.map((doc) => doc.relativePath))
 
   assertIncludes(readme, "guides/quick-start-scenarios.md", "README")
   assertIncludes(readme, "guides/policy-guidance.md", "README")
@@ -108,7 +113,8 @@ async function main() {
   assertIncludes(guidesReadme, "./operations/replay-inspection-workflow.md", "guides/README.md")
   assertIncludes(guidesReadme, "./operations/streaming-reconciliation-workflow.md", "guides/README.md")
   assertIncludes(guidesReadme, "./operations/operator-metrics-guide.md", "guides/README.md")
-  assertIncludes(guidesReadme, "compareByHlc()` and `compareDeterministically()", "guides/README.md")
+  assertIncludes(guidesReadme, "These guides show how to use `causal-order` in real workflows.", "guides/README.md")
+  assertIncludes(guidesReadme, "For function-by-function reference, see the API docs.", "guides/README.md")
   assertIncludes(guidesReadme, "../examples/ingress-minimal.mjs", "guides/README.md")
   assertIncludes(guidesReadme, "../examples/ingress-replay-pipeline.mjs", "guides/README.md")
   assertIncludes(guidesReadme, "../examples/local-durable-buffer-replay.mjs", "guides/README.md")
@@ -122,7 +128,8 @@ async function main() {
   assertIncludes(quickStart, "node examples/offline-sync-anomalies.mjs", "guides/quick-start-scenarios.md")
   assertIncludes(quickStart, "./policy-guidance.md", "guides/quick-start-scenarios.md")
   assertIncludes(quickStart, "./operations/replay-inspection-workflow.md", "guides/quick-start-scenarios.md")
-  assertIncludes(quickStart, "../docs/releases/0.5.0.md", "guides/quick-start-scenarios.md")
+  assertIncludes(quickStart, "./operations/streaming-reconciliation-workflow.md", "guides/quick-start-scenarios.md")
+  assertIncludes(quickStart, "/api/", "guides/quick-start-scenarios.md")
 
   assertIncludes(policyGuidance, "### `flag`", "guides/policy-guidance.md")
   assertIncludes(policyGuidance, "### `drop`", "guides/policy-guidance.md")
@@ -131,13 +138,14 @@ async function main() {
   assertIncludes(policyGuidance, "`strict: true`", "guides/policy-guidance.md")
   assertIncludes(policyGuidance, "`strict: false`", "guides/policy-guidance.md")
 
-  assertIncludes(wikiHome, "/guides/quick-start-scenarios.md", "wiki/Home.md")
-  assertIncludes(wikiHome, "/guides/policy-guidance.md", "wiki/Home.md")
-  assertIncludes(wikiHome, "/guides/operations/replay-inspection-workflow.md", "wiki/Home.md")
-  assertIncludes(wikiHome, "/guides/operations/streaming-reconciliation-workflow.md", "wiki/Home.md")
-  assertIncludes(wikiHome, "/guides/operations/operator-metrics-guide.md", "wiki/Home.md")
-  assertIncludes(wikiHome, "/guides/stability/implementation-guide-0.5.0.md", "wiki/Home.md")
-  assertIncludes(wikiHome, "/docs/releases/0.6.0.md", "wiki/Home.md")
+  assertIncludes(wikiHome, "[guides](/guides/)", "wiki/Home.md")
+  assertIncludes(wikiHome, "/guides/quick-start-scenarios/", "wiki/Home.md")
+  assertIncludes(wikiHome, "/guides/policy-guidance/", "wiki/Home.md")
+  assertIncludes(wikiHome, "/guides/operations/replay-inspection-workflow/", "wiki/Home.md")
+  assertIncludes(wikiHome, "/guides/operations/streaming-reconciliation-workflow/", "wiki/Home.md")
+  assertIncludes(wikiHome, "/guides/operations/operator-metrics-guide/", "wiki/Home.md")
+  assertIncludes(wikiHome, "README", "wiki/Home.md")
+  assertIncludes(wikiHome, "How To Use These Docs", "wiki/Home.md")
 
   assertIncludes(releaseNotes, "compatibility helper aliases", "docs/releases/0.5.0.md")
   assertIncludes(releaseNotes, "guides/stability/implementation-guide-0.5.0.md", "docs/releases/0.5.0.md")
@@ -200,6 +208,11 @@ async function main() {
   assertIncludes(operatorMetricsGuide, "correction-rate monitoring", "guides/operations/operator-metrics-guide.md")
   assertIncludes(operatorMetricsGuide, "inspectOrderBatch()", "guides/operations/operator-metrics-guide.md")
   assertIncludes(operatorMetricsGuide, "inspectOrderResult()", "guides/operations/operator-metrics-guide.md")
+  assert.equal(websiteGuidePaths.has("operations/implementation-guide-0.6.0.md"), false, "website guides should exclude implementation guides")
+  assert.equal(websiteGuidePaths.has("stability/implementation-guide-0.5.0.md"), false, "website guides should exclude stability implementation notes")
+  assert.equal(websiteGuidePaths.has("stability/decision-record-api-clarity-0.5.0.md"), false, "website guides should exclude decision records")
+  assert.equal(websiteGuidePaths.has("stability/domain-semantic-design-notes-0.5.0.md"), false, "website guides should exclude design notes")
+  assert.equal(websiteGuidePaths.has("devex/developer-experience-0.4.0.md"), false, "website guides should exclude developer-experience notes")
 
   await assertExampleImportsStayPackageFacing()
 

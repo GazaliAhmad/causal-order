@@ -12,10 +12,11 @@ const {
   currentPath = "/api/",
 } = Astro.props;
 const articleAnchor = "docs-content";
+const hasToc = toc.length > 0;
 ---
 
 <BaseLayout title={`${title} | causal-order API`} description={description}>
-  <div class="docs-shell">
+  <div class:list={["docs-shell", { "docs-shell-with-toc": hasToc, "docs-shell-no-toc": !hasToc }]}>
     <aside class="docs-sidebar">
       <div class="sidebar-label">API</div>
 
@@ -56,19 +57,17 @@ const articleAnchor = "docs-content";
       </div>
     </article>
 
-    <aside class="docs-toc">
-      {toc.length > 0 && (
-        <>
-          <div class="toc-label">On this page</div>
-          <ul>
-            {toc.map((heading) => (
-              <li class:list={{ nested: heading.depth === 3 }}>
-                <a href={`#${heading.id}`}>{heading.text}</a>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-    </aside>
+    {hasToc && (
+      <aside class="docs-toc">
+        <div class="toc-label">On this page</div>
+        <ul>
+          {toc.map((heading) => (
+            <li class:list={{ nested: heading.depth === 3 }}>
+              <a href={`#${heading.id}`}>{heading.text}</a>
+            </li>
+          ))}
+        </ul>
+      </aside>
+    )}
   </div>
 </BaseLayout>

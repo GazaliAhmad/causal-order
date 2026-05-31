@@ -1,18 +1,18 @@
 # Anomaly Surface Audit
 
-This guide explains how the current anomaly surface maps to the `0.3.2` production-gate categories.
+This guide explains how the current anomaly surface maps to the main production-facing failure categories.
 
 The goal is not to claim that every important failure shape has a dedicated anomaly type.
 The goal is to make clear which cases are already surfaced directly, which are surfaced indirectly, and which limitations are part of the current payload-agnostic core.
 
 ## Why This Exists
 
-`0.3.2` is the milestone where the current `0.3.1` contract is being defended as production-credible on its own terms.
+This is the point where the package's anomaly model is being evaluated as production-credible on its own terms.
 
-That means the repository should be explicit about two things:
+That means the docs should be explicit about two things:
 
 * what anomalies the runtime already emits today
-* where the current implementation relies on ordering conclusions and general corruption signals rather than on a dedicated anomaly for one named scenario
+* where the runtime relies on ordering conclusions and general corruption signals rather than on a dedicated anomaly for one named scenario
 
 If a current-core signal is missing, the honest choices are:
 
@@ -33,7 +33,7 @@ The current runtime anomaly surface includes:
 * `unknown_order`
 * `late_arrival`
 
-These are the anomalies the current release line can already emit directly.
+These are the anomalies the package can emit directly today.
 
 ## Gate-Category Mapping
 
@@ -110,7 +110,7 @@ Why this is still acceptable for `0.3.2`:
 
 Current limitation:
 
-* `clock_regression` exists in the public anomaly type surface, but the current implementation does not yet emit it directly as a dedicated same-node clock-reset signal
+* `clock_regression` exists in the public anomaly type surface, but the runtime does not yet emit it directly as a dedicated same-node clock-reset signal
 
 ### Massive Out-Of-Order Replay
 
@@ -168,7 +168,7 @@ This is already part of the current stream contract and should remain explicit i
 
 ## Audit Outcome
 
-The current anomaly surface is sufficient for `0.3.2` if the repo stays honest about the distinction between:
+The current anomaly surface is sufficient as long as the docs stay honest about the distinction between:
 
 * direct anomaly support
 * indirect support through stable ordering conclusions

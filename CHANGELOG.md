@@ -3,6 +3,15 @@
 All notable changes to this project are summarized here.
 Detailed release write-ups live in `docs/releases/`.
 
+## [0.6.1] - Unreleased
+
+* This version is not published to npm.
+* Automated the README publish-size badge from the actual published package contents and refreshed it during release-check and prepack flows.
+* Tightened the website docs boundary so implementation guides, decision records, stability notes, migration notes, and similar repo-only artifacts stay off the public site by rule and by test coverage.
+* Reworked the website copy, guides landing page, wiki landing page, and generated API descriptions so the site stays focused on helping users understand and use `causal-order`.
+* Improved website metadata and route support with a local-dev-safe sitemap, a simple RSS feed, stable canonical-site configuration, stronger page metadata, and the README banner as the default social/share image.
+* Polished docs-site navigation and layout consistency across guides, wiki, and API pages, including clearer sidebar grouping, consistent right-side TOC behavior, and cleaner local badge/link behavior.
+
 ## [0.6.0]
 
 * Added a repo-local `0.6.0` implementation guide that records the shipped operational-tooling scope and release boundary.

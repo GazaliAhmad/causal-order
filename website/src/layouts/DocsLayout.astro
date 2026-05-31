@@ -5,10 +5,11 @@ import "../styles/prose.css";
 
 const { doc, navigation, sectionLabel, currentPath = doc.routePath } = Astro.props;
 const articleAnchor = "docs-content";
+const hasToc = doc.toc.length > 0;
 ---
 
 <BaseLayout title={`${doc.title} | causal-order`} description={doc.description}>
-  <div class="docs-shell">
+  <div class:list={["docs-shell", { "docs-shell-with-toc": hasToc, "docs-shell-no-toc": !hasToc }]}>
     <aside class="docs-sidebar">
       <div class="sidebar-label">{sectionLabel}</div>
 
@@ -47,19 +48,17 @@ const articleAnchor = "docs-content";
       <div class="markdown-body" set:html={doc.html} />
     </article>
 
-    <aside class="docs-toc">
-      {doc.toc.length > 0 && (
-        <>
-          <div class="toc-label">On this page</div>
-          <ul>
-            {doc.toc.map((heading) => (
-              <li class:list={{ nested: heading.depth === 3 }}>
-                <a href={`#${heading.id}`}>{heading.text}</a>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-    </aside>
+    {hasToc && (
+      <aside class="docs-toc">
+        <div class="toc-label">On this page</div>
+        <ul>
+          {doc.toc.map((heading) => (
+            <li class:list={{ nested: heading.depth === 3 }}>
+              <a href={`#${heading.id}`}>{heading.text}</a>
+            </li>
+          ))}
+        </ul>
+      </aside>
+    )}
   </div>
 </BaseLayout>

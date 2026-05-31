@@ -1,8 +1,7 @@
 # Streaming Recovery And Resync
 
-`0.3.0` is where `causal-order` starts being honest about continuous streaming generally, not just bounded replay.
-
-That includes both:
+`causal-order` supports continuous streaming as well as bounded replay.
+That matters for both:
 
 * ordinary daily stream processing where events keep arriving as part of normal operations
 * delayed reconnect, offline sync, and recovery flows where late arrivals are part of the operational reality
@@ -39,11 +38,11 @@ The same shape applies if the central server itself is unavailable for several h
 4. nodes sync their backlog
 5. the merged stream must reconcile delayed history honestly instead of flattening it into fake global-clock order
 
-That is one important reason `0.3.0` has watermark, lateness, and correction behavior at all.
+That is one important reason the streaming surface includes watermark, lateness, and correction behavior at all.
 
 The same machinery also matters in normal daily operations when a live stream is simply too large or too continuous to model honestly as one bounded batch.
 
-## Recommended `0.3.0` Baseline
+## Recommended Baseline
 
 For delayed reconnect and resync flows, the most honest first baseline is usually:
 
@@ -73,9 +72,9 @@ Why this shape:
 For ordinary daily operations without reconnect-heavy behavior, the same `orderEventStream()` surface still applies.
 The main difference is usually the chosen watermark strategy and late-arrival policy, not whether streaming is conceptually the right model.
 
-## What `emit_correction` Means In `0.3.0`
+## What `emit_correction` Means
 
-In the `0.3.0` baseline contract, `lateArrivalPolicy: "emit_correction"` means:
+In the current package behavior, `lateArrivalPolicy: "emit_correction"` means:
 
 * late events are still emitted
 * a correction-capable batch can be flushed immediately when that late event arrives
@@ -92,15 +91,15 @@ What it does not mean:
 * the library does not define a universal correction storage schema
 * the library does not claim that an emitted batch was causally complete just because it was operationally ready
 
-So the correction contract in `0.3.0` is:
+So the correction contract is:
 
 * the library tells you output was ready enough to emit now
 * the library tells you when a late arrival means previously emitted state may need reconciliation
 * your downstream storage pattern decides how that reconciliation is applied
 
-## Correction Scope In `0.3.1`
+## Correction Scope
 
-In the current `0.3.1` semantic-tightening contract, correction reach is explicit:
+Correction reach is explicit:
 
 * `lateArrivalPolicy: "emit_correction"` is policy-based rather than bounded by a separate watermark lookback window
 * when a batch includes `batch.correction`, any previously emitted non-final output from the same stream instance may need reconciliation
@@ -113,9 +112,9 @@ So the practical rule is:
 * use `batch.correction` as the machine-readable notice that reconciliation is now required
 * do not treat `emit_correction` as a bounded historical patch API
 
-## Cross-Window Anomaly Contract In `0.3.1`
+## Cross-Window Anomaly Contract
 
-The current stream contract also makes retained anomaly history explicit:
+The stream contract also makes retained anomaly history explicit:
 
 * `batch.anomalyHorizon.retainedEventHistory` is `buffered_window_only`
 * once a batch has been emitted, those earlier emitted events are not retained for later relational anomaly comparison
@@ -129,7 +128,7 @@ So in practical terms:
 * use late-arrival anomalies for stream-wide operational lateness visibility
 * do not assume the stream is preserving a full emitted-history index for later cross-window duplicate or sequence checks
 
-## `batchSize` Semantics In `0.3.1`
+## `batchSize` Semantics
 
 The current contract also makes `batchSize` behavior explicit:
 
@@ -146,7 +145,7 @@ So the practical rule is:
 
 ## Safe Downstream Patterns
 
-The safest first `0.3.0` patterns are:
+The safest first patterns are:
 
 * store ordered stream output as derived state, not as irreplaceable truth
 * keep raw events separately
@@ -180,12 +179,12 @@ If your downstream store is non-transactional or only partially transactional:
 * treat `batch.correction` and `isFinal` as control signals for a reconciliation step, not as proof that one direct write is enough
 * let a projector, materialized-view refresh, or reconciliation worker decide when newer provisional output supersedes older output
 
-The important `0.3.0` rule is not “never emit early.”
+The important rule is not “never emit early.”
 It is “never hide that the output may still change.”
 
 ## Delayed Reconnect Example
 
-The repository includes a matching runnable example:
+A matching runnable example is available:
 
 * [Streaming Recovery Resync example](../examples/streaming-recovery-resync.mjs)
 

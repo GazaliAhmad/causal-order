@@ -25,23 +25,29 @@ const landingFiles = {
 };
 
 const hiddenFiles = new Set(["_Sidebar.md", "PUBLISH-ORDER.md"]);
+// Website boundary:
+// - `guides/` on the site are package-facing usage and workflow docs.
+// - `wiki/` on the site is conceptual explanation for users.
+// - implementation records, decision records, stability notes, migration notes,
+//   and other repo-local design/release artifacts stay in the repo only.
 const includedGuidesHardeningFiles = new Set([
   "hardening/anomaly-surface-0.3.2.md",
   "hardening/fuzz-testing-0.3.2.md",
   "hardening/runtime-stability-0.3.4.md",
   "hardening/streaming-hardening-0.3.3.md",
 ]);
-const hiddenGuidesDirectories = ["devex/"];
-const hiddenGuidesFiles = new Set([
+const repoOnlyGuideDirectoryPrefixes = ["devex/", "stability/"];
+const repoOnlyGuideBaseNamePrefixes = [
+  "implementation-guide-",
+  "decision-record-",
+  "release-prep-",
+  "migration-notes-",
+  "exported-surface-inventory-",
+  "default-behavior-compatibility-inventory-",
+  "domain-semantic-design-notes-",
+];
+const repoOnlyGuideFiles = new Set([
   "operations/implementation-guide-0.6.0.md",
-  "stability/decision-record-api-clarity-0.5.0.md",
-  "stability/decision-record-core-boundaries-0.5.0.md",
-  "stability/decision-record-default-behavior-0.5.0.md",
-  "stability/default-behavior-compatibility-inventory-0.5.0.md",
-  "stability/domain-semantic-design-notes-0.5.0.md",
-  "stability/exported-surface-inventory-0.5.0.md",
-  "stability/migration-notes-0.5.0.md",
-  "stability/release-prep-0.5.0.md",
 ]);
 const hardeningTitleOverrides = new Map([
   ["hardening/anomaly-surface-0.3.2.md", "Anomaly Surface Audit"],
@@ -49,6 +55,21 @@ const hardeningTitleOverrides = new Map([
   ["hardening/runtime-stability-0.3.4.md", "Runtime Stability"],
   ["hardening/streaming-hardening-0.3.3.md", "Streaming Hardening And Pressure"],
 ]);
+const featuredDocRoutePaths = {
+  guides: [
+    "/guides/quick-start-scenarios/",
+    "/guides/policy-guidance/",
+    "/guides/operations/replay-inspection-workflow/",
+    "/guides/operations/operator-metrics-guide/",
+  ],
+  wiki: [
+    "/wiki/what-this-library-is/",
+    "/wiki/the-problem-with-distributed-timelines/",
+    "/wiki/concurrent-vs-unknown/",
+    "/wiki/confidence-levels/",
+    "/wiki/streaming-finality/",
+  ],
+};
 
 const docsCache = buildDocsCache();
 
@@ -67,8 +88,8 @@ export function getNavigation(collection) {
 
 export function getFeaturedDocs() {
   return {
-    guides: getNavigation("guides")[0]?.items.slice(0, 4) ?? [],
-    wiki: getNavigation("wiki")[0]?.items.slice(0, 4) ?? [],
+    guides: getFeaturedDocsForCollection("guides"),
+    wiki: getFeaturedDocsForCollection("wiki"),
   };
 }
 
@@ -232,35 +253,31 @@ function parseGuidesNavigation(bySource) {
   const sections = [];
   let currentSection = createSection("Start Here");
   let currentSectionKey = "start";
+  const sectionTransitions = new Map([
+    ["Failure-mode guides:", { title: "Failure Modes", key: "failures" }],
+    ["## Failure Modes", { title: "Failure Modes", key: "failures" }],
+    ["Workloads and hardening:", { title: "Hardening", key: "hardening" }],
+    ["## Workloads And Hardening", { title: "Hardening", key: "hardening" }],
+    ["Developer experience:", { title: "Policy Guidance", key: "policy-guidance" }],
+    ["Policy guidance:", { title: "Policy Guidance", key: "policy-guidance" }],
+    ["## Policy Guidance", { title: "Policy Guidance", key: "policy-guidance" }],
+    ["Published `0.6.0` operational line:", { title: "Release Context", key: "release-context" }],
+    ["Operational workflows:", { title: "Operations", key: "operations" }],
+    ["## Operational Workflows", { title: "Operations", key: "operations" }],
+    ["Published stability line:", { title: "Stability", key: "stability" }],
+    ["Runnable examples:", { title: "Examples", key: "examples" }],
+    ["## Runnable Examples", { title: "Examples", key: "examples" }],
+    ["Stability candidate:", { title: "Stability", key: "stability" }],
+  ]);
 
   for (const line of readme.body.split(/\r?\n/)) {
     const trimmed = line.trim();
 
-    if (trimmed === "Failure-mode guides:") {
+    const transition = sectionTransitions.get(trimmed);
+    if (transition) {
       sections.push(currentSection);
-      currentSection = createSection("Failure Modes");
-      currentSectionKey = "failures";
-      continue;
-    }
-
-    if (trimmed === "Workloads and hardening:") {
-      sections.push(currentSection);
-      currentSection = createSection("Hardening");
-      currentSectionKey = "hardening";
-      continue;
-    }
-
-    if (trimmed === "Developer experience:") {
-      sections.push(currentSection);
-      currentSection = createSection("Developer Experience");
-      currentSectionKey = "devex";
-      continue;
-    }
-
-    if (trimmed === "Stability candidate:") {
-      sections.push(currentSection);
-      currentSection = createSection("Stability");
-      currentSectionKey = "stability";
+      currentSection = createSection(transition.title);
+      currentSectionKey = transition.key;
       continue;
     }
 
@@ -552,10 +569,31 @@ function humanizeTitle(relativePath) {
 
 function prepareDocBody(collection, relativePath, body) {
   if (collection === "guides" && relativePath === "README.md") {
-    return body.replace(
-      /\nActive `0\.6\.x` line:\r?\n\r?\n\* \[Implementation Guide `0\.6\.0`\]\(\.\/operations\/implementation-guide-0\.6\.0\.md\)\r?\n/g,
-      "\n",
-    );
+    return body
+      .replace(
+        /\r?\nUse the `0\.5\.0` release notes and stability implementation guide when you want the narrower contract and compatibility reasoning behind the current surface\.\r?\n/g,
+        "\n",
+      )
+      .replace(/^\* \[Developer Experience\]\(\.\/devex\/developer-experience-0\.4\.0\.md\)\r?\n/gm, "")
+      .replace(/^\* \[Implementation Guide `0\.4\.1`\]\(\.\/devex\/implementation-guide-0\.4\.1\.md\)\r?\n/gm, "")
+      .replace(/^\* \[Implementation Guide `0\.4\.2`\]\(\.\/devex\/implementation-guide-0\.4\.2\.md\)\r?\n/gm, "")
+      .replace(/^\* \[Release Notes `0\.4\.2`\]\(\.\.\/docs\/releases\/0\.4\.2\.md\)\r?\n/gm, "")
+      .replace(/^\* \[Release Notes `0\.5\.0`\]\(\.\.\/docs\/releases\/0\.5\.0\.md\)\r?\n/gm, "")
+      .replace(
+        /\r?\nPublished `0\.6\.0` operational line:\r?\n(?:\r?\n|\* .*\r?\n)+?(?=\r?\nOperational workflows:)/,
+        "\n\n",
+      )
+      .replace(
+        /\r?\nPublished stability line:\r?\n(?:\r?\n|\* .*\r?\n)+?(?=\r?\nRunnable examples:)/,
+        "\n\n",
+      )
+      .replace(/\r?\nStart here:\r?\n/g, "\n\n## Start Here\n\n")
+      .replace(/\r?\nWorkloads and hardening:\r?\n/g, "\n\n## Workloads And Hardening\n\n")
+      .replace(/\r?\nDeveloper experience:\r?\n/g, "\n\n## Policy Guidance\n\n")
+      .replace(/\r?\nPolicy guidance:\r?\n/g, "\n\n## Policy Guidance\n\n")
+      .replace(/\r?\nOperational workflows:\r?\n/g, "\n\n## Operational Workflows\n\n")
+      .replace(/\r?\nRunnable examples:\r?\n/g, "\n\n## Runnable Examples\n\n")
+      .replace(/\r?\nFailure-mode guides:\r?\n/g, "\n\n## Failure Modes\n\n");
   }
 
   return body;
@@ -564,28 +602,66 @@ function prepareDocBody(collection, relativePath, body) {
 function shouldExcludeDoc(collection, relativePath) {
   const normalizedRelativePath = relativePath.replace(/\\/g, "/");
 
-  if (
-    collection === "guides" &&
-    hiddenGuidesDirectories.some((prefix) =>
-      normalizedRelativePath.startsWith(prefix),
-    )
-  ) {
+  if (collection === "guides") {
+    return shouldExcludeGuideDoc(normalizedRelativePath);
+  }
+
+  return false;
+}
+
+function shouldExcludeGuideDoc(relativePath) {
+  if (isRepoOnlyGuideDoc(relativePath)) {
     return true;
   }
 
-  if (collection === "guides" && hiddenGuidesFiles.has(normalizedRelativePath)) {
-    return true;
-  }
-
   if (
-    collection === "guides" &&
-    normalizedRelativePath.startsWith("hardening/") &&
-    !includedGuidesHardeningFiles.has(normalizedRelativePath)
+    relativePath.startsWith("hardening/") &&
+    !includedGuidesHardeningFiles.has(relativePath)
   ) {
     return true;
   }
 
   return false;
+}
+
+function isRepoOnlyGuideDoc(relativePath) {
+  const baseName = path.basename(relativePath);
+
+  if (repoOnlyGuideFiles.has(relativePath)) {
+    return true;
+  }
+
+  if (
+    repoOnlyGuideDirectoryPrefixes.some((prefix) =>
+      relativePath.startsWith(prefix),
+    )
+  ) {
+    return true;
+  }
+
+  if (
+    repoOnlyGuideBaseNamePrefixes.some((prefix) =>
+      baseName.startsWith(prefix),
+    )
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function getFeaturedDocsForCollection(collection) {
+  const featuredPaths = featuredDocRoutePaths[collection] ?? [];
+  const docs = getDocsByCollection(collection);
+  const featured = featuredPaths
+    .map((routePath) => docs.find((doc) => doc.routePath === routePath))
+    .filter(Boolean);
+
+  if (featured.length > 0) {
+    return featured;
+  }
+
+  return getNavigation(collection)[0]?.items.slice(0, 4) ?? [];
 }
 
 function resolveDisplayTitle(collection, relativePath, fallbackTitle) {
@@ -635,7 +711,7 @@ function collapseGuideNavigationSections(sections) {
 
   for (const section of sections) {
     const shouldFoldIntoStartHere =
-      section.title === "Developer Experience" &&
+      section.title === "Policy Guidance" &&
       section.items.length === 1 &&
       section.items[0]?.title === "Policy Guidance";
 

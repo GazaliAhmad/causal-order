@@ -23,7 +23,7 @@ These changes are about longer and more operationally realistic evidence, not ab
 
 ## Endurance Harness
 
-The repo now has an explicit stream endurance runner:
+The project includes an explicit stream endurance runner:
 
 * `perf/endurance.mjs`
 
@@ -42,7 +42,7 @@ The purpose is to answer questions like:
 
 ## Constrained-Heap Runs
 
-The repo now also has an explicit constrained-heap wrapper:
+The project also includes an explicit constrained-heap wrapper:
 
 * `perf/constrained-heap.mjs`
 
@@ -60,7 +60,7 @@ They do not yet claim that every constrained-memory shape is stable enough for r
 
 ## GC-Observed Runs
 
-The repo now has an explicit GC-observed stream wrapper:
+The project includes an explicit GC-observed stream wrapper:
 
 * `perf/gc-observed.mjs`
 
@@ -78,7 +78,7 @@ The goal is to make it easier to reason about whether the current stream contrac
 
 ## Sustained Correction And Reconnect Pressure
 
-The repo now has longer-band endurance profiles for the two main `0.3.4` sustained operational churn cases:
+The project includes longer-band endurance profiles for two main sustained operational churn cases:
 
 * `streaming-150k-correction-churn`
 * `streaming-150k-anomaly-heavy-reconnect`

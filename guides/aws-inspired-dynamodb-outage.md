@@ -1,9 +1,9 @@
 # AWS-Inspired DynamoDB Outage Exercise
 
-This guide documents the repository's AWS-inspired streaming outage exercise.
+This guide documents an AWS-inspired streaming outage exercise for `causal-order`.
 
 It is inspired by the `US-East` DynamoDB event from `September 20, 2015`.
-It is not a claim that the repository recreates Amazon's internal systems or reproduces the exact outage mechanics.
+It is not a claim that this project recreates Amazon's internal systems or reproduces the exact outage mechanics.
 
 The goal here is narrower and more honest:
 
@@ -12,9 +12,9 @@ The goal here is narrower and more honest:
 * surface retry, duplicate, and invalid survivor pressure
 * observe correction churn, watermark behavior, memory, and GC posture under sustained streaming
 
-## What Is In The Repo
+## Available Assets
 
-Two repository artifacts now cover this exercise directly:
+Two project assets cover this exercise directly:
 
 * the small human-readable fixture: [test/fixtures/aws-inspired-dynamodb-us-east-2015.mjs](../test/fixtures/aws-inspired-dynamodb-us-east-2015.mjs)
 * the matching scenario tests: [test/scenarios/aws-inspired-dynamodb-us-east-2015.test.mjs](../test/scenarios/aws-inspired-dynamodb-us-east-2015.test.mjs)
@@ -116,8 +116,8 @@ The large run was intentionally dynamic rather than formalized into a checked-in
 
 Procedure:
 
-1. build the repo with `npm run build`
-2. run a one-off Node script from the repo root
+1. build the package with `npm run build`
+2. run a one-off Node script from the project root
 3. use `orderEventStream()` with an incremental async source
 4. use `ingestedAtWatermark`
 5. set `lateArrivalPolicy: "emit_correction"`
@@ -233,7 +233,7 @@ Use this guide as:
 Do not use it as:
 
 * a forensic reconstruction of AWS internals
-* evidence that the repository reproduces the actual DynamoDB outage
+* evidence that the project reproduces the actual DynamoDB outage
 
 If you want the smaller narrative version first, start with the fixture and scenario test.
 If you want the scaling story, use the million-record procedure and results described here.

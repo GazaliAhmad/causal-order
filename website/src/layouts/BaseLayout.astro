@@ -5,9 +5,9 @@ import "../styles/layout.css";
 import "../styles/ui.css";
 
 const {
-  title = "causal-order",
-  description = "Event integrity for distributed systems that cannot treat timestamp order alone as the truth model.",
-  imagePath = "/pwa-icon-512.png",
+  title = "causal-order | Event integrity ordering for distributed systems",
+  description = "Learn how to order distributed events by justified causality instead of timestamp alone with guides, API reference, and conceptual docs for causal-order.",
+  imagePath = "https://causal-order.gazali.one/readme-banner.svg",
   noindex = false,
   pathname = Astro.url.pathname,
   type = "website",
@@ -21,7 +21,16 @@ const imageUrl = siteOrigin && imagePath
   ? new URL(imagePath, `${siteOrigin}/`).toString()
   : "";
 const robotsContent = noindex ? "noindex, nofollow" : "index, follow";
-const twitterCard = imageUrl ? "summary" : "summary";
+const twitterCard = imageUrl ? "summary_large_image" : "summary";
+const imageAlt = "causal-order banner showing the library identity and event-ordering visual";
+const structuredData = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "causal-order",
+  url: siteOrigin || undefined,
+  description,
+  inLanguage: "en",
+});
 
 const themeBootScript = `
   (() => {
@@ -149,10 +158,12 @@ const registerServiceWorkerScript = `
     <meta property="og:type" content={type} />
     {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
     {imageUrl && <meta property="og:image" content={imageUrl} />}
+    {imageUrl && <meta property="og:image:alt" content={imageAlt} />}
     <meta name="twitter:card" content={twitterCard} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     {imageUrl && <meta name="twitter:image" content={imageUrl} />}
+    {imageUrl && <meta name="twitter:image:alt" content={imageAlt} />}
     <meta name="application-name" content="causal-order" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -163,6 +174,8 @@ const registerServiceWorkerScript = `
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180.png" />
     <link rel="mask-icon" href="/pwa-maskable.svg" color="#0f766e" />
+    <link rel="alternate" type="application/rss+xml" title="causal-order releases" href="/rss.xml" />
+    <script type="application/ld+json" set:html={structuredData}></script>
     <script is:inline set:html={themeBootScript}></script>
   </head>
   <body>
@@ -266,6 +279,9 @@ const registerServiceWorkerScript = `
             © {currentYear}
             <a href="https://gazali.one" target="_blank" rel="noreferrer">gazali.one</a>
           </p>
+          <span aria-hidden="true">|</span>
+          <a href="/rss.xml">RSS</a>
+          <span aria-hidden="true">|</span>
           <a href="/privacy/">Privacy</a>
         </div>
       </div>

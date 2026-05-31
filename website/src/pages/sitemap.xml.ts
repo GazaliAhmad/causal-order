@@ -28,18 +28,14 @@ function escapeXml(value) {
     .replace(/'/g, "&apos;");
 }
 
-export function GET({ site }) {
-  if (!site) {
-    return new Response("Astro site URL is required to generate sitemap.xml", {
-      status: 500,
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-      },
-    });
-  }
+export function GET({ site, url }) {
+  const baseUrl = site ?? new URL(url.origin);
 
   const urls = getAllRoutePaths()
-    .map((pathname) => `  <url><loc>${escapeXml(new URL(pathname, site).toString())}</loc></url>`)
+    .map(
+      (pathname) =>
+        `  <url><loc>${escapeXml(new URL(pathname, baseUrl).toString())}</loc></url>`,
+    )
     .join("\n");
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
