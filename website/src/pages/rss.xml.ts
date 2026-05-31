@@ -1,16 +1,28 @@
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import matter from "gray-matter";
 import { marked } from "marked";
 
-const releasesRoot = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../../../docs/releases",
-);
 const repoUrl = "https://github.com/GazaliAhmad/causal-order";
 const defaultSiteDescription =
   "Release notes and docs-site updates for causal-order.";
+
+function resolveReleasesRoot() {
+  const candidates = [
+    path.resolve(process.cwd(), "../docs/releases"),
+    path.resolve(process.cwd(), "docs/releases"),
+  ];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+
+  throw new Error(
+    `Could not locate docs/releases from cwd ${process.cwd()}; tried ${candidates.join(", ")}`,
+  );
+}
 
 function escapeXml(value) {
   return String(value)
@@ -22,6 +34,8 @@ function escapeXml(value) {
 }
 
 function getReleaseEntries() {
+  const releasesRoot = resolveReleasesRoot();
+
   return fs
     .readdirSync(releasesRoot, { withFileTypes: true })
     .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
