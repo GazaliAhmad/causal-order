@@ -661,7 +661,10 @@ function getFeaturedDocsForCollection(collection) {
     .filter(Boolean);
 
   if (featured.length > 0) {
-    return featured;
+    return featured.map((doc) => ({
+      title: doc.title,
+      href: doc.sitePath,
+    }));
   }
 
   return getNavigation(collection)[0]?.items.slice(0, 4) ?? [];

@@ -31,88 +31,113 @@ const toc = [
   currentPath="/api/"
 >
   <p>
-    The published package is organized around one practical flow: translate raw records when
-    needed, validate or compare when you want narrower primitives, order bounded or streaming
-    inputs, then inspect the result with operator-facing summaries instead of building that layer
-    yourself first.
+    The published package is organized around one practical flow: translate raw
+    records when needed, validate or compare when you want narrower primitives,
+    order bounded or streaming inputs, then inspect the result with
+    operator-facing summaries instead of building that layer yourself first.
   </p>
 
   <h2 id="where-to-start">Where to start</h2>
   <p>
     If your data is not already in the event-envelope shape, start with
-    <code>translateBatch()</code>. Use <code>validateEvent()</code> when you need a narrow
-    validation step before ordering, and <code>compareByCausality()</code> when you only need
-    pairwise causal comparison. Move to <code>orderEvents()</code> for bounded replay or audit
-    slices, then to <code>orderEventStream()</code> when you need watermark, late-arrival, and
-    correction-capable behavior. Use <code>inspectOrderResult()</code> or
-    <code>inspectOrderBatch()</code> when you want compact operational summaries without writing
-    your own result-shaping layer first.
+    <code>translateBatch()</code>. Use <code>validateEvent()</code> when you need
+    a narrow validation step before ordering, and <code
+      >compareByCausality()</code
+    > when you only need pairwise causal comparison. Move to <code
+      >orderEvents()</code
+    > for bounded replay or audit slices, then to <code>orderEventStream()</code
+    > when you need watermark, late-arrival, and correction-capable behavior. Use
+    <code>inspectOrderResult()</code> or
+    <code>inspectOrderBatch()</code> when you want compact operational summaries without
+    writing your own result-shaping layer first.
   </p>
 
   <h2 id="focused-entrypoints">Focused entrypoints</h2>
   <p>
-    If you prefer smaller import surfaces, the package also exposes focused subpath entrypoints
-    alongside the root <code>causal-order</code> import. The root import may still keep
-    compatibility aliases for older code, but the focused subpaths are the cleaner primary
-    surface for new code.
+    If you prefer smaller import surfaces, the package also exposes focused
+    subpath entrypoints alongside the root <code>causal-order</code> import. The root
+    import may still keep compatibility aliases for older code, but the focused subpaths
+    are the cleaner primary surface for new code.
   </p>
   <ul>
-    {apiOverview.focusedEntrypoints.map((entrypoint) => (
-      <li>
-        <code>{entrypoint.path}</code>{` - ${entrypoint.description}`}
-      </li>
-    ))}
+    {
+      apiOverview.focusedEntrypoints.map((entrypoint) => (
+        <li>
+          <code>{entrypoint.path}</code>
+          {` - ${entrypoint.description}`}
+        </li>
+      ))
+    }
   </ul>
 
   <h2 id="entry-points">Primary entry points</h2>
   <ul>
-    {primaryPages.map((page) => (
-      <li>
-        <a href={page.href}><code>{page.title}</code></a>
-        {page.description ? ` - ${page.description}` : ""}
-      </li>
-    ))}
+    {
+      primaryPages.map((page) => (
+        <li>
+          <a href={page.href}>
+            <code>{page.title}</code>
+          </a>
+          {page.description ? ` - ${page.description}` : ""}
+        </li>
+      ))
+    }
   </ul>
 
   <h2 id="all-exports">All exports</h2>
-  {apiExportsByGroup.map((group) => (
-    <>
-      <p><strong>{group.title}</strong></p>
-      <ul>
-        {group.items.map((item) => (
-          <li>
-            {functionPageByName.has(item.name) ? (
-              <a href={functionPageByName.get(item.name)}><code>{item.label}</code></a>
-            ) : (
-              <code>{item.label}</code>
-            )}
-            {item.deprecated && <span class="api-status api-status-deprecated">Deprecated</span>}
-            {item.description ? ` - ${item.description}` : ""}
-            {item.deprecated?.replacementLabel ? ` Prefer ${item.deprecated.replacementLabel}.` : ""}
-          </li>
-        ))}
-      </ul>
-    </>
-  ))}
+  {
+    apiExportsByGroup.map((group) => (
+      <>
+        <p>
+          <strong>{group.title}</strong>
+        </p>
+        <ul>
+          {group.items.map((item) => (
+            <li>
+              {functionPageByName.has(item.name) ? (
+                <a href={functionPageByName.get(item.name)}>
+                  <code>{item.label}</code>
+                </a>
+              ) : (
+                <code>{item.label}</code>
+              )}
+              {item.deprecated && (
+                <span class="api-status api-status-deprecated">Deprecated</span>
+              )}
+              {item.description ? ` - ${item.description}` : ""}
+              {item.deprecated?.replacementLabel
+                ? ` Prefer ${item.deprecated.replacementLabel}.`
+                : ""}
+            </li>
+          ))}
+        </ul>
+      </>
+    ))
+  }
 
   <h2 id="public-types">Public types</h2>
   <p>
-    The public type surface is grouped separately from the runtime entry points so you can scan the
-    main event, result, and streaming types without mixing them into the function list.
+    The public type surface is grouped separately from the runtime entry points
+    so you can scan the main event, result, and streaming types without mixing
+    them into the function list.
   </p>
-  {apiTypes.groups.map((group) => (
-    <>
-      <p><strong>{group.title}</strong></p>
-      <ul>
-        {group.items.map((item) => (
-          <li>
-            <code>{item.label}</code>
-            {item.description ? ` - ${item.description}` : ""}
-          </li>
-        ))}
-      </ul>
-    </>
-  ))}
+  {
+    apiTypes.groups.map((group) => (
+      <>
+        <p>
+          <strong>{group.title}</strong>
+        </p>
+        <ul>
+          {group.items.map((item) => (
+            <li>
+              <code>{item.label}</code>
+              {item.description ? ` - ${item.description}` : ""}
+            </li>
+          ))}
+        </ul>
+      </>
+    ))
+  }
 
   <pre><code>{`import {
 ${primaryPages.map((page) => `  ${page.title.replace(/\(\)$/, "")},`).join("\n")}
