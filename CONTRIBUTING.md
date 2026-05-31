@@ -18,6 +18,9 @@ Read these first:
 
 * [README.md](./README.md)
 * [ROADMAP.md](./ROADMAP.md)
+* [MAINTENANCE.md](./MAINTENANCE.md)
+* [RELEASE_PROCESS.md](./RELEASE_PROCESS.md)
+* [COMPATIBILITY.md](./COMPATIBILITY.md)
 * [SECURITY.md](./SECURITY.md)
 * [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
 

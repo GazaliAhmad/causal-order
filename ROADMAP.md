@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap describes how `causal-order` should mature from the published `0.6.0` release into a stable `1.0.0` npm package.
+This roadmap describes how `causal-order` should mature from the published `0.7.0` release into a stable `1.0.0` npm package.
 
 The goal is not to rush publication.
 The goal is to make sure the semantics are trustworthy before the package becomes a long-term contract.
@@ -45,6 +45,7 @@ Design standards for `1.0`:
 Release bar for `1.0`:
 
 * the top-level API surface feels small and stable
+* primary entrypoints are explicit and compatibility aliases no longer blur the intended public path
 * the README teaches the mental model without overwhelming first-time users
 * result objects are easy to inspect and hard to misuse
 * tests and examples cover the common distributed failure modes the package claims to handle
@@ -1070,6 +1071,43 @@ Release result:
 Goal:
 Reduce dependence on any single team member and make the package easier for a broader team to carry forward safely.
 
+## `0.7.0` Transferability Baseline
+
+Status:
+Published as `0.7.0`.
+
+Goal:
+Make the package easier to operate, evolve, and assess without relying on undocumented project memory.
+
+Delivered in `0.7.0`:
+
+* transferability core:
+  * maintenance guide
+  * release process guide
+  * compatibility policy
+* public boundary clarity:
+  * supported versus intentionally unsupported usage guide
+  * clearer upgrade expectations for the current preserved surface
+  * explicit root-versus-subpath compatibility boundary so focused entrypoints expose the current primary names
+* discovery and orientation:
+  * improved examples index and entrypoint guidance
+  * lightweight package-surface overview for the main public modules
+
+Release result:
+
+* a new maintainer can follow a documented release path without guessing at hidden steps
+* an evaluator can tell what compatibility posture the package intends to preserve
+* a user can see which usage patterns are supported, unsupported, or intentionally out of scope
+* a user can tell that the root import may preserve compatibility aliases while the focused subpaths represent the primary public path
+* the examples surface is easier to browse from a package-consumer point of view
+
+Not part of the published `0.7.0` claim surface:
+
+* broad case-study expansion
+* major benchmark-reporting overhaul
+* large repository reorganization
+* new runtime or API-surface expansion disguised as docs work
+
 Focus:
 
 * strengthen transferability:
@@ -1132,6 +1170,7 @@ Focus:
 
 * resolve any remaining ambiguity before `1.0.0`
 * make final naming or compatibility decisions if anything still feels soft
+* make the final `1.0.0` decision on whether any remaining root-level compatibility aliases survive, move, or disappear
 * do a last pass over:
   * docs
   * examples

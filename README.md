@@ -270,6 +270,9 @@ As of `0.5.0`, these are the preferred names for:
 * direct HLC comparison: `compareByHlc()`
 * deterministic fallback comparison: `compareDeterministically()`
 
+Older aliases may still exist for compatibility, but new code should prefer the primary names above.
+The root `causal-order` import may still keep compatibility aliases when that reduces migration pain, but focused entrypoints already emphasize the primary names rather than mixed canonical-and-compatibility naming.
+
 ## Raw Record Translation
 
 When your data is not already in the library's event-envelope shape, use `translateBatch()` first and then pass the translated records into `orderEvents()`.
@@ -366,7 +369,7 @@ Choose `"continue"` only when omission is genuinely acceptable, and choose `"fai
 
 ## Operational Inspection Helpers
 
-For operational review, replay audits, or emitted-batch inspection, `0.6.0` adds a small additive helper layer on top of the core runtime output:
+For operational review, replay audits, or emitted-batch inspection, the current release includes a small additive helper layer on top of the core runtime output:
 
 ```ts
 import {
@@ -474,6 +477,10 @@ Start here:
 * [Wiki Home](https://github.com/GazaliAhmad/causal-order/wiki)
 * [What This Library Is](https://github.com/GazaliAhmad/causal-order/wiki/What-This-Library-Is)
 * [Quick Start Scenarios](https://github.com/GazaliAhmad/causal-order/blob/main/guides/quick-start-scenarios.md)
+* [Examples And Entrypoints](https://github.com/GazaliAhmad/causal-order/blob/main/guides/examples-and-entrypoints.md)
+* [Package Surface Overview](https://github.com/GazaliAhmad/causal-order/blob/main/guides/package-surface-overview.md)
+* [Supported Vs Unsupported Usage](https://github.com/GazaliAhmad/causal-order/blob/main/guides/supported-vs-unsupported-usage.md)
+* [Upgrade Expectations](https://github.com/GazaliAhmad/causal-order/blob/main/guides/upgrade-expectations.md)
 * [Policy Guidance](https://github.com/GazaliAhmad/causal-order/blob/main/guides/policy-guidance.md)
 * [Mental Model](https://github.com/GazaliAhmad/causal-order/blob/main/guides/mental-model.md)
 * [Clocks, Causality, And Why HLC](https://github.com/GazaliAhmad/causal-order/blob/main/guides/clocks-causality-and-why-hlc.md)
@@ -556,18 +563,19 @@ They use the public `causal-order` package surface so copied example code still 
 
 ## Status
 
-`causal-order` is published at `0.6.0`.
+`causal-order` is published at `0.7.0`.
 
-`0.6.0` release shape:
+`0.7.0` release shape:
 
 * `0.3.2` established the current production-gate hardening baseline
 * `0.3.3` broadened the streaming hardening and pressure release story after that production-gate milestone
 * `0.3.4` hardened prolonged and constrained-runtime streaming stability
-* `0.4.0` adds the first narrow raw-record ingress contract through `translateBatch()`
-* `0.4.1` makes translation diagnostics safer to inspect and control without widening the ingress boundary
-* `0.4.2` makes that same package surface easier to evaluate through runnable ingress examples, package-facing policy guidance, and docs synchronization enforcement
-* `0.5.0` turns the next line into a published stability-and-contract-design release with explicit migration notes and payload-agnostic core-boundary decisions
-* `0.6.0` adds operational inspection helpers, replay and reconciliation workflow guides, a first integration-shaped replay example, and a first operator metrics guide
+* `0.4.0` added the first narrow raw-record ingress contract through `translateBatch()`
+* `0.4.1` made translation diagnostics safer to inspect and control without widening the ingress boundary
+* `0.4.2` made that same package surface easier to evaluate through runnable ingress examples, package-facing policy guidance, and docs synchronization enforcement
+* `0.5.0` published the stability-and-contract-design release with explicit migration notes and payload-agnostic core-boundary decisions
+* `0.6.0` added operational inspection helpers, replay and reconciliation workflow guides, a first integration-shaped replay example, and a first operator metrics guide
+* `0.7.0` adds the transferability baseline through maintainer guidance, compatibility guidance, support-boundary guidance, stronger discovery docs, and a clearer primary-versus-compatibility entrypoint boundary for focused subpaths
 
 For the current operational decision layer, see:
 
@@ -575,6 +583,7 @@ For the current operational decision layer, see:
 * [Replay Inspection Workflow](https://github.com/GazaliAhmad/causal-order/blob/main/guides/operations/replay-inspection-workflow.md)
 * [Streaming Reconciliation Workflow](https://github.com/GazaliAhmad/causal-order/blob/main/guides/operations/streaming-reconciliation-workflow.md)
 * [Operator Metrics Guide](https://github.com/GazaliAhmad/causal-order/blob/main/guides/operations/operator-metrics-guide.md)
+* [Release Notes `0.7.0`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.7.0.md)
 * [Release Notes `0.6.0`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.6.0.md)
 * [Release Notes `0.5.0`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.5.0.md)
 
@@ -614,9 +623,8 @@ Current deployment posture:
 That means:
 
 * the package is usable today
-* the API is still evolving, but `0.5.0` and `0.6.0` make the contract and operational posture much more explicit
-* the published `0.6.0` line adds the first helper, workflow, example, and metrics layer on top of the `0.5.0` boundary
-* the next implementation work is about follow-through and refinement more than reopening the same `0.5.0` surface questions
+* the API is still evolving, but `0.5.0`, `0.6.0`, and `0.7.0` make the contract, operational posture, and support boundary much more explicit
+* the published `0.7.0` line adds the first coherent maintainer, compatibility, upgrade, and discovery layer on top of the `0.5.0` and `0.6.0` package surface, while making the focused subpaths read more clearly as the primary API story for new code
 * `1.0.0` is the point where the semantic contract should feel stable enough to preserve long-term
 
 ## Repository Development

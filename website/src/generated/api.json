@@ -84,7 +84,7 @@
       },
       {
         "path": "causal-order/compare",
-        "description": "Pairwise comparison helpers for HLC and causal reasoning."
+        "description": "Pairwise comparison helpers for HLC and causal reasoning, centered on the current primary names rather than deprecated compatibility aliases."
       },
       {
         "path": "causal-order/validate",
@@ -104,7 +104,7 @@
       },
       {
         "path": "causal-order/batch",
-        "description": "Bounded batch ordering plus tie-breaker helpers."
+        "description": "Bounded batch ordering plus current tie-breaker helpers, without the deprecated compatibility alias kept at the root import."
       },
       {
         "path": "causal-order/stream",

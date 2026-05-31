@@ -258,10 +258,12 @@ function parseGuidesNavigation(bySource) {
     ["## Failure Modes", { title: "Failure Modes", key: "failures" }],
     ["Workloads and hardening:", { title: "Hardening", key: "hardening" }],
     ["## Workloads And Hardening", { title: "Hardening", key: "hardening" }],
+    ["Support and upgrades:", { title: "Support And Upgrades", key: "support-upgrades" }],
+    ["## Support And Upgrades", { title: "Support And Upgrades", key: "support-upgrades" }],
     ["Developer experience:", { title: "Policy Guidance", key: "policy-guidance" }],
     ["Policy guidance:", { title: "Policy Guidance", key: "policy-guidance" }],
     ["## Policy Guidance", { title: "Policy Guidance", key: "policy-guidance" }],
-    ["Published `0.6.0` operational line:", { title: "Release Context", key: "release-context" }],
+    ["Published `0.7.0` release line:", { title: "Release Context", key: "release-context" }],
     ["Operational workflows:", { title: "Operations", key: "operations" }],
     ["## Operational Workflows", { title: "Operations", key: "operations" }],
     ["Published stability line:", { title: "Stability", key: "stability" }],
@@ -580,7 +582,7 @@ function prepareDocBody(collection, relativePath, body) {
       .replace(/^\* \[Release Notes `0\.4\.2`\]\(\.\.\/docs\/releases\/0\.4\.2\.md\)\r?\n/gm, "")
       .replace(/^\* \[Release Notes `0\.5\.0`\]\(\.\.\/docs\/releases\/0\.5\.0\.md\)\r?\n/gm, "")
       .replace(
-        /\r?\nPublished `0\.6\.0` operational line:\r?\n(?:\r?\n|\* .*\r?\n)+?(?=\r?\nOperational workflows:)/,
+        /\r?\nPublished `0\.7\.0` release line:\r?\n(?:\r?\n|\* .*\r?\n)+?(?=\r?\nOperational workflows:)/,
         "\n\n",
       )
       .replace(
@@ -589,6 +591,7 @@ function prepareDocBody(collection, relativePath, body) {
       )
       .replace(/\r?\nStart here:\r?\n/g, "\n\n## Start Here\n\n")
       .replace(/\r?\nWorkloads and hardening:\r?\n/g, "\n\n## Workloads And Hardening\n\n")
+      .replace(/\r?\nSupport and upgrades:\r?\n/g, "\n\n## Support And Upgrades\n\n")
       .replace(/\r?\nDeveloper experience:\r?\n/g, "\n\n## Policy Guidance\n\n")
       .replace(/\r?\nPolicy guidance:\r?\n/g, "\n\n## Policy Guidance\n\n")
       .replace(/\r?\nOperational workflows:\r?\n/g, "\n\n## Operational Workflows\n\n")

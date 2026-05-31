@@ -52,7 +52,9 @@ const toc = [
   <h2 id="focused-entrypoints">Focused entrypoints</h2>
   <p>
     If you prefer smaller import surfaces, the package also exposes focused subpath entrypoints
-    alongside the root <code>causal-order</code> import.
+    alongside the root <code>causal-order</code> import. The root import may still keep
+    compatibility aliases for older code, but the focused subpaths are the cleaner primary
+    surface for new code.
   </p>
   <ul>
     {apiOverview.focusedEntrypoints.map((entrypoint) => (

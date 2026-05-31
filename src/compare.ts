@@ -1,3 +1,10 @@
-export * from "./compare/hlcCompare.js"
-export * from "./compare/causalCompare.js"
-export * from "./compare/deterministicCompare.js"
+export { compareByHlc } from "./compare/hlcCompare.js"
+export {
+  compareByCausality,
+  compareValidatedByCausality,
+} from "./compare/causalCompare.js"
+export {
+  applyTieBreaker,
+  compareDeterministically,
+  compareValidatedDeterministically,
+} from "./compare/deterministicCompare.js"

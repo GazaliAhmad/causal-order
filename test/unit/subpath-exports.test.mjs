@@ -27,7 +27,7 @@ import {
 } from "causal-order/order"
 import {
   orderEvents as batchOrderEvents,
-  compareWithTieBreaker,
+  DEFAULT_TIE_BREAKER,
   getTieBreaker,
 } from "causal-order/batch"
 import {
@@ -41,7 +41,7 @@ import { TranslateBatchPolicyError, translateBatch } from "causal-order/translat
 import { validateClock, validateEvent } from "causal-order/validate"
 import { test } from "../helpers/harness.mjs"
 
-test("package subpath exports expose focused runtime entrypoints", () => {
+test("package subpath exports expose focused runtime entrypoints", async () => {
   const expectedFunctions = [
     createHlcClock,
     parseHlc,
@@ -55,7 +55,6 @@ test("package subpath exports expose focused runtime entrypoints", () => {
     orderEventStream,
     createProcessingTimeWatermark,
     batchOrderEvents,
-    compareWithTieBreaker,
     getTieBreaker,
     streamingOrderEventStream,
     createProcessingTimeWatermarkOnly,
@@ -74,4 +73,11 @@ test("package subpath exports expose focused runtime entrypoints", () => {
   }
 
   assert.equal(typeof TranslateBatchPolicyError, "function")
+  assert.equal(DEFAULT_TIE_BREAKER, "event_id")
+
+  const compareSubpath = await import("causal-order/compare")
+  const batchSubpath = await import("causal-order/batch")
+
+  assert.equal("compareClocks" in compareSubpath, false)
+  assert.equal("compareWithTieBreaker" in batchSubpath, false)
 })

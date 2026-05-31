@@ -5,4 +5,4 @@ contact_links:
     about: Please do not open public issues for undisclosed security problems. Follow SECURITY.md and report them privately.
   - name: Contribution guide
     url: https://github.com/GazaliAhmad/causal-order/blob/main/CONTRIBUTING.md
-    about: Read the repository workflow, verification expectations, and documentation guidance before opening larger work items.
+    about: Read the repository workflow, verification expectations, compatibility posture, and release guidance before opening larger work items.
