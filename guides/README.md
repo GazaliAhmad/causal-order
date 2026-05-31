@@ -11,10 +11,14 @@ For function-by-function reference, see the API docs.
 Start here:
 
 * [Quick Start Scenarios](./quick-start-scenarios.md)
+* [Examples And Entrypoints](./examples-and-entrypoints.md)
+* [Package Surface Overview](./package-surface-overview.md)
 * [Mental Model](./mental-model.md)
 * [Notation And Runtime Contract](./notation-and-runtime-contract.md)
 * [How Order Is Written](./how-order-is-written.md)
 * [Clocks, Causality, And Why HLC](./clocks-causality-and-why-hlc.md)
+* [Supported Vs Unsupported Usage](./supported-vs-unsupported-usage.md)
+* [Upgrade Expectations](./upgrade-expectations.md)
 * [Case Studies](./case-studies.md)
 * [Stress Hardening](./stress-hardening.md)
 * [After-Hours Batch Processing](./after-hours-batch-processing.md)
@@ -27,18 +31,23 @@ Workloads and hardening:
 * [Streaming Hardening And Pressure](./hardening/streaming-hardening-0.3.3.md)
 * [Runtime Stability](./hardening/runtime-stability-0.3.4.md)
 
+Support and upgrades:
+
+* [Supported Vs Unsupported Usage](./supported-vs-unsupported-usage.md)
+* [Upgrade Expectations](./upgrade-expectations.md)
+* [Policy Guidance](./policy-guidance.md)
+
 Developer experience:
 
 * [Developer Experience](./devex/developer-experience-0.4.0.md)
 * [Implementation Guide `0.4.1`](./devex/implementation-guide-0.4.1.md)
 * [Implementation Guide `0.4.2`](./devex/implementation-guide-0.4.2.md)
-* [Policy Guidance](./policy-guidance.md)
 * [Release Notes `0.4.2`](../docs/releases/0.4.2.md)
 * [Release Notes `0.5.0`](../docs/releases/0.5.0.md)
 
-Published `0.6.0` operational line:
+Published `0.7.0` release line:
 
-* [Implementation Guide `0.6.0`](./operations/implementation-guide-0.6.0.md)
+* [Release Notes `0.7.0`](../docs/releases/0.7.0.md)
 * [Release Notes `0.6.0`](../docs/releases/0.6.0.md)
 
 Operational workflows:
@@ -61,6 +70,7 @@ Published stability line:
 
 Runnable examples:
 
+* [Examples And Entrypoints](./examples-and-entrypoints.md)
 * [Examples Index](../examples/README.md)
 * [Minimal Ingress Example](../examples/ingress-minimal.mjs)
 * [Ingress Replay Pipeline Example](../examples/ingress-replay-pipeline.mjs)

@@ -187,14 +187,18 @@ function buildReportPayload(packageJson, files, summary, badge) {
   }
 }
 
+function normalizeLineEndings(value) {
+  return value.replaceAll("\r\n", "\n")
+}
+
 async function syncFile(filePath, payload) {
   const nextContent = `${JSON.stringify(payload, null, 2)}\n`
 
   if (checkMode) {
     const currentContent = await readFile(filePath, "utf8")
     assert.equal(
-      currentContent,
-      nextContent,
+      normalizeLineEndings(currentContent),
+      normalizeLineEndings(nextContent),
       `${path.relative(rootDir, filePath)} is out of date. Run: npm run badge:footprint`,
     )
     return
@@ -207,8 +211,8 @@ async function syncTextFile(filePath, content) {
   if (checkMode) {
     const currentContent = await readFile(filePath, "utf8")
     assert.equal(
-      currentContent,
-      content,
+      normalizeLineEndings(currentContent),
+      normalizeLineEndings(content),
       `${path.relative(rootDir, filePath)} is out of date. Run: npm run badge:footprint`,
     )
     return

@@ -40,6 +40,9 @@ Mark what was updated if the public behavior, release posture, or surfaced site 
 - [ ] README
 - [ ] CHANGELOG
 - [ ] ROADMAP
+- [ ] MAINTENANCE
+- [ ] RELEASE_PROCESS
+- [ ] COMPATIBILITY
 - [ ] guides
 - [ ] website
 - [ ] no docs change needed

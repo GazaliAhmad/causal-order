@@ -1,7 +1,37 @@
 # Examples
 
-These examples are runnable counterparts to the failure-mode guides.
-They are also the human-sized semantic seeds for the larger corrupted-dataset stress profiles used in `0.2.2` hardening work.
+These examples are runnable starting points for understanding how to use `causal-order` by workload shape.
+
+They are meant to answer:
+
+* which example should I run first?
+* which package entrypoint does that example demonstrate?
+* what kind of operational problem is this example helping me evaluate?
+
+If you want the package-facing guide version of that chooser, see:
+
+* [Examples And Entrypoints](../guides/examples-and-entrypoints.md)
+* [Quick Start Scenarios](../guides/quick-start-scenarios.md)
+
+## Choose A First Example
+
+Start with the scenario that looks closest to your real workload:
+
+* raw ingress into ordering:
+  * `examples/ingress-minimal.mjs`
+* replay, duplicates, and rejected raw rows:
+  * `examples/ingress-replay-pipeline.mjs`
+* local durable replay and inspection:
+  * `examples/local-durable-buffer-replay.mjs`
+* audit reconstruction:
+  * `examples/false-audit-timeline.mjs`
+* cross-region or cross-service causal ambiguity:
+  * `examples/multi-region-drift.mjs`
+  * `examples/causal-inversion.mjs`
+* offline sync backlog inspection:
+  * `examples/offline-sync-anomalies.mjs`
+* reconnect-heavy stream correction:
+  * `examples/streaming-recovery-resync.mjs`
 
 Run all examples:
 
@@ -43,40 +73,48 @@ npm run build
 node examples/benchmark.mjs 100000
 ```
 
-Each example shows:
+## What The Main Example Groups Show
 
-* either the raw-record ingress path or a failure-mode ordering story
-* the `causal-order` interpretation
-* anomalies when data or timelines are suspicious
+### Ingress examples
 
-The ingress examples add:
+These show:
 
 * the real `translateBatch()` to `orderEvents()` path
 * translated-versus-rejected record visibility
 * a runnable starting point for the published ingress contract
 
-The first integration-shaped example adds:
+### Replay and inspection example
+
+This shows:
 
 * local durable JSONL buffering before replay
 * replay inspection via `inspectOrderResult()`
 * a package-facing example of bounded replay review before downstream writeback
 
-The failure-mode and streaming examples add:
+### Failure-mode and streaming examples
+
+These show:
 
 * naive clock-order comparisons where they help
 * confidence labels
 * causal evidence where available
+* reconnect/resync behavior
+* late-arrival correction batches
+* a concrete `orderEventStream()` operational slice
+
+## Which Entrypoints These Examples Exercise
+
+The examples mainly exercise:
+
+* `translateBatch()`
+* `orderEvents()`
+* `orderEventStream()`
+* `inspectOrderResult()`
 
 For pairwise helper usage outside the runnable scenario files, prefer:
 
 ```ts
 import { compareByHlc, compareDeterministically } from "causal-order"
 ```
-
-The streaming recovery example adds:
-
-* reconnect/resync behavior
-* late-arrival correction batches
-* a concrete `orderEventStream()` operational slice
 
 If you want the larger-batch follow-through beyond these small examples, see the [Stress Hardening guide](../guides/stress-hardening.md).

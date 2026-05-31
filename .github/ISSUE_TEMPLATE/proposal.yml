@@ -20,10 +20,12 @@ body:
         - Core ordering
         - Streaming behavior
         - Batch behavior
+        - Compatibility or supported usage
         - Performance
         - Documentation
         - Website
         - CI or release workflow
+        - Maintenance or release process
         - Developer experience
     validations:
       required: true
@@ -59,7 +61,7 @@ body:
     id: context
     attributes:
       label: Extra context
-      description: Add links, screenshots, prior discussion, or related roadmap notes if helpful.
+      description: Add links, screenshots, prior discussion, related roadmap chunk, or compatibility notes if helpful.
     validations:
       required: false
 

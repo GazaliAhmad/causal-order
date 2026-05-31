@@ -3,6 +3,18 @@
 All notable changes to this project are summarized here.
 Detailed release write-ups live in `docs/releases/`.
 
+## [0.7.0]
+
+* Published the transferability-baseline release line.
+* Added maintainer-facing `MAINTENANCE.md`, `RELEASE_PROCESS.md`, and `COMPATIBILITY.md` so release and compatibility posture are explicit instead of tribal knowledge.
+* Added public guides for supported versus unsupported usage, upgrade expectations, examples and entrypoints, and a lightweight package-surface overview.
+* Tightened focused subpath exports so `causal-order/compare` and `causal-order/batch` expose the current primary names instead of continuing to present deprecated compatibility aliases as equally canonical entrypoints.
+* Reworked the public website and surfaced docs so the site stays focused on helping users understand and use `causal-order` rather than exposing repo-only implementation history.
+* Automated the README publish-size badge from actual package contents and refreshed it during release-check and prepack flows.
+* Improved website metadata and route support with a local-dev-safe sitemap, an RSS feed, stable canonical-site configuration, stronger page metadata, and the README banner as the default social/share image.
+* Polished docs-site navigation and layout consistency across guides, wiki, and API pages, including clearer sidebar grouping, consistent right-side TOC behavior, and better examples and entrypoint discovery.
+* Added CI support so docs-sync checks install website dependencies before importing website-backed docs helpers.
+
 ## [0.6.1] - Unreleased
 
 * This version is not published to npm.
