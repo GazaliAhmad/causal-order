@@ -272,9 +272,10 @@
   }
 
   .footer-meta {
-    align-items: start;
-    flex-direction: column;
-    gap: 6px;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .mobile-return-top {
