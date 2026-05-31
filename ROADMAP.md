@@ -1161,6 +1161,84 @@ Exit criteria:
 * the project reads like a reliable technical foundation for adoption and extension
 * the maintainability and transferability story is strong enough that another team could extend it confidently
 
+## `0.8.0` First Adoption-Maturity Cut
+
+Goal:
+Turn the published `0.7.0` transferability baseline into a clearer adoption path for evaluators, maintainers, and early real-world users.
+
+Release shape:
+
+* `0.8.0` is the first concrete release inside the broader `0.8.x` maturity line
+* the work is chunked internally as:
+  * `0.8.0-a` adoption flow
+  * `0.8.0-b` operator maturity
+  * `0.8.0-c` extension readiness
+* those chunk labels are planning labels, not npm versions
+* the default expectation is:
+  * publish `0.8.0` when `0.8.0-a` is complete
+  * continue `0.8.0-b` and `0.8.0-c` as later `0.8.x` follow-through unless they also fit cleanly before release
+
+Required scope for `0.8.0`:
+
+* stronger onboarding and evaluation flow
+* clearer operational positioning
+* clearer handoff and maintenance expectations for adopters
+* more polished public release discipline where it directly affects evaluator trust
+
+### `0.8.0-a` Adoption Flow
+
+Focus:
+
+* create a clearer first-run path for:
+  * evaluators
+  * maintainers
+  * engineers deciding whether `causal-order` fits their workload
+* make the package easier to judge quickly without reading the whole repository
+* tighten the "when to use / when not to use" entry flow across:
+  * README
+  * guides
+  * website landing and docs navigation
+
+Definition of done:
+
+* a technically strong evaluator can understand the package value, boundary, and likely fit from the public docs flow alone
+* a new maintainer can identify the practical starting points for release, compatibility, and support posture without reconstruction work
+* the project presents a more deliberate onboarding path rather than a set of individually good but loosely connected docs
+
+### `0.8.0-b` Operator Maturity
+
+Focus:
+
+* strengthen operator-facing guidance around:
+  * replay inspection
+  * reconciliation workflows
+  * anomaly interpretation
+* make the package easier to use in operational review and incident-style analysis
+
+Expected status:
+
+* should land during `0.8.x`
+* does not need to block the first `0.8.0` publish unless the adoption flow still feels too weak without it
+
+### `0.8.0-c` Extension Readiness
+
+Focus:
+
+* clarify how adjacent tooling and workflow layers can build on the package without forcing those concerns into the core
+* make extension seams and future integration boundaries easier to evaluate
+
+Expected status:
+
+* belongs in `0.8.x`
+* should not block `0.8.0` unless the project still feels too opaque about extension direction
+
+Not the point of `0.8.0`:
+
+* not a new core-runtime semantics release
+* not a broad adapter or integration expansion
+* not a benchmark-overhaul milestone
+* not a final `1.0.0` compatibility decision line
+
 ## `0.9.x` Final Stabilization Before `1.0.0`
 
 Goal:
