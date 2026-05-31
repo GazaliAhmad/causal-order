@@ -97,9 +97,15 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            website/package-lock.json
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Install website dependencies
+        run: npm --prefix website ci
 
       - name: Run docs synchronization checks
         run: npm run docs:sync:check
