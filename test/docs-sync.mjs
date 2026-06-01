@@ -232,6 +232,7 @@ async function main() {
   assertIncludes(operatorMetricsGuide, "inspectOrderResult()", "guides/operations/operator-metrics-guide.md")
   assert.equal(websiteGuidePaths.has("operations/implementation-guide-0.6.0.md"), false, "website guides should exclude implementation guides")
   assert.equal(websiteGuidePaths.has("stability/implementation-guide-0.5.0.md"), false, "website guides should exclude stability implementation notes")
+  assert.equal(websiteGuidePaths.has("stability/0.9.0-checklist.md"), false, "website guides should exclude repo-local 0.9.0 checklist notes")
   assert.equal(websiteGuidePaths.has("stability/decision-record-api-clarity-0.5.0.md"), false, "website guides should exclude decision records")
   assert.equal(websiteGuidePaths.has("stability/domain-semantic-design-notes-0.5.0.md"), false, "website guides should exclude design notes")
   assert.equal(websiteGuidePaths.has("devex/developer-experience-0.4.0.md"), false, "website guides should exclude developer-experience notes")
