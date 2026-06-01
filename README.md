@@ -310,6 +310,10 @@ The `0.8.0` helper layer is intentionally narrow:
 
 These helpers summarize or explain existing package output. They do not hide anomalies, rewrite ordered state, or invent stronger causal claims than the runtime already supports.
 
+If you need adjacent adapters, workflow glue, or domain policy on top of this surface, see:
+
+* [Extension Boundary Guide](https://causal-order.gazali.one/guides/extension-boundary-guide/)
+
 ## Streaming Overview
 
 For large or unbounded event flows, use `orderEventStream()` instead of assuming everything belongs in one in-memory batch.
@@ -345,6 +349,8 @@ For the full stream contract, see:
 ## When To Use It
 
 `causal-order` is primarily for deployable operational event processing in distributed systems that cannot rely on one perfect global clock.
+It is meant to be deployable as the event-ordering engine in that workflow, not as a complete end-to-end event platform by itself.
+One of its main applications is straightforward deployment as the ordering layer for distributed event workflows that still need honest causal ordering at runtime.
 
 That includes:
 
@@ -371,7 +377,11 @@ It is especially useful when:
 It is less useful when:
 
 * you already have authoritative causal ordering elsewhere
+* your data has already been normalized into the exact ordering truth you trust by a consensus layer such as Raft or Paxos
 * you only need a plain timestamp sort
+
+If a consensus system has already settled the ordering question cleanly for the stream you care about, `causal-order` is usually not the interesting part of the stack anymore.
+The library is strongest when ordering truth is still messy, partial, cross-boundary, or worth explaining.
 
 ## Get Started
 
@@ -426,29 +436,42 @@ They use the public `causal-order` package surface so copied example code still 
 
 ## Status
 
-`0.8.0` is the current `causal-order` release line in this repository.
-The latest published npm package remains `0.7.0` until the `0.8.0` tag and publish step are cut.
+`0.8.0` is the current published `causal-order` release.
 
 Current package posture:
 
-* bounded batch recovery, replay, reconciliation, and audit-style workloads remain the stronger production-credible side of the current contract
-* streaming remains part of the public contract, with the current hardening and runtime-stability guides defining the proof base the project is willing to defend
+* `causal-order` is ready to use as a deployable event-ordering library today when you want confidence-aware ordering, anomaly visibility, and explicit causal justification in a real workflow
+* deployment is a first-class application of the package, not only a forensic or post-incident use case
+* bounded batch recovery, replay, reconciliation, and audit-style workloads are the clearest production-credible starting point in the current contract
+* streaming is also part of the public contract, with the current hardening and runtime-stability guides defining how to deploy it with explicit lateness, correction, and reconciliation posture
+* the repo already includes heavier deployment-facing evidence, including named `250k` batch and stream validation profiles and a documented `1,000,000`-event AWS-inspired streaming outage exercise
 * raw-record translation into the event envelope and its machine-readable failure contract are now part of the package surface rather than repo-local work
 
-The current `0.8.0` line adds:
+Confidence ladder:
+
+* `CI` covers everyday correctness, docs sync, and package-facing examples
+* `Post-Merge 150k Confidence` is the routine stronger automated confidence run
+* `Manual 250k Confidence` is the heavier on-demand batch and stream validation path
+* `Manual AWS Incident Confidence` is the outage-shape streaming confidence run with GC-observed summary artifacts
+
+`0.8.0` adds:
 
 * a clearer maintainer, compatibility, upgrade, and discovery layer on top of the published `0.7.0` package surface
 * focused subpaths that read more clearly as the primary API story for new code
+* a clearer package-facing extension boundary so adjacent tooling can build on the runtime without pretending the core owns connector or domain-resolution concerns
 * `1.0.0` is the point where the semantic contract should feel stable enough to preserve long-term
 
-For the `0.8.0` operational decision layer, see:
+For the `0.8.0` package-facing decision layer, see:
 
+* [Extension Boundary Guide](https://causal-order.gazali.one/guides/extension-boundary-guide/)
 * [Policy Guidance](https://causal-order.gazali.one/guides/policy-guidance/)
 * [Replay Inspection Workflow](https://causal-order.gazali.one/guides/operations/replay-inspection-workflow/)
 * [Streaming Reconciliation Workflow](https://causal-order.gazali.one/guides/operations/streaming-reconciliation-workflow/)
 * [Incident Review Guide](https://causal-order.gazali.one/guides/operations/incident-review-guide/)
 * [Anomaly Interpretation Guide](https://causal-order.gazali.one/guides/operations/anomaly-interpretation-guide/)
 * [Operator Metrics Guide](https://causal-order.gazali.one/guides/operations/operator-metrics-guide/)
+* [Stress Hardening](https://causal-order.gazali.one/guides/stress-hardening/)
+* [AWS-Inspired DynamoDB Outage Exercise](https://causal-order.gazali.one/guides/aws-inspired-dynamodb-outage/)
 
 ## Repository Development
 

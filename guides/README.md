@@ -22,6 +22,7 @@ Evaluate quickly:
 Build with the package:
 
 * [Package Surface Overview](./package-surface-overview.md)
+* [Extension Boundary Guide](./extension-boundary-guide.md)
 * [Policy Guidance](./policy-guidance.md)
 * [Mental Model](./mental-model.md)
 * [Notation And Runtime Contract](./notation-and-runtime-contract.md)
@@ -59,6 +60,7 @@ Workloads and hardening:
 Support and upgrades:
 
 * [Supported Vs Unsupported Usage](./supported-vs-unsupported-usage.md)
+* [Extension Boundary Guide](./extension-boundary-guide.md)
 * [Upgrade Expectations](./upgrade-expectations.md)
 * [Policy Guidance](./policy-guidance.md)
 

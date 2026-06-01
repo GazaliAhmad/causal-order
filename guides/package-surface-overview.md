@@ -4,6 +4,9 @@ This guide gives a lightweight overview of the main public modules in `causal-or
 
 It is not an implementation deep dive.
 It is a map of the package surface so you can tell which part to use first and how the pieces fit together.
+The package is meant to be the deployable ordering layer in a larger workflow, not the whole workflow by itself.
+If you are evaluating whether it can be used in an actual system, the answer is yes: this is the public package surface for putting the ordering engine into that workflow.
+That deployment story is not only theoretical; the repo includes heavier validation and outage-shape exercises for teams that want evidence beyond toy examples.
 
 ## The Main Shape
 
@@ -130,5 +133,6 @@ This guide is only meant to make the public surface easier to understand from a 
 After reading this overview:
 
 * run an example from [Examples And Entrypoints](./examples-and-entrypoints.md)
+* read [Extension Boundary Guide](./extension-boundary-guide.md) if you need to decide what should live in package-adjacent tooling versus the core runtime
 * read [Quick Start Scenarios](./quick-start-scenarios.md) if you want the first-path chooser by workload
 * open the [API Reference](/api/) when you want function-level detail

@@ -47,6 +47,7 @@ async function main() {
   const examplesReadme = await readRootFile("examples/README.md")
   const guidesReadme = await readRootFile("guides/README.md")
   const quickStart = await readRootFile("guides/quick-start-scenarios.md")
+  const extensionBoundaryGuide = await readRootFile("guides/extension-boundary-guide.md")
   const policyGuidance = await readRootFile("guides/policy-guidance.md")
   const wikiHome = await readRootFile("wiki/Home.md")
   const releaseNotes = await readRootFile("docs/releases/0.5.0.md")
@@ -69,6 +70,7 @@ async function main() {
   const websiteGuidePaths = new Set(websiteGuides.map((doc) => doc.relativePath))
 
   assertIncludes(readme, "https://causal-order.gazali.one/guides/quick-start-scenarios/", "README")
+  assertIncludes(readme, "https://causal-order.gazali.one/guides/extension-boundary-guide/", "README")
   assertIncludes(readme, "https://causal-order.gazali.one/guides/policy-guidance/", "README")
   assertIncludes(readme, "https://causal-order.gazali.one/guides/operations/replay-inspection-workflow/", "README")
   assertIncludes(readme, "https://causal-order.gazali.one/guides/operations/streaming-reconciliation-workflow/", "README")
@@ -100,6 +102,7 @@ async function main() {
   assertIncludes(examplesReadme, "compareByHlc, compareDeterministically", "examples/README.md")
 
   assertIncludes(guidesReadme, "./quick-start-scenarios.md", "guides/README.md")
+  assertIncludes(guidesReadme, "./extension-boundary-guide.md", "guides/README.md")
   assertIncludes(guidesReadme, "./policy-guidance.md", "guides/README.md")
   assertIncludes(guidesReadme, "../docs/releases/0.7.0.md", "guides/README.md")
   assertIncludes(guidesReadme, "../docs/releases/0.5.0.md", "guides/README.md")
@@ -135,6 +138,11 @@ async function main() {
   assertIncludes(quickStart, "./operations/replay-inspection-workflow.md", "guides/quick-start-scenarios.md")
   assertIncludes(quickStart, "./operations/streaming-reconciliation-workflow.md", "guides/quick-start-scenarios.md")
   assertIncludes(quickStart, "/api/", "guides/quick-start-scenarios.md")
+
+  assertIncludes(extensionBoundaryGuide, "translateBatch()", "guides/extension-boundary-guide.md")
+  assertIncludes(extensionBoundaryGuide, "CausalContradictionPolicy", "guides/extension-boundary-guide.md")
+  assertIncludes(extensionBoundaryGuide, "./stability/decision-record-core-boundaries-0.5.0.md", "guides/extension-boundary-guide.md")
+  assertIncludes(extensionBoundaryGuide, "./operations/incident-review-guide.md", "guides/extension-boundary-guide.md")
 
   assertIncludes(policyGuidance, "### `flag`", "guides/policy-guidance.md")
   assertIncludes(policyGuidance, "### `drop`", "guides/policy-guidance.md")
