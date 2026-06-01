@@ -422,21 +422,10 @@ Runnable examples:
 The runnable examples are written from the package consumer point of view.
 They use the public `causal-order` package surface so copied example code still looks like the right starting point in a real project.
 
-Repo-only reference material:
-
-* [Production Gate](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/production-gate-0.3.2.md)
-* [Streaming Hardening Implementation Notes](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/implementation-guide-0.3.3.md)
-* [Runtime Stability Implementation Notes](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/implementation-guide-0.3.4.md)
-* [Stability Implementation Guide](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stability/implementation-guide-0.5.0.md)
-* [Release Notes `0.7.0`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.7.0.md)
-* [ROADMAP `0.8.0`](https://github.com/GazaliAhmad/causal-order/blob/main/ROADMAP.md)
-* [MAINTENANCE.md](https://github.com/GazaliAhmad/causal-order/blob/main/MAINTENANCE.md)
-* [RELEASE_PROCESS.md](https://github.com/GazaliAhmad/causal-order/blob/main/RELEASE_PROCESS.md)
-* [COMPATIBILITY.md](https://github.com/GazaliAhmad/causal-order/blob/main/COMPATIBILITY.md)
-
 ## Status
 
-`causal-order` is published at `0.7.0`, and the current docs line is being carried forward as `0.8.0`.
+`0.8.0` is the current `causal-order` release line in this repository.
+The latest published npm package remains `0.7.0` until the `0.8.0` tag and publish step are cut.
 
 Current package posture:
 
@@ -444,7 +433,7 @@ Current package posture:
 * streaming remains part of the public contract, with the current hardening and runtime-stability guides defining the proof base the project is willing to defend
 * raw-record translation into the event envelope and its machine-readable failure contract are now part of the package surface rather than repo-local work
 
-The current `0.8.0` docs line adds:
+The current `0.8.0` line adds:
 
 * a clearer maintainer, compatibility, upgrade, and discovery layer on top of the published `0.7.0` package surface
 * focused subpaths that read more clearly as the primary API story for new code

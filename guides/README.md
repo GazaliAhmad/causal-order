@@ -68,6 +68,7 @@ Release and maintenance context:
 * [Release Notes `0.4.2`](../docs/releases/0.4.2.md)
 * [Release Notes `0.5.0`](../docs/releases/0.5.0.md)
 * [Release Notes `0.7.0`](../docs/releases/0.7.0.md)
+* [Release Notes `0.8.0`](../docs/releases/0.8.0.md)
 * [ROADMAP `0.8.0`](../ROADMAP.md)
 
 Published stability line:

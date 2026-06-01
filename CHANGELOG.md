@@ -3,6 +3,13 @@
 All notable changes to this project are summarized here.
 Detailed release write-ups live in `docs/releases/`.
 
+## [0.8.0] - Unreleased
+
+* This version is not published to npm.
+* Tightened the public adoption flow so evaluators can move from README to guides, examples, API docs, and release history without reconstructing the package story by hand.
+* Clarified maintainer starting points around release, compatibility, support posture, and repo-local reference material across the root docs set.
+* Kept the `0.8.0` docs line aligned with the release-history trail and docs-sync expectations so release verification reflects the intended onboarding path.
+
 ## [0.7.0]
 
 * Published the transferability-baseline release line.

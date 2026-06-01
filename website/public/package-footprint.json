@@ -3,17 +3,17 @@
   "version": "0.7.0",
   "fileCount": 69,
   "totals": {
-    "rawBytes": 128445,
-    "gzipBytes": 36765,
-    "brotliBytes": 31151,
-    "raw": "128.4 kB",
-    "gzip": "36.8 kB",
-    "brotli": "31.2 kB"
+    "rawBytes": 127437,
+    "gzipBytes": 36669,
+    "brotliBytes": 31080,
+    "raw": "127.4 kB",
+    "gzip": "36.7 kB",
+    "brotli": "31.1 kB"
   },
   "badge": {
     "schemaVersion": 1,
     "label": "publish size",
-    "message": "36.8 kB (gzip) | 31.2 kB (brotli)",
+    "message": "36.7 kB (gzip) | 31.1 kB (brotli)",
     "color": "blue"
   },
   "files": [
@@ -427,9 +427,9 @@
     },
     {
       "path": "README.md",
-      "size": 19869,
-      "gzip": 6319,
-      "brotli": 5194
+      "size": 18861,
+      "gzip": 6223,
+      "brotli": 5123
     }
   ]
 }
