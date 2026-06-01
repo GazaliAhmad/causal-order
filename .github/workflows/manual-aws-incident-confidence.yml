@@ -49,7 +49,7 @@ jobs:
 
       - name: Upload AWS incident confidence artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: aws-incident-confidence-${{ github.run_id }}
           path: perf/results/aws-incident/manual-${{ github.run_id }}
