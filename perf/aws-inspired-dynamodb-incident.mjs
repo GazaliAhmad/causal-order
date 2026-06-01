@@ -467,6 +467,7 @@ async function runStreamIncident(options, memorySnapshots) {
     totalEventsRequested: options.totalEvents,
     runtimeMs,
     orderedEvents,
+    requestedInputsNotCountedAsOrderedEvents: options.totalEvents - orderedEvents,
     anomalyCount,
     emittedBatches,
     correctionBatches,
@@ -523,6 +524,7 @@ function createMarkdownSummary(summary) {
     "",
     `- Runtime: \`${formatMs(summary.stream.runtimeMs)}\``,
     `- Ordered events: \`${summary.stream.orderedEvents.toLocaleString("en-US")}\``,
+    `- Requested inputs not counted as ordered events: \`${summary.stream.requestedInputsNotCountedAsOrderedEvents.toLocaleString("en-US")}\``,
     `- Anomalies: \`${summary.stream.anomalyCount.toLocaleString("en-US")}\``,
     `- Emitted batches: \`${summary.stream.emittedBatches.toLocaleString("en-US")}\``,
     `- Correction batches: \`${summary.stream.correctionBatches.toLocaleString("en-US")}\``,
@@ -531,6 +533,8 @@ function createMarkdownSummary(summary) {
     `- Max batch events: \`${summary.stream.maxBatchEvents.toLocaleString("en-US")}\``,
     `- Max anomalies in one batch: \`${summary.stream.maxAnomaliesPerBatch.toLocaleString("en-US")}\``,
     `- Last watermark: \`${summary.stream.lastWatermark}\``,
+    "",
+    "> Ordered output can be lower than requested input in this outage analog because duplicate, invalid-clock, and regressive inputs are intentionally surfaced as anomalies or correction triggers instead of being counted as clean ordered output. This is expected scenario behavior, not silent loss.",
   ]
 
   if (summary.stream.firstCorrectionTriggerEventIds.length > 0) {
