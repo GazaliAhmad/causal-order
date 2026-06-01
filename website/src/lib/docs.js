@@ -7,6 +7,7 @@ import { marked } from "marked";
 const repoRoot = findRepoRoot();
 const guidesRoot = path.join(repoRoot, "guides");
 const wikiRoot = path.join(repoRoot, "wiki");
+const examplesRoot = path.join(repoRoot, "examples");
 const repoPackage = JSON.parse(
   fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"),
 );
@@ -17,11 +18,13 @@ const repoUrl = normalizeRepoUrl(
 const docsRoots = {
   guides: guidesRoot,
   wiki: wikiRoot,
+  examples: examplesRoot,
 };
 
 const landingFiles = {
   guides: "README.md",
   wiki: "Home.md",
+  examples: "README.md",
 };
 
 const hiddenFiles = new Set(["_Sidebar.md", "PUBLISH-ORDER.md"]);
@@ -35,6 +38,12 @@ const includedGuidesHardeningFiles = new Set([
   "hardening/fuzz-testing-0.3.2.md",
   "hardening/runtime-stability-0.3.4.md",
   "hardening/streaming-hardening-0.3.3.md",
+]);
+const publicGuideRouteOverrides = new Map([
+  ["hardening/anomaly-surface-0.3.2.md", "/guides/hardening/anomaly-surface/"],
+  ["hardening/fuzz-testing-0.3.2.md", "/guides/hardening/fuzz-testing/"],
+  ["hardening/runtime-stability-0.3.4.md", "/guides/hardening/runtime-stability/"],
+  ["hardening/streaming-hardening-0.3.3.md", "/guides/hardening/streaming-hardening/"],
 ]);
 const repoOnlyGuideDirectoryPrefixes = ["devex/", "stability/"];
 const repoOnlyGuideBaseNamePrefixes = [
@@ -128,6 +137,9 @@ function buildDocsCache() {
     wiki: docs
       .filter((doc) => doc.collection === "wiki")
       .sort((left, right) => left.routePath.localeCompare(right.routePath)),
+    examples: docs
+      .filter((doc) => doc.collection === "examples")
+      .sort((left, right) => left.routePath.localeCompare(right.routePath)),
   };
 
   const byRoute = new Map(
@@ -137,6 +149,7 @@ function buildDocsCache() {
   const navigation = {
     guides: parseGuidesNavigation(bySource),
     wiki: parseWikiNavigation(bySource),
+    examples: parseExamplesNavigation(bySource),
   };
 
   return { byCollection, byRoute, navigation };
@@ -229,6 +242,14 @@ function walkMarkdownFiles(dir) {
 }
 
 function buildSitePath(collection, relativePath) {
+  if (collection === "guides") {
+    const normalizedRelativePath = relativePath.replace(/\\/g, "/");
+    const routeOverride = publicGuideRouteOverrides.get(normalizedRelativePath);
+    if (routeOverride) {
+      return routeOverride;
+    }
+  }
+
   if (path.basename(relativePath) === landingFiles[collection]) {
     return `/${collection}/`;
   }
@@ -251,19 +272,28 @@ function parseGuidesNavigation(bySource) {
   }
 
   const sections = [];
-  let currentSection = createSection("Start Here");
-  let currentSectionKey = "start";
+  let currentSection = createSection("Evaluate Quickly");
+  let currentSectionKey = "evaluate";
   const sectionTransitions = new Map([
     ["Failure-mode guides:", { title: "Failure Modes", key: "failures" }],
+    ["Failure modes:", { title: "Failure Modes", key: "failures" }],
     ["## Failure Modes", { title: "Failure Modes", key: "failures" }],
     ["Workloads and hardening:", { title: "Hardening", key: "hardening" }],
     ["## Workloads And Hardening", { title: "Hardening", key: "hardening" }],
+    ["Evaluate quickly:", { title: "Evaluate Quickly", key: "evaluate" }],
+    ["## Evaluate Quickly", { title: "Evaluate Quickly", key: "evaluate" }],
+    ["Build with the package:", { title: "Build With The Package", key: "build" }],
+    ["## Build With The Package", { title: "Build With The Package", key: "build" }],
+    ["Operate and inspect:", { title: "Operations", key: "operations" }],
+    ["## Operate And Inspect", { title: "Operations", key: "operations" }],
     ["Support and upgrades:", { title: "Support And Upgrades", key: "support-upgrades" }],
     ["## Support And Upgrades", { title: "Support And Upgrades", key: "support-upgrades" }],
     ["Developer experience:", { title: "Policy Guidance", key: "policy-guidance" }],
     ["Policy guidance:", { title: "Policy Guidance", key: "policy-guidance" }],
     ["## Policy Guidance", { title: "Policy Guidance", key: "policy-guidance" }],
-    ["Published `0.7.0` release line:", { title: "Release Context", key: "release-context" }],
+    ["Release and maintenance context:", { title: "Release Context", key: "release-context" }],
+    ["## Release And Maintenance Context", { title: "Release Context", key: "release-context" }],
+    ["Current release line:", { title: "Release Context", key: "release-context" }],
     ["Operational workflows:", { title: "Operations", key: "operations" }],
     ["## Operational Workflows", { title: "Operations", key: "operations" }],
     ["Published stability line:", { title: "Stability", key: "stability" }],
@@ -350,6 +380,27 @@ function parseWikiNavigation(bySource) {
   }
 
   return [{ title: "Concepts", items }];
+}
+
+function parseExamplesNavigation(bySource) {
+  const readmePath = normalizeFsPath(path.join(examplesRoot, "README.md"));
+  const readme = bySource.get(readmePath);
+
+  if (!readme) {
+    return [];
+  }
+
+  return [
+    {
+      title: "Examples",
+      items: [
+        {
+          title: "Overview",
+          href: readme.sitePath,
+        },
+      ],
+    },
+  ];
 }
 
 function renderMarkdown(doc, bySource) {
@@ -589,13 +640,21 @@ function prepareDocBody(collection, relativePath, body) {
         /\r?\nPublished stability line:\r?\n(?:\r?\n|\* .*\r?\n)+?(?=\r?\nRunnable examples:)/,
         "\n\n",
       )
-      .replace(/\r?\nStart here:\r?\n/g, "\n\n## Start Here\n\n")
+      .replace(
+        /\r?\nRelease and maintenance context:\r?\n(?:\r?\n|\* .*\r?\n)+?(?=\r?\nPublished stability line:|\r?\nRunnable examples:)/,
+        "\n\n",
+      )
+      .replace(/\r?\nStart here:\r?\n/g, "\n\n## Evaluate Quickly\n\n")
+      .replace(/\r?\nEvaluate quickly:\r?\n/g, "\n\n## Evaluate Quickly\n\n")
+      .replace(/\r?\nBuild with the package:\r?\n/g, "\n\n## Build With The Package\n\n")
+      .replace(/\r?\nOperate and inspect:\r?\n/g, "\n\n## Operate And Inspect\n\n")
       .replace(/\r?\nWorkloads and hardening:\r?\n/g, "\n\n## Workloads And Hardening\n\n")
       .replace(/\r?\nSupport and upgrades:\r?\n/g, "\n\n## Support And Upgrades\n\n")
       .replace(/\r?\nDeveloper experience:\r?\n/g, "\n\n## Policy Guidance\n\n")
       .replace(/\r?\nPolicy guidance:\r?\n/g, "\n\n## Policy Guidance\n\n")
       .replace(/\r?\nOperational workflows:\r?\n/g, "\n\n## Operational Workflows\n\n")
       .replace(/\r?\nRunnable examples:\r?\n/g, "\n\n## Runnable Examples\n\n")
+      .replace(/\r?\nFailure modes:\r?\n/g, "\n\n## Failure Modes\n\n")
       .replace(/\r?\nFailure-mode guides:\r?\n/g, "\n\n## Failure Modes\n\n");
   }
 

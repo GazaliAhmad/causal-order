@@ -4,7 +4,7 @@ import { getDocsByCollection } from "../lib/docs.js";
 function getAllRoutePaths() {
   const routes = new Set(["/", "/privacy/"]);
 
-  for (const collection of ["guides", "wiki"]) {
+  for (const collection of ["guides", "wiki", "examples"]) {
     for (const doc of getDocsByCollection(collection)) {
       routes.add(doc.sitePath);
     }

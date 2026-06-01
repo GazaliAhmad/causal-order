@@ -80,7 +80,7 @@ So the streaming fuzz suite checks different invariants:
 
 ## Why The Suite Is Seeded
 
-`0.3.2` is using seeded fuzzing because the production gate needs replayable failures.
+The package uses seeded fuzzing because the production gate needs replayable failures.
 
 A useful fuzz failure is not only:
 
@@ -121,7 +121,7 @@ They are also part of:
 npm run release:check
 ```
 
-So the current release gate already treats them as part of normal correctness verification rather than as an optional local experiment.
+So the current production gate already treats them as part of normal correctness verification rather than as an optional local experiment.
 
 ## Relationship To Broader Pressure Work
 

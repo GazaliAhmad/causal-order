@@ -62,12 +62,12 @@ That means an event can still be:
 When that happens, the stream should handle the event through the configured late-arrival policy.
 It should not silently downgrade causal proof into mere uncertainty.
 
-In the current `0.3.1` contract, `lateArrivalPolicy: "emit_correction"` also means
+In the current streaming contract, `lateArrivalPolicy: "emit_correction"` also means
 correction scope is policy-based across the active non-final stream history, not a
 separate bounded lookback window. A `batch.correction` notice means previously
 emitted non-final output from that stream instance may need reconciliation.
 
-The current `0.3.1` contract also keeps cross-window anomaly history narrow:
+The current streaming contract also keeps cross-window anomaly history narrow:
 `batch.anomalyHorizon.retainedEventHistory` is `buffered_window_only`, so
 previously emitted events are not retained for later duplicate, sequence, or
 causal relational anomaly comparisons. The only relational stream-wide anomaly
@@ -80,4 +80,4 @@ If your sink is append-only, non-transactional, or otherwise cannot rewrite
 cleanly, treat `batch.correction` and `isFinal` as instructions for a later
 reconciliation step rather than as proof that one emitted write is final truth.
 
-For the `0.3.0` daily-operations, delayed reconnect, and downstream correction model, see [Streaming Recovery and Resync](Streaming-Recovery-and-Resync).
+For the current daily-operations, delayed reconnect, and downstream correction model, see [Streaming Recovery and Resync](Streaming-Recovery-and-Resync).

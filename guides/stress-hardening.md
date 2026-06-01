@@ -61,7 +61,7 @@ They are concentrated versions of the same failure shapes already represented in
 
 ## What The Stress Work Proved
 
-The `0.2.2` stress pass was valuable for two reasons:
+The stress pass is valuable for two reasons:
 
 * it confirmed that the semantic model still holds under large corrupted batches, not just under hand-sized examples
 * it exposed a real bottleneck in the ready-queue ordering path that small tests did not make obvious

@@ -37,7 +37,7 @@ The key distinction is:
 A stream batch can be ready to emit because the watermark advanced enough for an operational decision.
 That does not mean the system has proved no older relevant event could still appear.
 
-In the current `0.3.1` contract, this also means:
+In the current streaming contract, this also means:
 
 * correction scope is policy-based across previously emitted non-final output in the same stream instance
 * cross-window relational anomaly history is intentionally narrow
