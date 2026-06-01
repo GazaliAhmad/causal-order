@@ -393,6 +393,8 @@ Operate or debug a deployed workflow:
 
 * use [Replay Inspection Workflow](https://causal-order.gazali.one/guides/operations/replay-inspection-workflow/)
 * use [Streaming Reconciliation Workflow](https://causal-order.gazali.one/guides/operations/streaming-reconciliation-workflow/)
+* use [Incident Review Guide](https://causal-order.gazali.one/guides/operations/incident-review-guide/)
+* use [Anomaly Interpretation Guide](https://causal-order.gazali.one/guides/operations/anomaly-interpretation-guide/)
 * use [Operator Metrics Guide](https://causal-order.gazali.one/guides/operations/operator-metrics-guide/)
 * use [Streaming Recovery And Resync](https://causal-order.gazali.one/guides/streaming-recovery-resync/) and [Streaming Finality](https://causal-order.gazali.one/wiki/streaming-finality/) for stream-specific behavior
 
@@ -444,6 +446,8 @@ For the `0.8.0` operational decision layer, see:
 * [Policy Guidance](https://causal-order.gazali.one/guides/policy-guidance/)
 * [Replay Inspection Workflow](https://causal-order.gazali.one/guides/operations/replay-inspection-workflow/)
 * [Streaming Reconciliation Workflow](https://causal-order.gazali.one/guides/operations/streaming-reconciliation-workflow/)
+* [Incident Review Guide](https://causal-order.gazali.one/guides/operations/incident-review-guide/)
+* [Anomaly Interpretation Guide](https://causal-order.gazali.one/guides/operations/anomaly-interpretation-guide/)
 * [Operator Metrics Guide](https://causal-order.gazali.one/guides/operations/operator-metrics-guide/)
 
 ## Repository Development

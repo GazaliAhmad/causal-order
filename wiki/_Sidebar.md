@@ -2,6 +2,7 @@
 
 * [Home](Home)
 * [What This Library Is](What-This-Library-Is)
+* [When to Use causal-order](When-to-Use-causal-order)
 * [The Problem With Distributed Timelines](The-Problem-With-Distributed-Timelines)
 * [Why Timestamp Sorting Fails](Why-Timestamp-Sorting-Fails)
 * [Confidence Levels](Confidence-Levels)
@@ -11,4 +12,3 @@
 * [Realistic Workloads](Realistic-Workloads)
 * [Stress Hardening](Stress-Hardening)
 * [Design Philosophy](Design-Philosophy)
-* [When to Use causal-order](When-to-Use-causal-order)

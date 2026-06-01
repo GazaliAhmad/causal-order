@@ -9,6 +9,7 @@ Detailed release write-ups live in `docs/releases/`.
 * Tightened the public adoption flow so evaluators can move from README to guides, examples, API docs, and release history without reconstructing the package story by hand.
 * Clarified maintainer starting points around release, compatibility, support posture, and repo-local reference material across the root docs set.
 * Kept the `0.8.0` docs line aligned with the release-history trail and docs-sync expectations so release verification reflects the intended onboarding path.
+* Strengthened the first operator-maturity slice with an anomaly-interpretation guide, an incident-review guide, and tighter cross-linking between replay, reconciliation, and metrics workflows.
 
 ## [0.7.0]
 

@@ -3,10 +3,10 @@
   "version": "0.7.0",
   "fileCount": 69,
   "totals": {
-    "rawBytes": 127437,
-    "gzipBytes": 36669,
-    "brotliBytes": 31080,
-    "raw": "127.4 kB",
+    "rawBytes": 127873,
+    "gzipBytes": 36716,
+    "brotliBytes": 31120,
+    "raw": "127.9 kB",
     "gzip": "36.7 kB",
     "brotli": "31.1 kB"
   },
@@ -427,9 +427,9 @@
     },
     {
       "path": "README.md",
-      "size": 18861,
-      "gzip": 6223,
-      "brotli": 5123
+      "size": 19297,
+      "gzip": 6270,
+      "brotli": 5163
     }
   ]
 }

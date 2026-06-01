@@ -175,6 +175,8 @@ The safer rule is:
 ## Relationship To The Existing Streaming Guide
 
 Use [Streaming Recovery And Resync](../streaming-recovery-resync.md) for the broader stream contract and lateness semantics.
+Use [Incident Review Guide](./incident-review-guide.md) when the next question is how to explain delayed reconnect, correction churn, and projection replacement pressure during incident review.
+Use [Anomaly Interpretation Guide](./anomaly-interpretation-guide.md) when the next question is what the emitted anomaly mix says about reconnect, lateness, or weaker evidence quality.
 Use [Operator Metrics Guide](./operator-metrics-guide.md) when the next question is what to graph or investigate once correction-capable output is live.
 
 Use this reconciliation workflow guide when the narrower question is:

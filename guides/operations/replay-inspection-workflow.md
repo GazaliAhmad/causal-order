@@ -179,6 +179,8 @@ That gives the team a stable place to answer:
 ## Relationship To The Existing Batch Guide
 
 Use [After-Hours Batch Processing](../after-hours-batch-processing.md) for the broader operational model.
+Use [Incident Review Guide](./incident-review-guide.md) when the next question is how to turn replay output, anomaly clusters, and row-level explanation into an incident-readable timeline.
+Use [Anomaly Interpretation Guide](./anomaly-interpretation-guide.md) when the next question is what one anomaly cluster or suspicious replay signal usually means operationally.
 Use [Operator Metrics Guide](./operator-metrics-guide.md) when the next question is what replay counters or anomaly trends to track over time.
 
 Use this replay-inspection guide when the harder question is:

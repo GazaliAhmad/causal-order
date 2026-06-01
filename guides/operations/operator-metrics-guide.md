@@ -238,8 +238,8 @@ So the first alert heuristics should be phrased as:
 
 * investigate sustained watermark stall beyond expected idle windows
 * investigate sudden late-arrival spikes beyond recent baseline
-* investigate anomaly-rate spikes clustered on one event source, mapper, or anomaly type
-* investigate sustained correction churn after reconnect recovery should already have stabilized
+* investigate anomaly-mix shifts toward more `warning` or `error`
+* investigate recurring correction churn after the workload should have settled
 
 These are intentionally heuristics, not hard universal thresholds.
 
@@ -264,6 +264,10 @@ So keep the split clear:
 Use [Replay Inspection Workflow](./replay-inspection-workflow.md) when the main question is how to inspect bounded replay before writeback.
 
 Use [Streaming Reconciliation Workflow](./streaming-reconciliation-workflow.md) when the main question is how to apply correction-capable batches downstream.
+
+Use [Incident Review Guide](./incident-review-guide.md) when the main question is how to interpret those metrics inside an active or retrospective incident timeline.
+
+Use [Anomaly Interpretation Guide](./anomaly-interpretation-guide.md) when the next question is what one anomaly type or anomaly cluster usually means operationally rather than only how often it appears.
 
 Use this metrics guide when the main question is:
 

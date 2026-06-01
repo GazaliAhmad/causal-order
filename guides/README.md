@@ -14,10 +14,10 @@ For function-by-function reference, see the API docs.
 Evaluate quickly:
 
 * [Quick Start Scenarios](./quick-start-scenarios.md)
-* [Examples And Entrypoints](./examples-and-entrypoints.md)
-* [Package Surface Overview](./package-surface-overview.md)
 * [Supported Vs Unsupported Usage](./supported-vs-unsupported-usage.md)
 * [Case Studies](./case-studies.md)
+* [Examples And Entrypoints](./examples-and-entrypoints.md)
+* [Package Surface Overview](./package-surface-overview.md)
 
 Build with the package:
 
@@ -33,9 +33,10 @@ Operate and inspect:
 
 * [Replay Inspection Workflow](./operations/replay-inspection-workflow.md)
 * [Streaming Reconciliation Workflow](./operations/streaming-reconciliation-workflow.md)
+* [Incident Review Guide](./operations/incident-review-guide.md)
+* [Anomaly Interpretation Guide](./operations/anomaly-interpretation-guide.md)
 * [Operator Metrics Guide](./operations/operator-metrics-guide.md)
 * [Streaming Recovery And Resync](./streaming-recovery-resync.md)
-* [Stress Hardening](./stress-hardening.md)
 * [After-Hours Batch Processing](./after-hours-batch-processing.md)
 
 Failure modes:
@@ -47,18 +48,19 @@ Failure modes:
 * [Causal Inversion](./causal-inversion.md)
 * [AWS-Inspired DynamoDB Outage Exercise](./aws-inspired-dynamodb-outage.md)
 
+Workloads and hardening:
+
+* [Stress Hardening](./stress-hardening.md)
+* [Anomaly Surface Audit](./hardening/anomaly-surface-0.3.2.md)
+* [Fuzz Testing](./hardening/fuzz-testing-0.3.2.md)
+* [Streaming Hardening And Pressure](./hardening/streaming-hardening-0.3.3.md)
+* [Runtime Stability](./hardening/runtime-stability-0.3.4.md)
+
 Support and upgrades:
 
 * [Supported Vs Unsupported Usage](./supported-vs-unsupported-usage.md)
 * [Upgrade Expectations](./upgrade-expectations.md)
 * [Policy Guidance](./policy-guidance.md)
-
-Workloads and hardening:
-
-* [Anomaly Surface Audit](./hardening/anomaly-surface-0.3.2.md)
-* [Fuzz Testing](./hardening/fuzz-testing-0.3.2.md)
-* [Streaming Hardening And Pressure](./hardening/streaming-hardening-0.3.3.md)
-* [Runtime Stability](./hardening/runtime-stability-0.3.4.md)
 
 Release and maintenance context:
 
