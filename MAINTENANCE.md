@@ -79,6 +79,19 @@ npm run bench:check
 npm run site:build
 ```
 
+Confidence ladder:
+
+* `CI`
+  * everyday correctness and package-facing drift prevention
+* `Post-Merge 150k Confidence`
+  * the routine stronger automated confidence layer
+* `Manual 250k Confidence`
+  * heavier on-demand validation for larger batch and stream posture
+* `Manual AWS Incident Confidence`
+  * outage-shape streaming confidence with GC-observed summary artifacts
+
+Treat those as different maintenance tools for different levels of confidence, not as one flat pile of workflows.
+
 ## How To Make Safe Changes
 
 Before changing runtime behavior:

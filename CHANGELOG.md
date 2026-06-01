@@ -3,6 +3,15 @@
 All notable changes to this project are summarized here.
 Detailed release write-ups live in `docs/releases/`.
 
+## [0.8.0]
+
+* Tightened the public adoption flow so evaluators can move from README to guides, examples, API docs, and release history without reconstructing the package story by hand.
+* Clarified maintainer starting points around release, compatibility, support posture, and repo-local reference material across the root docs set.
+* Kept the `0.8.0` docs line aligned with the release-history trail and docs-sync expectations so release verification reflects the intended onboarding path.
+* Strengthened the first operator-maturity slice with an anomaly-interpretation guide, an incident-review guide, and tighter cross-linking between replay, reconciliation, and metrics workflows.
+* Added a package-facing extension-boundary guide so adjacent adapters, workflow glue, and future policy layers can be evaluated without widening the core runtime claim surface.
+* Added a checked-in AWS-inspired incident confidence command, including a GC-observed mode and a manual GitHub Actions workflow that publishes runtime, anomaly, correction, and memory summaries as artifacts.
+
 ## [0.7.0]
 
 * Published the transferability-baseline release line.

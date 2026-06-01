@@ -1,6 +1,6 @@
 # Operator Metrics Guide
 
-This guide is the first `0.6.0` operator-facing metrics playbook for `causal-order`.
+This guide is the current operator-facing metrics playbook for `causal-order`.
 
 It is not trying to define a full observability platform.
 It is answering the narrower practical question:
@@ -9,18 +9,18 @@ It is answering the narrower practical question:
 
 ## Working Rule
 
-The current package emits ordering results, anomalies, stream batches, watermarks, and correction notices.
+The package emits ordering results, anomalies, stream batches, watermarks, and correction notices.
 It does not ship a metrics backend, dashboard product, or alerting system.
 
-So the safe `0.6.0` rule is:
+So the safe rule is:
 
-* derive metrics from the current runtime output
+* derive metrics from the runtime output
 * keep those metrics honest about what the runtime actually knows
 * do not promote operational counters into stronger causal claims than the package can justify
 
 ## The First Four Metrics Families
 
-For `0.6.0`, operators should track:
+Operators should track:
 
 * watermark progress
 * late-arrival frequency
@@ -42,7 +42,7 @@ Watermark progress answers:
 * are ready windows being emitted?
 * is the pipeline stalling under lag or idle input?
 
-The current runtime already exposes:
+The runtime already exposes:
 
 * `batch.watermark`
 * `batch.isFinal`
@@ -75,7 +75,7 @@ Late-arrival frequency answers:
 * is reconnect or backlog upload becoming more common?
 * is operational lateness normal for this workload or starting to drift?
 
-The current runtime already exposes:
+The runtime already exposes:
 
 * `late_arrival` anomalies
 * `batch.correction` for `lateArrivalPolicy: "emit_correction"`
@@ -106,7 +106,7 @@ Anomaly-rate monitoring answers:
 * are suspicious or malformed cases increasing?
 * is a deployment or upstream change creating noisier event history?
 
-The current runtime already exposes:
+The runtime already exposes:
 
 * `result.anomalies`
 * `batch.anomalies`
@@ -146,7 +146,7 @@ Correction-rate monitoring answers:
 * is `emit_correction` still occasional or becoming the normal shape?
 * how much replacement or supersession pressure is the projection layer under?
 
-The current runtime already exposes:
+The runtime already exposes:
 
 * `batch.correction`
 * `batch.isFinal`
@@ -172,7 +172,7 @@ What not to overclaim:
 
 ## Using The `inspect` Helpers
 
-The new `0.6.0` helper layer is useful here because it keeps the first metrics pass small and package-facing:
+The helper layer is useful here because it keeps the first metrics pass small and package-facing:
 
 * `inspectOrderResult()` gives replay stats, order-basis counts, confidence counts, and anomaly summaries
 * `inspectOrderBatch()` gives batch watermark, correction metadata, order-basis counts, confidence counts, and anomaly summaries
@@ -233,13 +233,13 @@ That is enough for a first operational view without pretending the package alrea
 
 ## First Alert Heuristics
 
-The `0.6.0` guide stays conservative.
+This guide stays conservative.
 So the first alert heuristics should be phrased as:
 
 * investigate sustained watermark stall beyond expected idle windows
 * investigate sudden late-arrival spikes beyond recent baseline
-* investigate anomaly-rate spikes clustered on one event source, mapper, or anomaly type
-* investigate sustained correction churn after reconnect recovery should already have stabilized
+* investigate anomaly-mix shifts toward more `warning` or `error`
+* investigate recurring correction churn after the workload should have settled
 
 These are intentionally heuristics, not hard universal thresholds.
 
@@ -264,6 +264,10 @@ So keep the split clear:
 Use [Replay Inspection Workflow](./replay-inspection-workflow.md) when the main question is how to inspect bounded replay before writeback.
 
 Use [Streaming Reconciliation Workflow](./streaming-reconciliation-workflow.md) when the main question is how to apply correction-capable batches downstream.
+
+Use [Incident Review Guide](./incident-review-guide.md) when the main question is how to interpret those metrics inside an active or retrospective incident timeline.
+
+Use [Anomaly Interpretation Guide](./anomaly-interpretation-guide.md) when the next question is what one anomaly type or anomaly cluster usually means operationally rather than only how often it appears.
 
 Use this metrics guide when the main question is:
 

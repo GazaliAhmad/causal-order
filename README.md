@@ -14,14 +14,9 @@
 
 An event integrity library for distributed systems that still use clocks, but cannot rely on one globally synchronized clock as the truth model.
 
-`causal-order` helps developers design and run event processing, replay, and recovery flows without assuming the system has one perfect global time source.
+`causal-order` helps developers design and run event processing, replay, and recovery flows without assuming the system has one perfect global time source. It does not replace clocks or timestamps; it helps when timestamp order alone is not enough to explain what happened.
 
-It does not replace clocks or timestamps.
-It helps when timestamp order alone is not enough to explain what happened.
-
-Website:
-
-* [https://causal-order.gazali.one](https://causal-order.gazali.one)
+Website: [https://causal-order.gazali.one](https://causal-order.gazali.one)
 
 It helps you:
 
@@ -39,9 +34,6 @@ Distributed systems often produce misleading timelines:
 * offline devices sync late
 * ingestion order differs from creation order
 * some events are truly concurrent
-
-A timestamp-only sort produces a clean-looking answer.
-In distributed systems, clean-looking timestamp order is often not the same as causal truth.
 
 `causal-order` exists to make that uncertainty visible instead of hiding it.
 
@@ -70,9 +62,7 @@ It is trying to stop treating wall-clock agreement as the truth model for a dist
 
 ## What You Get
 
-Given a set of distributed events, the library returns more than a sorted list.
-
-It returns:
+Given a set of distributed events, the library returns:
 
 * `ordered`: events with `orderIndex`, `orderBasis`, and `confidence`
 * `anomalies`: invalid, suspicious, or operationally important records
@@ -91,9 +81,7 @@ Confidence is explicit:
 npm install causal-order
 ```
 
-Platform:
-
-* ESM only
+ESM only.
 
 Focused imports are also available when you want a narrower public entrypoint:
 
@@ -108,59 +96,14 @@ import { createHlcClock } from "causal-order/clock"
 
 ## Runtime Policy
 
-### Development Environment
+Current runtime posture:
 
-Primary active development targets Node.js `24`.
+* published package support starts at `Node.js >=20`
+* active development and performance validation target `Node.js 24`
+* CI still exercises `Node.js 18`, `20`, and `24` to catch regressions around the supported floor
+* the package is ESM only
 
-Internal profiling, benchmarking, local tooling, and performance validation workflows are optimized against the latest stable Node.js runtime.
-
----
-
-### Minimum Supported Runtime
-
-The published npm package declares:
-
-```text
-Node.js >=20
-```
-
-as the official supported runtime floor.
-
-Public package behavior, exported APIs, and example integrations must remain fully functional under Node.js 20 without requiring runtime feature flags or polyfills.
-
-No runtime-specific capabilities requiring versions newer than Node.js 20 may be introduced into the public package surface without a formal major-version compatibility review.
-
----
-
-### CI Compatibility Matrix
-
-Continuous Integration validation executes against:
-
-* Node.js `18`
-* Node.js `20`
-* Node.js `24`
-
-Purpose by runtime tier:
-
-| Runtime | Role |
-| --- | --- |
-| Node.js 18 | Legacy compatibility regression detection |
-| Node.js 20 | Official supported runtime floor |
-| Node.js 24 | Active development and performance validation |
-
----
-
-### Compatibility Contract Clarification
-
-Node.js 18 compatibility is treated as best-effort regression validation rather than a guaranteed long-term support contract.
-
-The project's formal runtime support boundary begins at:
-
-```text
-Node.js >=20
-```
-
-Successful execution under Node.js 18 should not be interpreted as a permanent stability guarantee across future release lines.
+For the fuller compatibility and support boundary, see [COMPATIBILITY.md](https://github.com/GazaliAhmad/causal-order/blob/main/COMPATIBILITY.md).
 
 ## Quick Example
 
@@ -265,10 +208,10 @@ console.log(hlcRelation)
 console.log(fallbackOrder)
 ```
 
-As of `0.5.0`, these are the preferred names for:
+As of `0.5.0`, the preferred names are:
 
-* direct HLC comparison: `compareByHlc()`
-* deterministic fallback comparison: `compareDeterministically()`
+* `compareByHlc()` for direct HLC comparison
+* `compareDeterministically()` for deterministic fallback comparison
 
 Older aliases may still exist for compatibility, but new code should prefer the primary names above.
 The root `causal-order` import may still keep compatibility aliases when that reduces migration pain, but focused entrypoints already emphasize the primary names rather than mixed canonical-and-compatibility naming.
@@ -317,55 +260,19 @@ const ordered = orderEvents(translated.translated, {
 console.log(ordered.ordered)
 ```
 
-Current ingress contract highlights:
+What matters most:
 
 * required mappers: `getEventId`, `getNodeId`, `getPhysicalTime`
 * accepted timestamp inputs: `bigint`, safe integer `number`, or canonical integer `string`
 * rejected timestamp inputs include `Date`, ISO timestamp strings, decimals, exponent notation, and unsafe integers
 * translated results split accepted records from structured translation anomalies
-* the returned envelope shell is shallowly frozen, while `payload` stays by reference
 
-Ingestion design rules:
+Keep pre-translation shaping narrow. Pass original source records into `translateBatch()` whenever possible and let it own coercion, rejection, and anomaly reporting.
 
-* pass original source records into `translateBatch()` whenever possible
-* keep pre-translation shaping narrow and cheap rather than building per-record "almost-envelope" wrappers
-* let `translateBatch()` own coercion, rejection, and anomaly reporting instead of hiding those rules in ad hoc adapter code
-* avoid broad cloning or repeated metadata copying before translation unless a real upstream constraint requires it
-* if a wrapper layer can be removed without losing anything except convenience, it is probably the wrong layer to keep
+If you need the deeper ingress-policy details, see:
 
-### Translation Policy Surface
-
-Ingress policy choices are explicit and stay separate from `orderEvents()` strictness:
-
-```ts
-const translated = translateBatch(records, {
-  getEventId: (record) => record.eventId,
-  getNodeId: (record) => record.source,
-  getPhysicalTime: (record) => record.occurredAt,
-  getPayload: (record) => record.body,
-  policy: {
-    recordFailure: "warn",
-    optionalFieldFailure: "warn",
-  },
-})
-```
-
-Current policy syntax:
-
-* `recordFailure: "warn" | "fail"`
-* `optionalFieldFailure: "warn" | "continue" | "fail"`
-
-Policy meanings:
-
-* `"warn"`
-  reject the affected record or field path, keep the problem visible as a structured translation anomaly, and continue processing the batch
-* `"continue"`
-  only for optional-field failures; omit the rejected optional value, keep the translated event moving, and still emit the anomaly so the omission is operator-visible
-* `"fail"`
-  stop immediately by throwing `TranslateBatchPolicyError`
-
-If you are unsure, keep the default warning-visible posture first.
-Choose `"continue"` only when omission is genuinely acceptable, and choose `"fail"` only when the ingress contract should reject the batch immediately.
+* API: [translateBatch()](https://causal-order.gazali.one/api/translate-batch/)
+* Guide: [Policy Guidance](https://causal-order.gazali.one/guides/policy-guidance/)
 
 ## Operational Inspection Helpers
 
@@ -393,7 +300,7 @@ console.log(translationSummary)
 console.log(inspection)
 ```
 
-The current helper layer is intentionally narrow:
+The `0.8.0` helper layer is intentionally narrow:
 
 * `summarizeEventAnomalies()`
 * `summarizeTranslationAnomalies()`
@@ -401,17 +308,17 @@ The current helper layer is intentionally narrow:
 * `inspectOrderResult()`
 * `inspectOrderBatch()`
 
-These helpers summarize or explain existing package output.
-They do not hide anomalies, rewrite ordered state, or invent stronger causal claims than the runtime already supports.
+These helpers summarize or explain existing package output. They do not hide anomalies, rewrite ordered state, or invent stronger causal claims than the runtime already supports.
+
+If you need adjacent adapters, workflow glue, or domain policy on top of this surface, see:
+
+* [Extension Boundary Guide](https://causal-order.gazali.one/guides/extension-boundary-guide/)
 
 ## Streaming Overview
 
 For large or unbounded event flows, use `orderEventStream()` instead of assuming everything belongs in one in-memory batch.
 
-That includes both:
-
-* ordinary day-to-day stream processing
-* delayed reconnect, offline sync, or recovery flows where late arrivals are part of normal operations
+That includes both ordinary day-to-day stream processing and delayed reconnect, offline sync, or recovery flows where late arrivals are part of normal operations.
 
 ```ts
 import { orderEventStream } from "causal-order"
@@ -436,12 +343,14 @@ Keep this mental model in mind:
 
 For the full stream contract, see:
 
-* [Streaming Recovery And Resync](https://github.com/GazaliAhmad/causal-order/blob/main/guides/streaming-recovery-resync.md)
-* [Streaming Finality](https://github.com/GazaliAhmad/causal-order/wiki/Streaming-Finality)
+* [Streaming Recovery And Resync](https://causal-order.gazali.one/guides/streaming-recovery-resync/)
+* [Streaming Finality](https://causal-order.gazali.one/wiki/streaming-finality/)
 
 ## When To Use It
 
 `causal-order` is primarily for deployable operational event processing in distributed systems that cannot rely on one perfect global clock.
+It is meant to be deployable as the event-ordering engine in that workflow, not as a complete end-to-end event platform by itself.
+One of its main applications is straightforward deployment as the ordering layer for distributed event workflows that still need honest causal ordering at runtime.
 
 That includes:
 
@@ -468,89 +377,53 @@ It is especially useful when:
 It is less useful when:
 
 * you already have authoritative causal ordering elsewhere
+* your data has already been normalized into the exact ordering truth you trust by a consensus layer such as Raft or Paxos
 * you only need a plain timestamp sort
 
-## Documentation
+If a consensus system has already settled the ordering question cleanly for the stream you care about, `causal-order` is usually not the interesting part of the stack anymore.
+The library is strongest when ordering truth is still messy, partial, cross-boundary, or worth explaining.
 
-Start here:
+## Get Started
 
-* [Wiki Home](https://github.com/GazaliAhmad/causal-order/wiki)
-* [What This Library Is](https://github.com/GazaliAhmad/causal-order/wiki/What-This-Library-Is)
-* [Quick Start Scenarios](https://github.com/GazaliAhmad/causal-order/blob/main/guides/quick-start-scenarios.md)
-* [Examples And Entrypoints](https://github.com/GazaliAhmad/causal-order/blob/main/guides/examples-and-entrypoints.md)
-* [Package Surface Overview](https://github.com/GazaliAhmad/causal-order/blob/main/guides/package-surface-overview.md)
-* [Supported Vs Unsupported Usage](https://github.com/GazaliAhmad/causal-order/blob/main/guides/supported-vs-unsupported-usage.md)
-* [Upgrade Expectations](https://github.com/GazaliAhmad/causal-order/blob/main/guides/upgrade-expectations.md)
-* [Policy Guidance](https://github.com/GazaliAhmad/causal-order/blob/main/guides/policy-guidance.md)
-* [Mental Model](https://github.com/GazaliAhmad/causal-order/blob/main/guides/mental-model.md)
-* [Clocks, Causality, And Why HLC](https://github.com/GazaliAhmad/causal-order/blob/main/guides/clocks-causality-and-why-hlc.md)
+Evaluate the package:
 
-Streaming:
+* start with [What This Library Is](https://causal-order.gazali.one/wiki/what-this-library-is/)
+* read [Quick Start Scenarios](https://causal-order.gazali.one/guides/quick-start-scenarios/)
+* check [Supported Vs Unsupported Usage](https://causal-order.gazali.one/guides/supported-vs-unsupported-usage/)
+* scan [Examples And Entrypoints](https://causal-order.gazali.one/guides/examples-and-entrypoints/)
 
-* [Streaming Recovery And Resync](https://github.com/GazaliAhmad/causal-order/blob/main/guides/streaming-recovery-resync.md)
-* [Streaming Finality](https://github.com/GazaliAhmad/causal-order/wiki/Streaming-Finality)
-* [Streaming Recovery and Resync Wiki](https://github.com/GazaliAhmad/causal-order/wiki/Streaming-Recovery-and-Resync)
+Build a first flow:
 
-Operational workflows:
+* start with [Package Surface Overview](https://causal-order.gazali.one/guides/package-surface-overview/)
+* use [Policy Guidance](https://causal-order.gazali.one/guides/policy-guidance/) to choose strictness and late-arrival behavior
+* keep [Upgrade Expectations](https://causal-order.gazali.one/guides/upgrade-expectations/) nearby if you are adopting it into a maintained system
+* use [Mental Model](https://causal-order.gazali.one/guides/mental-model/) and [Clocks, Causality, And Why HLC](https://causal-order.gazali.one/guides/clocks-causality-and-why-hlc/) when you need deeper design context
 
-* [Replay Inspection Workflow](https://github.com/GazaliAhmad/causal-order/blob/main/guides/operations/replay-inspection-workflow.md)
-* [Streaming Reconciliation Workflow](https://github.com/GazaliAhmad/causal-order/blob/main/guides/operations/streaming-reconciliation-workflow.md)
-* [Operator Metrics Guide](https://github.com/GazaliAhmad/causal-order/blob/main/guides/operations/operator-metrics-guide.md)
+Operate or debug a deployed workflow:
 
-Failure modes and case studies:
+* use [Replay Inspection Workflow](https://causal-order.gazali.one/guides/operations/replay-inspection-workflow/)
+* use [Streaming Reconciliation Workflow](https://causal-order.gazali.one/guides/operations/streaming-reconciliation-workflow/)
+* use [Incident Review Guide](https://causal-order.gazali.one/guides/operations/incident-review-guide/)
+* use [Anomaly Interpretation Guide](https://causal-order.gazali.one/guides/operations/anomaly-interpretation-guide/)
+* use [Operator Metrics Guide](https://causal-order.gazali.one/guides/operations/operator-metrics-guide/)
+* use [Streaming Recovery And Resync](https://causal-order.gazali.one/guides/streaming-recovery-resync/) and [Streaming Finality](https://causal-order.gazali.one/wiki/streaming-finality/) for stream-specific behavior
 
-* [Case Studies](https://github.com/GazaliAhmad/causal-order/blob/main/guides/case-studies.md)
-* [Replay Corruption](https://github.com/GazaliAhmad/causal-order/blob/main/guides/replay-corruption.md)
-* [Multi-Region Drift](https://github.com/GazaliAhmad/causal-order/blob/main/guides/multi-region-drift.md)
-* [False Audit Timelines](https://github.com/GazaliAhmad/causal-order/blob/main/guides/false-audit-timeline.md)
-* [Offline Sync Anomalies](https://github.com/GazaliAhmad/causal-order/blob/main/guides/offline-sync-anomalies.md)
-* [Causal Inversion](https://github.com/GazaliAhmad/causal-order/blob/main/guides/causal-inversion.md)
-* [AWS-Inspired DynamoDB Outage Exercise](https://github.com/GazaliAhmad/causal-order/blob/main/guides/aws-inspired-dynamodb-outage.md)
+Study failure patterns and workloads:
 
-Workloads and hardening:
-
-* [Production Gate `0.3.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/production-gate-0.3.2.md)
-* [Anomaly Surface Audit `0.3.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/anomaly-surface-0.3.2.md)
-* [Fuzz Testing `0.3.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/fuzz-testing-0.3.2.md)
-* [Streaming Hardening And Pressure `0.3.3`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/streaming-hardening-0.3.3.md)
-* [Implementation Guide `0.3.3`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/implementation-guide-0.3.3.md)
-* [Runtime Stability 0.3.4](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/runtime-stability-0.3.4.md)
-* [Implementation Guide 0.3.4](https://github.com/GazaliAhmad/causal-order/blob/main/guides/hardening/implementation-guide-0.3.4.md)
-
-Published developer-experience docs:
-
-* [Developer Experience `0.4.0`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/devex/developer-experience-0.4.0.md)
-* [Implementation Guide `0.4.0`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/devex/implementation-guide-0.4.0.md)
-* [Implementation Guide `0.4.1`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/devex/implementation-guide-0.4.1.md)
-* [Release Notes `0.4.1`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.4.1.md)
-
-Continuing follow-through notes:
-
-* [Implementation Guide `0.4.2`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/devex/implementation-guide-0.4.2.md)
-* [Release Notes `0.4.2`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.4.2.md)
-
-Published stability release:
-
-* [Implementation Guide `0.5.0`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stability/implementation-guide-0.5.0.md)
-* [Release Notes `0.5.0`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.5.0.md)
-
-Additional operational reading:
-
-* [Stress Hardening](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stress-hardening.md)
-* [After-Hours Batch Processing](https://github.com/GazaliAhmad/causal-order/blob/main/guides/after-hours-batch-processing.md)
-* [Realistic Workloads](https://github.com/GazaliAhmad/causal-order/wiki/Realistic-Workloads)
-
-The `0.3.2` hardening story is now explicit:
-
-* production-gate criteria define what the current contract must prove
-* anomaly-surface notes explain what the runtime can and cannot currently signal
-* seeded fuzz coverage pressure-tests outage, replay, reconnect, duplicate, and clock-noise cases reproducibly
-* bounded batch recovery, replay, and audit-style workloads are the stronger current deployment story within the existing contract
-* the larger remaining proof bar is on long-running streaming behavior rather than on bounded batch ordering
+* [Case Studies](https://causal-order.gazali.one/guides/case-studies/)
+* [Replay Corruption](https://causal-order.gazali.one/guides/replay-corruption/)
+* [Multi-Region Drift](https://causal-order.gazali.one/guides/multi-region-drift/)
+* [False Audit Timelines](https://causal-order.gazali.one/guides/false-audit-timeline/)
+* [Offline Sync Anomalies](https://causal-order.gazali.one/guides/offline-sync-anomalies/)
+* [Causal Inversion](https://causal-order.gazali.one/guides/causal-inversion/)
+* [AWS-Inspired DynamoDB Outage Exercise](https://causal-order.gazali.one/guides/aws-inspired-dynamodb-outage/)
+* [Stress Hardening](https://causal-order.gazali.one/guides/stress-hardening/)
+* [After-Hours Batch Processing](https://causal-order.gazali.one/guides/after-hours-batch-processing/)
+* [Realistic Workloads](https://causal-order.gazali.one/wiki/realistic-workloads/)
 
 Runnable examples:
 
-* [Examples Index](https://github.com/GazaliAhmad/causal-order/blob/main/examples/README.md)
+* [Examples Index](https://causal-order.gazali.one/examples/)
 * [Minimal Ingress Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/ingress-minimal.mjs)
 * [Ingress Replay Pipeline Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/ingress-replay-pipeline.mjs)
 * [Local Durable Buffer Replay Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/local-durable-buffer-replay.mjs)
@@ -563,107 +436,58 @@ They use the public `causal-order` package surface so copied example code still 
 
 ## Status
 
-`causal-order` is published at `0.7.0`.
+`0.8.0` is the current published `causal-order` release.
 
-`0.7.0` release shape:
+Current package posture:
 
-* `0.3.2` established the current production-gate hardening baseline
-* `0.3.3` broadened the streaming hardening and pressure release story after that production-gate milestone
-* `0.3.4` hardened prolonged and constrained-runtime streaming stability
-* `0.4.0` added the first narrow raw-record ingress contract through `translateBatch()`
-* `0.4.1` made translation diagnostics safer to inspect and control without widening the ingress boundary
-* `0.4.2` made that same package surface easier to evaluate through runnable ingress examples, package-facing policy guidance, and docs synchronization enforcement
-* `0.5.0` published the stability-and-contract-design release with explicit migration notes and payload-agnostic core-boundary decisions
-* `0.6.0` added operational inspection helpers, replay and reconciliation workflow guides, a first integration-shaped replay example, and a first operator metrics guide
-* `0.7.0` adds the transferability baseline through maintainer guidance, compatibility guidance, support-boundary guidance, stronger discovery docs, and a clearer primary-versus-compatibility entrypoint boundary for focused subpaths
-
-For the current operational decision layer, see:
-
-* [Policy Guidance](https://github.com/GazaliAhmad/causal-order/blob/main/guides/policy-guidance.md)
-* [Replay Inspection Workflow](https://github.com/GazaliAhmad/causal-order/blob/main/guides/operations/replay-inspection-workflow.md)
-* [Streaming Reconciliation Workflow](https://github.com/GazaliAhmad/causal-order/blob/main/guides/operations/streaming-reconciliation-workflow.md)
-* [Operator Metrics Guide](https://github.com/GazaliAhmad/causal-order/blob/main/guides/operations/operator-metrics-guide.md)
-* [Release Notes `0.7.0`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.7.0.md)
-* [Release Notes `0.6.0`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.6.0.md)
-* [Release Notes `0.5.0`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.5.0.md)
-
-`0.5.0` is centered on:
-
-* the existing `0.3.x` hardening and runtime-stability foundation
-* a top-level synchronous raw-record ingress surface via `translateBatch()`
-* explicit mapper rules for required and optional fields
-* deterministic timestamp coercion for accepted primitive inputs
-* structured translation anomalies with nested diagnostics, stable classification, and field references
-* explicit translation strictness-policy handling
-* deterministic diagnostic ordering metadata
-* shallow immutability guarantees for translated envelopes with payload preservation by reference
-* additive focused subpath exports for narrower package entrypoints
-* runnable ingress examples through the real public package surface
-* package-facing quick-start and policy guidance for the current contract
-* docs synchronization enforcement that keeps examples and top-level docs aligned
-* exported-surface review, explicit default-behavior decisions, and published migration notes for the next long-term contract boundary
-
-The released `0.5.0` stability work is centered on:
-
-* exported-surface stability review
-* compatibility and migration notes
-* explicit core-versus-extension decisions for contradictory events, entity forks, and semantic dedupe across different IDs
-
-For the released stability line, see:
-
-* [Implementation Guide `0.5.0`](https://github.com/GazaliAhmad/causal-order/blob/main/guides/stability/implementation-guide-0.5.0.md)
-* [Release Notes `0.5.0`](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/0.5.0.md)
-
-Current deployment posture:
-
-* bounded batch recovery, replay, reconciliation, and audit-style workloads remain the stronger production-credible side of the current contract
-* streaming remains part of the public contract, with the earlier hardening and runtime-stability work still defining its current proof base
+* `causal-order` is ready to use as a deployable event-ordering library today when you want confidence-aware ordering, anomaly visibility, and explicit causal justification in a real workflow
+* deployment is a first-class application of the package, not only a forensic or post-incident use case
+* bounded batch recovery, replay, reconciliation, and audit-style workloads are the clearest production-credible starting point in the current contract
+* streaming is also part of the public contract, with the current hardening and runtime-stability guides defining how to deploy it with explicit lateness, correction, and reconciliation posture
+* the repo already includes heavier deployment-facing evidence, including named `250k` batch and stream validation profiles and a documented `1,000,000`-event AWS-inspired streaming outage exercise
 * raw-record translation into the event envelope and its machine-readable failure contract are now part of the package surface rather than repo-local work
 
-That means:
+Confidence ladder:
 
-* the package is usable today
-* the API is still evolving, but `0.5.0`, `0.6.0`, and `0.7.0` make the contract, operational posture, and support boundary much more explicit
-* the published `0.7.0` line adds the first coherent maintainer, compatibility, upgrade, and discovery layer on top of the `0.5.0` and `0.6.0` package surface, while making the focused subpaths read more clearly as the primary API story for new code
+* `CI` covers everyday correctness, docs sync, and package-facing examples
+* `Post-Merge 150k Confidence` is the routine stronger automated confidence run
+* `Manual 250k Confidence` is the heavier on-demand batch and stream validation path
+* `Manual AWS Incident Confidence` is the outage-shape streaming confidence run with GC-observed summary artifacts
+
+`0.8.0` adds:
+
+* a clearer maintainer, compatibility, upgrade, and discovery layer on top of the published `0.7.0` package surface
+* focused subpaths that read more clearly as the primary API story for new code
+* a clearer package-facing extension boundary so adjacent tooling can build on the runtime without pretending the core owns connector or domain-resolution concerns
 * `1.0.0` is the point where the semantic contract should feel stable enough to preserve long-term
+
+For the `0.8.0` package-facing decision layer, see:
+
+* [Extension Boundary Guide](https://causal-order.gazali.one/guides/extension-boundary-guide/)
+* [Policy Guidance](https://causal-order.gazali.one/guides/policy-guidance/)
+* [Replay Inspection Workflow](https://causal-order.gazali.one/guides/operations/replay-inspection-workflow/)
+* [Streaming Reconciliation Workflow](https://causal-order.gazali.one/guides/operations/streaming-reconciliation-workflow/)
+* [Incident Review Guide](https://causal-order.gazali.one/guides/operations/incident-review-guide/)
+* [Anomaly Interpretation Guide](https://causal-order.gazali.one/guides/operations/anomaly-interpretation-guide/)
+* [Operator Metrics Guide](https://causal-order.gazali.one/guides/operations/operator-metrics-guide/)
+* [Stress Hardening](https://causal-order.gazali.one/guides/stress-hardening/)
+* [AWS-Inspired DynamoDB Outage Exercise](https://causal-order.gazali.one/guides/aws-inspired-dynamodb-outage/)
 
 ## Repository Development
 
-If you are working in the repository itself:
+If you are working in the repository itself, start with:
+
+* [CONTRIBUTING.md](https://github.com/GazaliAhmad/causal-order/blob/main/CONTRIBUTING.md)
+* [MAINTENANCE.md](https://github.com/GazaliAhmad/causal-order/blob/main/MAINTENANCE.md)
+* [RELEASE_PROCESS.md](https://github.com/GazaliAhmad/causal-order/blob/main/RELEASE_PROCESS.md)
+
+The most useful local gates are:
 
 ```bash
-npm install
 npm run check
 npm test
-npm run bench:check
 npm run release:check
 ```
-
-Useful local commands:
-
-* `npm run demo`
-* `npm run examples`
-* `npm run bench`
-* `npm run bench:stream`
-* `npm run bench:all`
-* `npm run bench:csv`
-* `npm run bench:profile`
-
-Current test posture:
-
-* `npm test` includes the direct release-gate suites plus seeded `0.3.2` fuzz coverage
-* the fuzz layer currently covers batch outage/replay noise plus streaming reconnect, fragmented watermark-lag, correction-burst, sustained correction-churn, reconnect-burst, bounded-window lagging-watermark, and bounded-memory cross-window replay pressure
-* broader exploratory fuzz campaigns are now part of the shipped `0.3.3` pressure expansion
-
-Current benchmark posture:
-
-* `10k` and `100k` are the main enforced guardrail bands
-* `150k` corrupted-dataset profiles are available for stress visibility, but are not currently enforced in `npm run bench:check`
-* `150k` remains the enforced sustained watermark-lag stream guard band
-* a separate non-blocking GitHub Actions post-merge confidence workflow now runs the `150k` batch and `150k` stream validation pair on `main`
-* named `250k` batch and stream profiles are already operational extended-validation runs, even though they remain outside the default lightweight `bench:check` guard path
-* repeated-cycle, constrained-heap, GC-observed, and sustained correction/reconnect endurance runs are now available as explicit runtime-stability evidence commands
-* `npm run bench:profile` is available when you need CPU profiles for the slowest stress cases
 
 ## License
 

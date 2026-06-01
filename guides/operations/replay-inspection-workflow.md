@@ -1,6 +1,6 @@
 # Replay Inspection Workflow
 
-This guide is the first `0.6.0` operational playbook for bounded replay inspection.
+This guide is the operational playbook for bounded replay inspection.
 
 It is not trying to replace the broader [After-Hours Batch Processing](../after-hours-batch-processing.md) guide.
 It is the narrower operator-facing follow-through that answers:
@@ -71,7 +71,7 @@ That summary row is a good place for:
 
 ## Where The `inspect` Helpers Fit
 
-The new `0.6.0` helper layer is meant to reduce ad hoc operator glue:
+The helper layer is meant to reduce ad hoc operator glue:
 
 * `inspectOrderResult()` gives a compact replay snapshot
 * `summarizeEventAnomalies()` gives quick anomaly counts
@@ -179,10 +179,12 @@ That gives the team a stable place to answer:
 ## Relationship To The Existing Batch Guide
 
 Use [After-Hours Batch Processing](../after-hours-batch-processing.md) for the broader operational model.
+Use [Incident Review Guide](./incident-review-guide.md) when the next question is how to turn replay output, anomaly clusters, and row-level explanation into an incident-readable timeline.
+Use [Anomaly Interpretation Guide](./anomaly-interpretation-guide.md) when the next question is what one anomaly cluster or suspicious replay signal usually means operationally.
 Use [Operator Metrics Guide](./operator-metrics-guide.md) when the next question is what replay counters or anomaly trends to track over time.
 
 Use this replay-inspection guide when the harder question is:
 
 * how do we inspect and persist the result honestly before downstream writeback?
 
-That is the narrower `0.6.0` follow-through this guide covers.
+That is the narrower operator follow-through this guide covers.

@@ -1,6 +1,6 @@
 {
   "name": "causal-order",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "An event integrity library for ordering and analyzing distributed events without false certainty.",
   "keywords": [
     "distributed-systems",
@@ -114,6 +114,8 @@
     "bench:stream:gc:small": "npm run build && node perf/gc-observed.mjs --heap-mb 128 --profile streaming-150k-watermark-lag --repeat 3 --warmup 0",
     "bench:confidence:150k": "npm run build && node perf/run.mjs --profile baseline-150k-shuffled --profile streaming-150k-watermark-lag",
     "bench:confidence:250k": "npm run build && node perf/run.mjs --profile baseline-250k-shuffled --profile streaming-250k-watermark-lag",
+    "bench:aws:incident": "npm run build && node perf/aws-inspired-dynamodb-incident.mjs",
+    "bench:aws:incident:gc": "npm run build && node --max-old-space-size=256 --expose-gc perf/aws-inspired-dynamodb-incident.mjs --heap-mb 256",
     "bench:check": "npm run build && node perf/check.mjs",
     "prepack": "npm run build && npm run badge:footprint"
   },

@@ -47,6 +47,17 @@ npm run badge:footprint:check
 
 For release lines that touch performance or runtime-stability claims, also run the matching perf commands and record the exact profile used in the PR.
 
+Use the repo's confidence ladder deliberately:
+
+* `CI`
+  * ordinary release-facing correctness
+* `Post-Merge 150k Confidence`
+  * the routine stronger automated confidence layer after merge
+* `Manual 250k Confidence`
+  * heavier on-demand validation when the line changes deployment confidence or perf posture
+* `Manual AWS Incident Confidence`
+  * the outage-shape streaming confidence run when the line touches streaming recovery, correction churn, or incident-facing claims
+
 ## PR Expectations
 
 A release PR should say:
@@ -124,3 +135,5 @@ After the tag is pushed:
 * confirm the release notes or tag annotation are readable
 * confirm the website or package deployment signals are healthy if that release touched them
 * move roadmap attention to the next scoped chunk
+
+If the release changed stress, runtime-stability, or outage-shape claims, note which rung of the confidence ladder was actually run.

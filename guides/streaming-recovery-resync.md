@@ -74,7 +74,7 @@ The main difference is usually the chosen watermark strategy and late-arrival po
 
 ## What `emit_correction` Means
 
-In the current package behavior, `lateArrivalPolicy: "emit_correction"` means:
+In the current contract, `lateArrivalPolicy: "emit_correction"` means:
 
 * late events are still emitted
 * a correction-capable batch can be flushed immediately when that late event arrives
@@ -118,7 +118,7 @@ The stream contract also makes retained anomaly history explicit:
 
 * `batch.anomalyHorizon.retainedEventHistory` is `buffered_window_only`
 * once a batch has been emitted, those earlier emitted events are not retained for later relational anomaly comparison
-* that means `duplicate_event`, `sequence_regression`, `same_node_sequence_conflict`, `causal_inversion`, and `unknown_order` are only guaranteed within the currently buffered window that is flushed together
+* that means `duplicate_event`, `sequence_regression`, `same_node_sequence_conflict`, `causal_inversion`, and `unknown_order` are only guaranteed within the buffered window that is flushed together
 * `batch.anomalyHorizon.crossWindowRelationalDetection` is `late_arrival_only`
 * `late_arrival` remains stream-wide because it is checked against the active watermark rather than against retained emitted-event history
 

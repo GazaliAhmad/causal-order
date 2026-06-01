@@ -1,0 +1,53 @@
+name: Manual AWS Incident Confidence
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: manual-aws-incident-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  confidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run AWS incident confidence with GC
+        env:
+          REPORT_DIR: perf/results/aws-incident/manual-${{ github.run_id }}
+        run: |
+          mkdir -p "$REPORT_DIR"
+          npm run bench:aws:incident:gc -- --out-dir "$REPORT_DIR" | tee "$REPORT_DIR/run.log"
+
+      - name: Publish step summary
+        if: always()
+        env:
+          REPORT_DIR: perf/results/aws-incident/manual-${{ github.run_id }}
+        run: |
+          if [ -f "$REPORT_DIR/summary.md" ]; then
+            cat "$REPORT_DIR/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload AWS incident confidence artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aws-incident-confidence-${{ github.run_id }}
+          path: perf/results/aws-incident/manual-${{ github.run_id }}
+          if-no-files-found: error

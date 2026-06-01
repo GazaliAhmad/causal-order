@@ -1,6 +1,6 @@
 # Streaming Reconciliation Workflow
 
-This guide is the first `0.6.0` operational playbook for correction-capable streaming follow-through.
+This guide is the operational playbook for correction-capable streaming follow-through.
 
 It does not replace the broader [Streaming Recovery And Resync](../streaming-recovery-resync.md) guide.
 It answers the narrower workflow question:
@@ -24,7 +24,7 @@ This is the right fit for:
 
 ## The Core Rule
 
-The current stream contract is honest about one important thing:
+The stream contract is honest about one important thing:
 
 * non-final output may later need reconciliation
 
@@ -54,7 +54,7 @@ That keeps the stream honest without requiring the core package to become a proj
 
 ## Where The `inspect` Helpers Fit
 
-The `0.6.0` helper layer supports the operational check step:
+The helper layer supports the operational check step:
 
 * `inspectOrderBatch()` gives a compact batch snapshot
 * `summarizeEventAnomalies()` gives quick anomaly counts
@@ -96,7 +96,7 @@ If `batch.correction` is present:
 
 * late data has arrived
 * previously emitted non-final output from the same stream instance may need reconciliation
-* the current emitted rows should be treated as newer derived state
+* the emitted rows should be treated as newer derived state
 
 It does not mean:
 
@@ -175,10 +175,12 @@ The safer rule is:
 ## Relationship To The Existing Streaming Guide
 
 Use [Streaming Recovery And Resync](../streaming-recovery-resync.md) for the broader stream contract and lateness semantics.
+Use [Incident Review Guide](./incident-review-guide.md) when the next question is how to explain delayed reconnect, correction churn, and projection replacement pressure during incident review.
+Use [Anomaly Interpretation Guide](./anomaly-interpretation-guide.md) when the next question is what the emitted anomaly mix says about reconnect, lateness, or weaker evidence quality.
 Use [Operator Metrics Guide](./operator-metrics-guide.md) when the next question is what to graph or investigate once correction-capable output is live.
 
 Use this reconciliation workflow guide when the narrower question is:
 
 * how should emitted correction-capable batches be persisted, inspected, and applied downstream?
 
-That is the `0.6.0` operational follow-through this guide is meant to cover.
+That is the operational follow-through this guide is meant to cover.

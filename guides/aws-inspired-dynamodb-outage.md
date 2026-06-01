@@ -112,7 +112,23 @@ This is the human-sized version of the larger streaming storm.
 
 ## Million-Record Procedure
 
-The large run was intentionally dynamic rather than formalized into a checked-in benchmark profile.
+The large run is now available both as a checked-in repo command and as a manually triggered GitHub Actions confidence workflow.
+
+Checked-in command:
+
+* `npm run bench:aws:incident`
+* `npm run bench:aws:incident:gc`
+
+The GC-observed command uses:
+
+* `--expose-gc`
+* `--max-old-space-size=256`
+
+The matching GitHub Actions workflow is manual-only:
+
+* `Manual AWS Incident Confidence`
+
+It uploads a summary artifact with runtime, anomaly counts, correction counts, and memory snapshots.
 
 Procedure:
 

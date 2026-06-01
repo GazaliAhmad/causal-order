@@ -1,18 +1,18 @@
 # Runtime Stability
 
-`0.3.4` is the runtime-stability follow-up to the broader `0.3.3` pressure work.
+This guide is the runtime-stability follow-up to the broader pressure work already in place.
 
 The purpose of this line is not to widen semantics again.
-It is to make the current streaming contract more credible under prolonged and constrained runtime conditions.
+It is to make the streaming contract more credible under prolonged and constrained runtime conditions.
 
 At this stage, the important distinction is:
 
-* `0.3.3` widened pressure visibility and hotspot evidence
-* `0.3.4` is turning the most important of those cases into stronger sustained-runtime proof
+* the earlier pressure work widened visibility and hotspot evidence
+* this guide turns the most important of those cases into stronger sustained-runtime proof
 
 ## What Has Landed So Far
 
-The released `0.3.4` line is centered on four concrete areas:
+The current runtime-stability line is centered on four concrete areas:
 
 * repeated-cycle stream endurance runs in one process
 * constrained-heap stream endurance runs
@@ -50,7 +50,7 @@ This makes it straightforward to run the existing endurance profiles under small
 
 That matters because a profile that looks clean under a roomy default heap can still become operationally uncomfortable once memory is tighter.
 
-At the current stage, these runs are evidence-oriented:
+At this stage, these runs are evidence-oriented:
 
 * they show what remains stable
 * they show what becomes slower
@@ -66,7 +66,7 @@ The project includes an explicit GC-observed stream wrapper:
 
 This complements the earlier heap sampling by making GC activity directly visible during repeated endurance runs.
 
-The current GC-observed work surfaces:
+The GC-observed work surfaces:
 
 * GC count
 * GC duration
@@ -74,7 +74,7 @@ The current GC-observed work surfaces:
 * forced GC hook counts when that mode is used deliberately
 
 The goal here is not to treat every GC event as a failure.
-The goal is to make it easier to reason about whether the current stream contract stays understandable once collection pressure becomes real.
+The goal is to make it easier to reason about whether the stream contract stays understandable once collection pressure becomes real.
 
 ## Sustained Correction And Reconnect Pressure
 
@@ -92,14 +92,14 @@ That matters because:
 * correction churn keeps forcing repeated non-trivial flush decisions
 * anomaly-heavy replay and reconnect paths can be meaningfully slower and noisier than cleaner steady-state stream shapes
 
-The purpose of these profiles is to make that cost visible without changing the semantics that `0.3.3` already established.
+The purpose of these profiles is to make that cost visible without changing the semantics the package already established today.
 
 ## Current Posture
 
-The current `0.3.4` posture is:
+The posture is:
 
 * endurance and constrained-runtime evidence is now explicitly part of the shipped hardening story
-* the `150k` sustained watermark-lag stream profile remains the current enforced stream guard
+* the `150k` sustained watermark-lag stream profile remains the enforced stream guard
 * `250k` stream pressure remains exploratory stretch visibility
 * the newer correction-heavy and reconnect-heavy endurance profiles are evidence-oriented rather than routine CI guardrails
 
@@ -117,9 +117,9 @@ This work is not:
 * a new memory guarantee
 * a new domain-conflict or merge layer
 
-It is runtime-stability work for the current streaming contract.
+It is runtime-stability work for the streaming contract.
 
 ## Remaining Work
 
-The important remaining work after `0.3.4` is not basic runtime-stability scaffolding.
+The important remaining work after this runtime-stability layer is not basic scaffolding.
 It is the later maturity work around API stability, tooling, transferability, and long-term contract confidence.

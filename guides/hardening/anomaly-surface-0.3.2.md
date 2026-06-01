@@ -14,14 +14,14 @@ That means the docs should be explicit about two things:
 * what anomalies the runtime already emits today
 * where the runtime relies on ordering conclusions and general corruption signals rather than on a dedicated anomaly for one named scenario
 
-If a current-core signal is missing, the honest choices are:
+If a core signal is missing today, the honest choices are:
 
 * add it if it still fits the payload-agnostic core
 * or state the limitation clearly instead of implying that the signal already exists
 
 ## Current Anomaly Types
 
-The current runtime anomaly surface includes:
+The runtime anomaly surface today includes:
 
 * `invalid_clock`
 * `future_timestamp`
@@ -41,7 +41,7 @@ These are the anomalies the package can emit directly today.
 
 Current status:
 
-* supported as a current-core gate category
+* supported as a core gate category
 * no dedicated `missing_parent` anomaly exists today
 
 Current behavior:
@@ -49,14 +49,14 @@ Current behavior:
 * missing parent references do not invent causal evidence
 * ordering can still proceed using other supported evidence such as same-node sequence
 
-Why this is still acceptable for `0.3.2`:
+Why this remains acceptable today:
 
-* the current core already behaves honestly by refusing to fabricate parent support
+* the core already behaves honestly by refusing to fabricate parent support
 * this is a representational limitation, not silent false certainty
 
 Current limitation:
 
-* missing parent references are currently expressed through preserved ordering limits rather than through a dedicated anomaly type
+* missing parent references are expressed through preserved ordering limits rather than through a dedicated anomaly type
 
 ### Offline Device Merge
 
@@ -70,10 +70,10 @@ Current behavior:
 * same-node monotonic sequence can preserve local device history
 * misleading ingest-time appearance does not override supported same-node evidence
 
-Why this is still acceptable for `0.3.2`:
+Why this remains acceptable today:
 
 * this gate category is primarily about preserving correct local-history conclusions under delayed sync
-* the current core does that without pretending there is a domain-specific "offline merge" anomaly
+* the core does that without pretending there is a domain-specific "offline merge" anomaly
 
 Current limitation:
 
@@ -90,7 +90,7 @@ Current behavior:
 * exact duplicate IDs emit `duplicate_event`
 * large replay or duplicate-heavy workloads can still be ordered without hiding that corruption signal
 
-This is one of the strongest current anomaly categories because the runtime has a direct, machine-readable signal for the exact failure shape.
+This is one of the strongest anomaly categories today because the runtime has a direct, machine-readable signal for the exact failure shape.
 
 ### Clock Reset Scenarios
 
@@ -104,9 +104,9 @@ Current behavior:
 * same-node resets that show up as backward sequence movement can emit `sequence_regression`
 * invalid clock structure still emits `invalid_clock`
 
-Why this is still acceptable for `0.3.2`:
+Why this remains acceptable today:
 
-* the current release gate is about defending the current semantics honestly, not pretending the library already has a richer clock-reset diagnosis model than it does
+* the goal here is to defend the current semantics honestly, not pretend the library already has a richer clock-reset diagnosis model than it does
 
 Current limitation:
 
@@ -123,9 +123,9 @@ Current behavior:
 * same-node sequence can restore the truthful local order
 * replay-heavy corruption may also surface `duplicate_event` or `sequence_regression`, depending on the concrete data shape
 
-Why this is still acceptable for `0.3.2`:
+Why this remains acceptable today:
 
-* the production gate is about whether the library preserves honest conclusions under replay-heavy input
+* the current production gate is about whether the library preserves honest conclusions under replay-heavy input
 * it does not require a dedicated `replay_event` anomaly type
 
 Current limitation:
@@ -150,7 +150,7 @@ This category already fits the current payload-agnostic anomaly model well becau
 
 ## Streaming Limitation Reminder
 
-For streaming, the current anomaly story is intentionally narrower across emitted windows:
+For streaming, the anomaly story is intentionally narrower across emitted windows:
 
 * `duplicate_event`
 * `sequence_regression`
@@ -158,24 +158,24 @@ For streaming, the current anomaly story is intentionally narrower across emitte
 * `causal_inversion`
 * `unknown_order`
 
-are only guaranteed within the currently buffered window that is flushed together.
+are only guaranteed within the buffered window that is flushed together.
 
-Across earlier emitted windows, the currently retained relational anomaly carry is:
+Across earlier emitted windows, the retained relational anomaly carry is:
 
 * `late_arrival` only
 
-This is already part of the current stream contract and should remain explicit in the `0.3.2` release story.
+This is already part of the current stream contract and should remain explicit in the docs.
 
 ## Audit Outcome
 
-The current anomaly surface is sufficient as long as the docs stay honest about the distinction between:
+The anomaly surface is sufficient as long as the docs stay honest about the distinction between:
 
 * direct anomaly support
 * indirect support through stable ordering conclusions
-* explicit current limitations
+* explicit limitations today
 
 The most important limitation to keep visible today is this:
 
 * some production-gate categories are defended by ordering behavior plus generic anomalies, not by a dedicated scenario-named anomaly type
 
-That is acceptable for `0.3.2` as long as the docs and release wording do not imply a richer anomaly diagnosis model than the runtime currently provides.
+That is acceptable as long as the docs and release wording do not imply a richer anomaly diagnosis model than the runtime provides.

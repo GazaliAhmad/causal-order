@@ -1,31 +1,57 @@
 # Guides
 
-These guides show how to use `causal-order` in real workflows.
-They focus on package-facing usage, operational choices, and the deployment shapes where the library is most useful.
+These guides are the practical path for evaluating, adopting, and operating `causal-order`.
+They are organized around the questions most teams hit first:
 
-Start with the quick-start scenarios guide, then move into policy guidance, operational workflows, failure modes, or workload hardening depending on what you are trying to do.
+* does this fit our problem
+* how do we build a first flow with it
+* how do we operate and inspect the output
+* what support and upgrade posture should we expect
 
-For the deeper conceptual layer, mental-model pages, and explanatory write-ups about why the library behaves this way, see the wiki.
+For the deeper conceptual layer and mental-model material, see the wiki.
 For function-by-function reference, see the API docs.
 
-Start here:
+Evaluate quickly:
 
 * [Quick Start Scenarios](./quick-start-scenarios.md)
+* [Supported Vs Unsupported Usage](./supported-vs-unsupported-usage.md)
+* [Case Studies](./case-studies.md)
 * [Examples And Entrypoints](./examples-and-entrypoints.md)
 * [Package Surface Overview](./package-surface-overview.md)
+
+Build with the package:
+
+* [Package Surface Overview](./package-surface-overview.md)
+* [Extension Boundary Guide](./extension-boundary-guide.md)
+* [Policy Guidance](./policy-guidance.md)
 * [Mental Model](./mental-model.md)
 * [Notation And Runtime Contract](./notation-and-runtime-contract.md)
 * [How Order Is Written](./how-order-is-written.md)
 * [Clocks, Causality, And Why HLC](./clocks-causality-and-why-hlc.md)
-* [Supported Vs Unsupported Usage](./supported-vs-unsupported-usage.md)
 * [Upgrade Expectations](./upgrade-expectations.md)
-* [Case Studies](./case-studies.md)
-* [Stress Hardening](./stress-hardening.md)
-* [After-Hours Batch Processing](./after-hours-batch-processing.md)
+
+Operate and inspect:
+
+* [Replay Inspection Workflow](./operations/replay-inspection-workflow.md)
+* [Streaming Reconciliation Workflow](./operations/streaming-reconciliation-workflow.md)
+* [Incident Review Guide](./operations/incident-review-guide.md)
+* [Anomaly Interpretation Guide](./operations/anomaly-interpretation-guide.md)
+* [Operator Metrics Guide](./operations/operator-metrics-guide.md)
 * [Streaming Recovery And Resync](./streaming-recovery-resync.md)
+* [After-Hours Batch Processing](./after-hours-batch-processing.md)
+
+Failure modes:
+
+* [Replay Corruption](./replay-corruption.md)
+* [Multi-Region Drift](./multi-region-drift.md)
+* [False Audit Timelines](./false-audit-timeline.md)
+* [Offline Sync Anomalies](./offline-sync-anomalies.md)
+* [Causal Inversion](./causal-inversion.md)
+* [AWS-Inspired DynamoDB Outage Exercise](./aws-inspired-dynamodb-outage.md)
 
 Workloads and hardening:
 
+* [Stress Hardening](./stress-hardening.md)
 * [Anomaly Surface Audit](./hardening/anomaly-surface-0.3.2.md)
 * [Fuzz Testing](./hardening/fuzz-testing-0.3.2.md)
 * [Streaming Hardening And Pressure](./hardening/streaming-hardening-0.3.3.md)
@@ -34,27 +60,20 @@ Workloads and hardening:
 Support and upgrades:
 
 * [Supported Vs Unsupported Usage](./supported-vs-unsupported-usage.md)
+* [Extension Boundary Guide](./extension-boundary-guide.md)
 * [Upgrade Expectations](./upgrade-expectations.md)
 * [Policy Guidance](./policy-guidance.md)
 
-Developer experience:
+Release and maintenance context:
 
 * [Developer Experience](./devex/developer-experience-0.4.0.md)
 * [Implementation Guide `0.4.1`](./devex/implementation-guide-0.4.1.md)
 * [Implementation Guide `0.4.2`](./devex/implementation-guide-0.4.2.md)
 * [Release Notes `0.4.2`](../docs/releases/0.4.2.md)
 * [Release Notes `0.5.0`](../docs/releases/0.5.0.md)
-
-Published `0.7.0` release line:
-
 * [Release Notes `0.7.0`](../docs/releases/0.7.0.md)
-* [Release Notes `0.6.0`](../docs/releases/0.6.0.md)
-
-Operational workflows:
-
-* [Replay Inspection Workflow](./operations/replay-inspection-workflow.md)
-* [Streaming Reconciliation Workflow](./operations/streaming-reconciliation-workflow.md)
-* [Operator Metrics Guide](./operations/operator-metrics-guide.md)
+* [Release Notes `0.8.0`](../docs/releases/0.8.0.md)
+* [ROADMAP `0.8.0`](../ROADMAP.md)
 
 Published stability line:
 
@@ -78,15 +97,6 @@ Runnable examples:
 * [False Audit Timeline Example](../examples/false-audit-timeline.mjs)
 * [Offline Sync Anomalies Example](../examples/offline-sync-anomalies.mjs)
 * [Streaming Recovery Resync Example](../examples/streaming-recovery-resync.mjs)
-
-Failure-mode guides:
-
-* [Replay Corruption](./replay-corruption.md)
-* [Multi-Region Drift](./multi-region-drift.md)
-* [False Audit Timelines](./false-audit-timeline.md)
-* [Offline Sync Anomalies](./offline-sync-anomalies.md)
-* [Causal Inversion](./causal-inversion.md)
-* [AWS-Inspired DynamoDB Outage Exercise](./aws-inspired-dynamodb-outage.md)
 
 The point of this section is not only to explain the API.
 It is to show why the API exists.

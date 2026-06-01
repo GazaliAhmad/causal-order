@@ -43,6 +43,27 @@ One concrete real-world deployment example is a central server outage where:
 In that sense, the `150k` stress band is not only a lab exercise.
 It is a plausible deployment envelope for systems with many nodes or with busy nodes accumulating several hours of local history before sync.
 
+## Confidence Ladder
+
+The repo highlights these verification layers on purpose:
+
+* `CI`
+  * everyday correctness, docs-sync, and example alignment
+* `Post-Merge 150k Confidence`
+  * the routine stronger automated confidence layer after merge
+* `Manual 250k Confidence`
+  * heavier on-demand batch and stream validation beyond the routine path
+* `Manual AWS Incident Confidence`
+  * outage-shape streaming confidence with a checked-in `1,000,000`-event analog, GC-observed memory snapshots, and summary artifacts
+
+Read them as a ladder, not as four equivalent gates.
+
+The point is:
+
+1. keep ordinary changes fast to verify
+2. keep stronger deployment confidence visible
+3. keep the heaviest outage-shape validation available when you deliberately want it
+
 ## Stress Matrix
 
 Current `150k` corrupted-dataset stress profiles cover:
@@ -61,7 +82,7 @@ They are concentrated versions of the same failure shapes already represented in
 
 ## What The Stress Work Proved
 
-The `0.2.2` stress pass was valuable for two reasons:
+The stress pass is valuable for two reasons:
 
 * it confirmed that the semantic model still holds under large corrupted batches, not just under hand-sized examples
 * it exposed a real bottleneck in the ready-queue ordering path that small tests did not make obvious
@@ -100,6 +121,10 @@ Useful commands:
 ```bash
 npm run bench:all
 npm run bench:csv
+npm run bench:confidence:150k
+npm run bench:confidence:250k
+npm run bench:aws:incident
+npm run bench:aws:incident:gc
 node perf/run.mjs --profile baseline-250k-shuffled
 node perf/run.mjs --profile streaming-250k-watermark-lag
 node perf/run.mjs --profile stress-150k-inversion-chains

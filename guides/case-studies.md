@@ -5,7 +5,7 @@ These case studies show how `causal-order` handles timelines that look straightf
 The point is not only what the library outputs.
 It is why the library refuses certain stronger claims.
 
-These scenarios are also the right seeds for larger `0.2.2` corrupted-dataset stress profiles.
+These scenarios are also the right seeds for larger evaluation and hardening profiles.
 They represent realistic failure shapes that can be expanded into heavier benchmark inputs without changing the semantic question being tested.
 
 ## 1. Multi-Region Clock Drift
@@ -218,14 +218,14 @@ For a streaming outage analog with delayed reconnect waves, correction churn, na
 
 ## Stress-Hardening Follow-Up
 
-These case studies also map cleanly onto the `0.2.2` corrupted-dataset stress plan:
+These case studies also map cleanly onto the current hardening plan:
 
 * multi-region drift expands naturally into sparse-causality and weak-evidence graph pressure
 * replay corruption expands naturally into duplicate explosion, replay storms, and inversion-heavy stress
 * offline sync anomalies expand naturally into sequence conflicts and large same-timestamp clusters
 * the "unknown" case expands naturally into sparse-causality and cross-node ambiguity stress
 
-Additional `0.2.2` stress-only patterns that go beyond these small scenario fixtures include:
+Additional stress-only patterns that go beyond these small scenario fixtures include:
 
 * malformed-event ratios
 * cyclic dependency attempts

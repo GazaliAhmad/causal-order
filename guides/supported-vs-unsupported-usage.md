@@ -11,9 +11,13 @@ The short version is:
 ## Supported Usage Today
 
 `causal-order` is a good fit when you need to reconstruct or inspect distributed event order without pretending timestamp order is enough on its own.
+It is meant to be usable as a deployable event-ordering library inside a real system, while still leaving ingestion, orchestration, and domain-resolution layers outside the core package.
+The intended reading is not "interesting research code"; it is "usable ordering infrastructure when your system needs honest causal ordering rather than a plain timestamp sort."
+That includes ordinary deployment, not only replay forensics or retrospective analysis.
 
 Supported usage includes:
 
+* deploying the library as the event-ordering layer inside a real distributed workflow
 * bounded replay, audit, and recovery batches through `orderEvents()`
 * streaming workflows through `orderEventStream()` when late arrivals, correction windows, and reconciliation are part of the real operating model
 * raw-record ingress through `translateBatch()` when your source data is not already in the event-envelope shape
@@ -26,6 +30,9 @@ This package is especially useful when:
 * replayed data can arrive out of apparent timestamp order
 * you need to show why an order was chosen, not just emit one
 * you want uncertainty to remain visible instead of being flattened away
+
+It is much less compelling when your system has already normalized events into the exact ordering truth you trust.
+For example, if a consensus layer such as Raft or Paxos has already settled the order cleanly for the stream you care about, the main job of this library has mostly already been done upstream.
 
 ## Supported Evidence Model
 
@@ -64,6 +71,11 @@ If your workflow can accept:
 
 then you are inside the current supported path.
 
+The repo also carries deployment-facing evidence for that claim:
+
+* named `250k` batch and stream validation runs in [Stress Hardening](./stress-hardening.md)
+* a documented `1,000,000`-event streaming outage analog in [AWS-Inspired DynamoDB Outage Exercise](./aws-inspired-dynamodb-outage.md)
+
 ## Intentionally Unsupported Or Out Of Scope
 
 The package is intentionally not trying to do everything inside the core runtime.
@@ -72,6 +84,7 @@ Examples of intentionally unsupported or out-of-scope usage include:
 
 * treating wall-clock timestamp order alone as causal proof
 * treating shared `traceId` or `partition` metadata as automatic causal evidence
+* pretending the package adds value after a consensus layer has already produced the authoritative order you want to keep
 * domain-specific contradiction resolution inside the payload-agnostic core
 * field-level domain merge logic for forks, duplicates, or semantic collisions
 * broker-, database-, transport-, or file-format-specific glue inside the core package
@@ -79,6 +92,7 @@ Examples of intentionally unsupported or out-of-scope usage include:
 
 This boundary is deliberate.
 The goal is to keep the core library honest and composable rather than letting it absorb every adjacent systems concern.
+So the package should be read as a deployable ordering engine, not as a complete event platform.
 
 ## If You Need More Than The Supported Path
 
@@ -89,6 +103,8 @@ Examples:
 * if you need JSONL, broker, or database ingestion glue, build that around `translateBatch()` rather than expecting the core package to own it
 * if you need domain-semantic contradiction or dedupe policy, keep that in your own resolution layer rather than treating it as built into the current runtime
 * if you need stronger rejection posture, tighten translation and ordering policies explicitly instead of assuming the defaults already mean "hard fail"
+
+For the package-facing boundary map behind those choices, see [Extension Boundary Guide](./extension-boundary-guide.md).
 
 ## Warning Signs That You Are Leaving The Supported Boundary
 

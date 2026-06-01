@@ -3,7 +3,7 @@
 One of the cleanest operational uses of `causal-order` is not continuous streaming.
 It is scheduled batch processing after business hours or during off-peak windows.
 
-This guide explains that model, why it was the right `0.2.2` hardening story for the library, and how to preserve honest ordering when the central DB is updated in batches instead of continuously.
+This guide explains that model and how to preserve honest ordering when the central DB is updated in batches instead of continuously.
 
 ## When This Model Fits
 
@@ -35,7 +35,7 @@ That means the flow can be:
 4. pass the finite backlog into `orderEvents()`
 5. write ordered results and anomalies back into central storage
 
-This remains the simpler bounded-backlog path even now that `0.3.0` covers the first baseline streaming contract.
+This remains the simpler bounded-backlog path even now that the package has a broader streaming contract.
 
 ## What Metadata Matters
 
@@ -167,9 +167,9 @@ then some relationships may remain `derived` or `unknown`.
 That is not failure.
 That is the intended honesty of the model.
 
-## Why This Still Matters After `0.3.0`
+## Why This Still Matters
 
-`0.2.2` was the stress-hardening follow-up in the `0.2.x` line.
+This scenario remains one of the clearest hardening examples in the package.
 
 That means one of the strongest current operational stories remains:
 
@@ -188,28 +188,28 @@ That `150k` band should be read as a real-world deployment example, not just a s
 * several nodes can keep producing events locally during that outage
 * the resumed sync can easily produce a backlog large enough that serious bounded replay is the honest operational model
 
-## Relationship To `0.3.0`
+## Relationship To The Streaming Contract
 
 This guide describes the batch recovery and scheduled reconciliation story.
 
-`0.3.0` is the step where the same event model now works in ordinary continuous operations as well as continuous recovery or continuous sync flows.
+The streaming contract uses the same event model in ordinary continuous operations as well as continuous recovery or continuous sync flows.
 
 That means:
 
 * batch mode uses HLC plus event metadata to order a finite replayed backlog
-* `0.3.0` streaming mode uses the same event model, but adds watermark, lateness, correction, and the current stream-facing parameters for both normal live operations and reconnect-heavy flows
-* the completed `0.3.1` repo-state follow-up tightened the remaining stream semantic edge cases around:
+* streaming mode uses the same event model, but adds watermark, lateness, correction, and the current stream-facing parameters for both normal live operations and reconnect-heavy flows
+* later follow-up work tightened the remaining stream semantic edge cases around:
   * watermark callback semantics
   * boundary rules for lateness vs readiness
   * cross-window anomaly behavior
-* `0.3.2` is the production-gate hardening milestone for the settled `0.3.1` semantics:
+* later gate work hardened the settled streaming semantics with:
   * release-gate coverage for the current contract
-  * stronger determinism and current-core verification
-* `0.3.3` is where the broader additional streaming pressure work should land:
+  * stronger determinism and core verification
+* broader streaming pressure work adds:
   * pathological late arrivals
   * correction-window hardening
   * watermark pressure
   * bounded-memory demonstration and backpressure guidance
 
-So this guide is not being replaced by `0.3.0`.
+So this guide is not being replaced by the streaming contract.
 It is the simpler operational sibling of the streaming story.
