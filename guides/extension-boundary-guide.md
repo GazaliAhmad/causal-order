@@ -34,7 +34,7 @@ Those surfaces are useful because they preserve:
 * deterministic fallback when stronger proof is unavailable
 
 That is the contract to build on.
-The package helps you reason about event integrity.
+The package gives you a deployable ordering engine that protects event integrity by keeping uncertainty, anomaly visibility, and causal limits explicit.
 It does not claim ownership of every surrounding system concern.
 
 One explicit non-goal is replacing a consensus system that has already settled the exact order you want to trust.
@@ -112,18 +112,23 @@ Examples:
 
 Those concerns should live in a higher policy layer that can see domain meaning.
 
-The current public type surface already hints at this direction with draft interfaces such as:
+The current public type surface already makes this boundary explicit with interfaces such as:
 
 * `CausalContradictionPolicy`
 * `ForkResolutionPolicy`
 * `SemanticDedupePolicy`
 * `PolicyVisibilityRecord`
 
-Read those as boundary direction, not as a finished extension framework.
+Read those as intentional boundary types, not as a finished extension framework or built-in plug-in runtime.
 They show the intended split:
 
 * the core may surface candidates and visibility records
 * a higher layer owns action and business resolution
+
+They are public so higher layers can type their own policy decisions against the
+payload-agnostic core boundary.
+They should not be read as a promise that the package already implements those
+policy decisions inside the core runtime.
 
 ## What The Current Core Does Not Promise
 

@@ -3,14 +3,16 @@
 All notable changes to this project are summarized here.
 Detailed release write-ups live in `docs/releases/`.
 
-## [0.9.0] - Unreleased
-
-* This version is not published to npm.
+## [0.9.0]
 * Tightened the final pre-`1.0.0` runtime contract by removing `compareWithTieBreaker()` from the public surface while keeping `compareClocks()` only as deprecated root-level compatibility surface through `0.9.x`.
 * Classified `applyTieBreaker()` as intentional low-level public API and clarified that `compareDeterministically()` remains the primary user-facing deterministic fallback helper.
 * Narrowed `orderValidatedEvents()` to the public validated-events-plus-options shape and removed the old public `internal` coordination bag from the supported contract.
 * Hard-renamed the streaming result type from `OrderBatch` to `StreamOrderBatch` without preserving the older name as compatibility alias.
-* Updated the roadmap, repo-local stabilization notes, README wording, and generated API metadata so the `0.9.0-a` contract decisions read consistently across the package-facing release surface.
+* Preserved the exported extension-policy interfaces as intentional public boundary types and removed the older "draft by implication" framing from the source, guides, and generated API surface.
+* Froze the public explanation of `strict`, `detectAnomalies`, and `allowUnknownOrder` around one stable mental model: fail-fast behavior, uncertainty visibility, and diagnostic-output shaping.
+* Repositioned the docs and website around `causal-order` as a deployable event-ordering runtime while keeping forensics, audit, and inspection as secondary workflow layers.
+* Added the checked-in `0.9.0` release note and aligned the roadmap, repo-local stabilization notes, changelog, README wording, generated API metadata, and package metadata so the full `0.9.0` line reads consistently across the published release surface.
+* Removed the one-off Python PWA icon generator after preserving the generated icon assets, and narrowed CodeQL Advanced to the remaining JavaScript/TypeScript and GitHub Actions surfaces.
 
 ## [0.8.0]
 

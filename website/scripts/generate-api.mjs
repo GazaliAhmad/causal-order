@@ -74,7 +74,6 @@ const exportDescriptions = {
     "Builds a payload-agnostic inspection snapshot for one emitted orderEventStream() batch.",
   DEFAULT_TIE_BREAKER: "Default deterministic tie-breaker used when stronger ordering is unavailable.",
   getTieBreaker: "Resolves the tie-breaker function from the current ordering options.",
-  compareWithTieBreaker: "Compares two events with the configured deterministic tie-breaker.",
   orderValidatedEvents: "Orders already validated events without re-running validation.",
   orderEvents: "Orders a bounded event set and returns ordered output, anomalies, and stats.",
   orderEventStream:
@@ -175,9 +174,9 @@ console.log(result.stats)`,
       "<code>anomalies</code>: invalid, suspicious, or operationally important records.",
       "<code>stats</code>: counts for total, valid, invalid, ordered, and anomaly totals.",
       "<code>tieBreaker</code>: deterministic tie breaker such as <code>event_id</code> or <code>ingestion_order</code>.",
-      "<code>strict</code>: throw on invalid or unresolved conditions instead of returning a tolerant result.",
-      "<code>detectAnomalies</code>: include anomaly detection in the returned batch result.",
-      "<code>allowUnknownOrder</code>: permit unresolved ordering to remain explicit in non-strict mode.",
+      "<code>strict</code>: the main fail-fast switch for ordering and validation; translation fail-fast remains separately controlled through <code>translateBatch()</code> policy.",
+      "<code>detectAnomalies</code>: include emitted anomaly analysis in the returned batch result; turning it off reduces diagnostic output rather than upgrading confidence.",
+      "<code>allowUnknownOrder</code>: keep unresolved ordering explicit in non-strict mode; setting it to <code>false</code> strengthens severity posture rather than inventing stronger certainty.",
       "<code>maxClockDriftMs</code>: validation bound for future clock drift checks.",
     ],
   },
@@ -329,13 +328,6 @@ const deprecatedPages = {
     message:
       "This deprecated root-only compatibility alias remains through 0.9.x for older code, but new code should prefer the explicit HLC-specific helper before it disappears at 1.0.0.",
   },
-  compareWithTieBreaker: {
-    since: "0.5.0",
-    replacementName: "compareDeterministically",
-    replacementLabel: "compareDeterministically()",
-    message:
-      "This compatibility alias remains exported for older code, but new code should prefer the primary deterministic fallback helper.",
-  },
 };
 const typeDescriptions = {
   NodeId: "Branded node identifier used to separate same-node and cross-node reasoning.",
@@ -413,31 +405,34 @@ const typeDescriptions = {
   OrderResult: "Top-level bounded ordering result containing ordered events, anomalies, and stats.",
   TieBreaker: "Deterministic comparison function used when stronger ordering is absent.",
   OrderOptions: "Options controlling bounded ordering behavior and anomaly handling.",
-  PolicyVisibilityKind: "Draft audit-output category for future extension-policy decisions.",
+  PolicyVisibilityKind:
+    "Audit-output category used at the core-to-policy boundary for higher-layer decisions.",
   PolicyVisibilityRecord:
-    "Draft operator-visible audit record describing what an extension policy did without mutating payloads silently.",
-  ExtensionPolicyAction: "Draft contradiction-policy action shared across payload-agnostic extension hooks.",
+    "Operator-visible audit record describing what a higher-layer policy did without mutating payloads silently.",
+  ExtensionPolicyAction:
+    "Payload-agnostic contradiction-policy action shared across boundary-level policy hooks.",
   CausalContradictionCandidate:
-    "Draft payload-agnostic contradiction candidate for future policy hooks.",
+    "Payload-agnostic contradiction candidate surfaced at the core-to-policy boundary.",
   CausalContradictionPolicyResult:
-    "Draft result shape for contradiction-policy evaluation with explicit operator visibility.",
+    "Result shape for contradiction-policy evaluation with explicit operator visibility.",
   CausalContradictionPolicy:
-    "Draft policy interface for contradiction handling outside the core payload contract.",
+    "Policy interface for contradiction handling outside the core payload contract.",
   EntityForkCandidate:
-    "Draft payload-agnostic entity-fork candidate supplied by higher-layer identity logic.",
-  ForkResolutionAction: "Draft fork-policy action set that avoids implicit payload merging.",
+    "Payload-agnostic entity-fork candidate supplied by higher-layer identity logic.",
+  ForkResolutionAction:
+    "Fork-policy action set that avoids implicit payload merging inside the core.",
   ForkResolutionPolicyResult:
-    "Draft result shape for fork-resolution decisions with explicit visibility output.",
+    "Result shape for fork-resolution decisions with explicit visibility output.",
   ForkResolutionPolicy:
-    "Draft policy interface for entity-fork handling outside the core payload contract.",
+    "Policy interface for entity-fork handling outside the core payload contract.",
   SemanticDedupeCandidate:
-    "Draft semantic-dedupe candidate for future policy hooks across different identifiers.",
+    "Payload-agnostic semantic-dedupe candidate surfaced at the core-to-policy boundary across different identifiers.",
   SemanticDedupeAction:
-    "Draft dedupe-policy action set that preserves explicit operator-facing visibility.",
+    "Dedupe-policy action set that preserves explicit operator-facing visibility.",
   SemanticDedupePolicyResult:
-    "Draft result shape for semantic-dedupe decisions including retained and suppressed IDs.",
+    "Result shape for semantic-dedupe decisions including retained and suppressed IDs.",
   SemanticDedupePolicy:
-    "Draft policy interface for semantic dedupe without forcing payload-aware merge logic into the core.",
+    "Policy interface for semantic dedupe without forcing payload-aware merge logic into the core.",
   CorrectionScope: "Indicates whether a stream correction is local to a batch or broader in scope.",
   CorrectionNotice: "Structured notice attached to correction-capable stream batches.",
   StreamAnomalyHorizon: "Anomaly carry model for stream windows and emitted history.",
@@ -559,7 +554,7 @@ const types = {
       ],
     },
     {
-      title: "Extension-policy draft types",
+      title: "Extension-policy boundary types",
       items: [
         typeItem("PolicyVisibilityKind"),
         typeItem("PolicyVisibilityRecord"),

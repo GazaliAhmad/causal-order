@@ -102,6 +102,7 @@ Examples:
 
 * if you need JSONL, broker, or database ingestion glue, build that around `translateBatch()` rather than expecting the core package to own it
 * if you need domain-semantic contradiction or dedupe policy, keep that in your own resolution layer rather than treating it as built into the current runtime
+  The exported policy interfaces are boundary vocabulary for that layer, not evidence that the core now owns the decision logic.
 * if you need stronger rejection posture, tighten translation and ordering policies explicitly instead of assuming the defaults already mean "hard fail"
 
 For the package-facing boundary map behind those choices, see [Extension Boundary Guide](./extension-boundary-guide.md).

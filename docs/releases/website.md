@@ -6,12 +6,32 @@ These notes track docs-site and website refinements that do not map cleanly to a
 
 Recent website work includes:
 
+* 0.9.0 release-surface alignment around the deployable event-ordering runtime posture
 * docs navigation cleanup across guides, wiki, and API surfaces
 * sidebar label cleanup so navigation titles strip inline Markdown formatting such as visible backticks
 * mobile docs polish, including return-to-top behavior and tighter footer grouping
 * shared SEO metadata, `robots.txt`, `sitemap.xml`, and PWA metadata improvements
 * generated API reference improvements and reduced generated-snapshot churn
 * homepage hero typography and measure tuning so the main title and intro copy wrap more naturally instead of breaking in awkward places
+
+## `0.9.0` Website Release Surface
+
+The 0.9.0 website pass repositioned the public site around `causal-order` as a deployable event-ordering runtime rather than a forensics-only or design-note-oriented package.
+
+This pass included:
+
+* homepage hero, subtitle, navigation tagline, CTA, and feature-card copy updated to emphasize deployment, replay, recovery, stream reconciliation, late-arrival policy, and operator-visible output
+* website title, description, keywords, Open Graph metadata, and JSON-LD structured data aligned with the deployable-runtime framing
+* package metadata and public website metadata kept consistent around distributed event ordering, causal ordering, Lamport clocks, vector clocks, HLC, replay, reconciliation, and late-arriving events
+* public docs feeds and release-facing links adjusted so the website reads as documentation for the current runtime surface, not as a release-history archive
+* repo-only stability and design notes kept out of public website navigation, with tests guarding against public pages linking to excluded docs
+* mobile header tagline restored so the runtime direction remains visible on narrow screens
+
+The public website should now present three layers clearly:
+
+* practical guides for evaluating and deploying the runtime
+* conceptual wiki pages for distributed-systems background and terminology
+* API reference pages generated from the public package surface
 
 ## API Reference
 

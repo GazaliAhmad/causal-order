@@ -1,19 +1,19 @@
 {
   "package": "causal-order",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "fileCount": 69,
   "totals": {
-    "rawBytes": 131200,
-    "gzipBytes": 37595,
-    "brotliBytes": 31838,
-    "raw": "131.2 kB",
-    "gzip": "37.6 kB",
-    "brotli": "31.8 kB"
+    "rawBytes": 131809,
+    "gzipBytes": 37733,
+    "brotliBytes": 31955,
+    "raw": "131.8 kB",
+    "gzip": "37.7 kB",
+    "brotli": "32.0 kB"
   },
   "badge": {
     "schemaVersion": 1,
     "label": "publish size",
-    "message": "37.6 kB (gzip) | 31.8 kB (brotli)",
+    "message": "37.7 kB (gzip) | 32.0 kB (brotli)",
     "color": "blue"
   },
   "files": [
@@ -355,9 +355,9 @@
     },
     {
       "path": "dist/types.d.ts",
-      "size": 14505,
-      "gzip": 3705,
-      "brotli": 3217
+      "size": 14668,
+      "gzip": 3736,
+      "brotli": 3241
     },
     {
       "path": "dist/types.js",
@@ -421,15 +421,15 @@
     },
     {
       "path": "package.json",
-      "size": 5219,
-      "gzip": 1258,
-      "brotli": 1102
+      "size": 5243,
+      "gzip": 1266,
+      "brotli": 1112
     },
     {
       "path": "README.md",
-      "size": 21909,
-      "gzip": 7121,
-      "brotli": 5869
+      "size": 22331,
+      "gzip": 7220,
+      "brotli": 5952
     }
   ]
 }

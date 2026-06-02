@@ -632,16 +632,21 @@ function prepareDocBody(collection, relativePath, body) {
       .replace(/^\* \[Implementation Guide `0\.4\.2`\]\(\.\/devex\/implementation-guide-0\.4\.2\.md\)\r?\n/gm, "")
       .replace(/^\* \[Release Notes `0\.4\.2`\]\(\.\.\/docs\/releases\/0\.4\.2\.md\)\r?\n/gm, "")
       .replace(/^\* \[Release Notes `0\.5\.0`\]\(\.\.\/docs\/releases\/0\.5\.0\.md\)\r?\n/gm, "")
+      .replace(/^\* \[Release Notes `0\.6\.0`\]\(\.\.\/docs\/releases\/0\.6\.0\.md\)\r?\n/gm, "")
+      .replace(/^\* \[Release Notes `0\.7\.0`\]\(\.\.\/docs\/releases\/0\.7\.0\.md\)\r?\n/gm, "")
+      .replace(/^\* \[Release Notes `0\.8\.0`\]\(\.\.\/docs\/releases\/0\.8\.0\.md\)\r?\n/gm, "")
+      .replace(/^\* \[Release Notes `0\.9\.0`\]\(\.\.\/docs\/releases\/0\.9\.0\.md\)\r?\n/gm, "")
+      .replace(/^\* \[ROADMAP `0\.9\.x`\]\(\.\.\/ROADMAP\.md\)\r?\n/gm, "")
       .replace(
         /\r?\nPublished `0\.7\.0` release line:\r?\n(?:\r?\n|\* .*\r?\n)+?(?=\r?\nOperational workflows:)/,
         "\n\n",
       )
       .replace(
-        /\r?\nPublished stability line:\r?\n(?:\r?\n|\* .*\r?\n)+?(?=\r?\nRunnable examples:)/,
+        /\r?\nRelease and maintenance context:\r?\n(?:\r?\n|\* .*\r?\n)+?(?=\r?\nPublished stability line:|\r?\nRunnable examples:)/,
         "\n\n",
       )
       .replace(
-        /\r?\nRelease and maintenance context:\r?\n(?:\r?\n|\* .*\r?\n)+?(?=\r?\nPublished stability line:|\r?\nRunnable examples:)/,
+        /\r?\nPublished stability line:\r?\n(?:\r?\n|\* .*\r?\n)+?(?=\r?\nRunnable examples:)/,
         "\n\n",
       )
       .replace(/\r?\nStart here:\r?\n/g, "\n\n## Evaluate Quickly\n\n")

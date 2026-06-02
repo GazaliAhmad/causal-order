@@ -347,10 +347,11 @@ export type OrderOptions<T> = {
 export type PolicyVisibilityKind = "anomaly" | "telemetry"
 
 /**
- * Draft operator-visible audit output for future extension-policy decisions.
+ * Operator-visible audit output for higher-layer policy decisions.
  *
- * These records intentionally describe what happened without mutating payloads
- * or silently erasing the underlying events from operator view.
+ * These records are intentional boundary surface. They let surrounding policy
+ * layers explain what they did without mutating payloads or silently erasing
+ * the underlying events from operator view.
  */
 export interface PolicyVisibilityRecord {
   readonly kind: PolicyVisibilityKind
@@ -362,9 +363,11 @@ export interface PolicyVisibilityRecord {
 export type ExtensionPolicyAction = "flag" | "reject" | "defer"
 
 /**
- * Draft payload-agnostic contradiction candidate for future `0.6.x` policy
- * hooks. The core engine can supply the implicated events and causal evidence
- * without assuming domain-specific merge semantics.
+ * Payload-agnostic contradiction candidate surfaced at the core-to-policy
+ * boundary.
+ *
+ * The core engine can supply the implicated events and causal evidence without
+ * assuming domain-specific merge semantics or built-in contradiction handling.
  */
 export interface CausalContradictionCandidate<T = unknown> {
   readonly kind: string
@@ -385,8 +388,10 @@ export interface CausalContradictionPolicy<T = unknown, TContext = unknown> {
 }
 
 /**
- * Draft payload-agnostic fork candidate. Identity is supplied by the caller or
- * a higher layer rather than inferred from payload internals inside the core.
+ * Payload-agnostic fork candidate surfaced at the core-to-policy boundary.
+ *
+ * Identity is supplied by the caller or a higher layer rather than inferred
+ * from payload internals inside the core.
  */
 export interface EntityForkCandidate<T = unknown, TIdentity = unknown> {
   readonly identity: TIdentity
@@ -418,9 +423,11 @@ export interface ForkResolutionPolicy<
 }
 
 /**
- * Draft semantic-dedupe candidate for future policy hooks. Any suppression or
- * retention decision must stay operator-visible through the returned
- * visibility records rather than silently rewriting history.
+ * Payload-agnostic semantic-dedupe candidate surfaced at the core-to-policy
+ * boundary.
+ *
+ * Any suppression or retention decision must stay operator-visible through the
+ * returned visibility records rather than silently rewriting history.
  */
 export interface SemanticDedupeCandidate<T = unknown> {
   readonly events: readonly EventEnvelope<T>[]

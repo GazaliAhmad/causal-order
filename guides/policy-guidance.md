@@ -16,6 +16,14 @@ Use `strict: false` when you need the library to keep moving and surface problem
 
 Use `strict: true` when invalid or unresolved ordering should stop the workflow immediately rather than become provisional output.
 
+One mental model helps:
+
+* `strict` is the main fail-fast switch for ordering and validation
+* `allowUnknownOrder` is the uncertainty-visibility control layered on top of non-strict output
+* `detectAnomalies` is a diagnostic-output control, not a correctness mode
+
+Translation fail-fast behavior is still configured separately through `translateBatch()` policy.
+
 For streaming late arrivals:
 
 * use `flag` when you want to keep delayed events visible without triggering correction output
@@ -50,6 +58,7 @@ What this buys you:
 * invalid records can still be surfaced as anomalies instead of crashing the whole run
 * unresolved ordering can still be written deterministically with warnings
 * the anomaly stream stays part of the operational answer
+* translation ingress policy can still be tightened independently if you need fail-fast onboarding before ordering
 
 ### Prefer `strict: true` when
 

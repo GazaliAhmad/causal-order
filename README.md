@@ -12,9 +12,9 @@
 
 ![causal-order banner](https://causal-order.gazali.one/readme-banner.svg)
 
-An event integrity library for distributed systems that still use clocks, but cannot rely on one globally synchronized clock as the truth model.
+A deployable event-ordering runtime for distributed systems that still use clocks, but cannot rely on one globally synchronized clock as the truth model.
 
-`causal-order` helps developers design and run event processing, replay, and recovery flows without assuming the system has one perfect global time source. It does not replace clocks or timestamps; it helps when timestamp order alone is not enough to explain what happened.
+`causal-order` helps developers design and run event processing, replay, and recovery flows without assuming the system has one perfect global time source. It does not replace clocks or timestamps; it provides a deployable ordering layer when timestamp order alone is not enough to explain what happened or keep event integrity honest.
 
 Website: [https://causal-order.gazali.one](https://causal-order.gazali.one)
 
@@ -180,8 +180,13 @@ const result = orderEvents(events, {
 
 The main options to understand are:
 
+* think of the option boundary this way:
+  * `strict` controls fail-fast behavior for ordering and validation
+  * `allowUnknownOrder` controls whether unresolved placement stays explicit in non-strict output
+  * `detectAnomalies` controls how much diagnostic analysis is emitted with the result
 * `strict: false`
   keeps the run warning-visible by default so invalid or unresolved cases can surface as structured anomalies instead of stopping the whole batch immediately
+  translation fail-fast behavior is configured separately through `translateBatch()` policy rather than through this same option
 * `allowUnknownOrder`
   defaults to an uncertainty-visible posture where unresolved placement can still be emitted with warning-level visibility in non-strict mode
 * `detectAnomalies: true`
@@ -303,7 +308,7 @@ console.log(translationSummary)
 console.log(inspection)
 ```
 
-The `0.8.0` helper layer is intentionally narrow:
+The `0.9.0` helper layer is intentionally narrow:
 
 * `summarizeEventAnomalies()`
 * `summarizeTranslationAnomalies()`
@@ -440,11 +445,11 @@ They use the public `causal-order` package surface so copied example code still 
 
 ## Status
 
-`0.8.0` is the current published `causal-order` release.
+`0.9.0` is the current published `causal-order` release.
 
 Current package posture:
 
-* `causal-order` is ready to use as a deployable event-ordering library today when you want confidence-aware ordering, anomaly visibility, and explicit causal justification in a real workflow
+* `causal-order` is ready to use as a deployable event-ordering runtime today when you want confidence-aware ordering, anomaly visibility, and explicit causal justification in a real workflow
 * deployment is a first-class application of the package, not only a forensic or post-incident use case
 * bounded batch recovery, replay, reconciliation, and audit-style workloads are the clearest production-credible starting point in the current contract
 * streaming is also part of the public contract, with the current hardening and runtime-stability guides defining how to deploy it with explicit lateness, correction, and reconciliation posture
@@ -458,14 +463,13 @@ Confidence ladder:
 * `Manual 250k Confidence` is the heavier on-demand batch and stream validation path
 * `Manual AWS Incident Confidence` is the outage-shape streaming confidence run with GC-observed summary artifacts
 
-`0.8.0` adds:
+`0.9.0` finalizes:
 
-* a clearer maintainer, compatibility, upgrade, and discovery layer on top of the published `0.7.0` package surface
-* focused subpaths that read more clearly as the primary API story for new code
-* a clearer package-facing extension boundary so adjacent tooling can build on the runtime without pretending the core owns connector or domain-resolution concerns
-* `1.0.0` is the point where the semantic contract should feel stable enough to preserve long-term
+* the last pre-`1.0.0` contract cleanup across helper posture, alias posture, narrowed public signatures, and stream-result naming
+* the public boundary freeze for extension-policy interfaces and the final wording for `strict`, `detectAnomalies`, and `allowUnknownOrder`
+* the package-facing docs and website alignment around `causal-order` as a deployable event-ordering runtime
 
-For the `0.8.0` package-facing decision layer, see:
+For the `0.9.0` package-facing release surface, see:
 
 * [Extension Boundary Guide](https://causal-order.gazali.one/guides/extension-boundary-guide/)
 * [Policy Guidance](https://causal-order.gazali.one/guides/policy-guidance/)

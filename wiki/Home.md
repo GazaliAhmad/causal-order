@@ -1,6 +1,6 @@
 # causal-order Wiki
 
-`causal-order` is a library for reconstructing distributed event timelines without pretending the system knows more than it does, even when the deployment cannot rely on a globally synchronized clock.
+`causal-order` is a deployable event-ordering runtime for reconstructing distributed event timelines without pretending the system knows more than it does, even when the deployment cannot rely on a globally synchronized clock.
 
 This wiki is the conceptual layer of the project.
 It explains the mental model behind the library, why the problem is harder than ordinary timestamp sorting, and how `causal-order` tries to stay honest without becoming unusable.
@@ -71,7 +71,7 @@ It is also:
 * making suspicious or weak metadata visible
 
 So the project is not only about explaining distributed timelines after the fact.
-It is about giving real systems an event-integrity model designed to work without treating global clock sync as the source of truth.
+It is about giving real systems a deployable ordering runtime, with event integrity as the outcome, without treating global clock sync as the source of truth.
 
 ## Project Standard
 

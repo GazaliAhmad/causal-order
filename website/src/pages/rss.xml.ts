@@ -1,28 +1,8 @@
 import fs from "node:fs";
-import path from "node:path";
-import matter from "gray-matter";
-import { marked } from "marked";
+import { getDocsByCollection } from "../lib/docs.js";
 
-const repoUrl = "https://github.com/GazaliAhmad/causal-order";
 const defaultSiteDescription =
-  "Release notes and docs-site updates for causal-order.";
-
-function resolveReleasesRoot() {
-  const candidates = [
-    path.resolve(process.cwd(), "../docs/releases"),
-    path.resolve(process.cwd(), "docs/releases"),
-  ];
-
-  for (const candidate of candidates) {
-    if (fs.existsSync(candidate)) {
-      return candidate;
-    }
-  }
-
-  throw new Error(
-    `Could not locate docs/releases from cwd ${process.cwd()}; tried ${candidates.join(", ")}`,
-  );
-}
+  "Deployable event-ordering runtime docs for distributed systems.";
 
 function escapeXml(value) {
   return String(value)
@@ -33,67 +13,32 @@ function escapeXml(value) {
     .replace(/'/g, "&apos;");
 }
 
-function getReleaseEntries() {
-  const releasesRoot = resolveReleasesRoot();
-
-  return fs
-    .readdirSync(releasesRoot, { withFileTypes: true })
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
-    .map((entry) => {
-      const absolutePath = path.join(releasesRoot, entry.name);
-      const raw = fs.readFileSync(absolutePath, "utf8");
-      const parsed = matter(raw);
-      const tokens = marked.lexer(parsed.content, { gfm: true });
-      const title = extractTitle(tokens) ?? humanizeFilename(entry.name);
-      const description = extractDescription(tokens) ?? defaultSiteDescription;
-      const relativePath = `docs/releases/${entry.name}`.replace(/\\/g, "/");
-      const sourceUrl = `${repoUrl}/blob/main/${relativePath}`;
-      const publishedAt = fs.statSync(absolutePath).mtime;
-
+function getDocsFeedEntries(baseUrl) {
+  return ["guides", "wiki", "examples"]
+    .flatMap((collection) => getDocsByCollection(collection))
+    .map((doc) => {
+      const absoluteUrl = new URL(doc.sitePath, baseUrl).toString();
       return {
-        title,
-        description,
-        sourceUrl,
-        guid: sourceUrl,
-        publishedAt,
+        title: doc.title,
+        description: doc.description || defaultSiteDescription,
+        url: absoluteUrl,
+        guid: absoluteUrl,
+        publishedAt: fs.statSync(doc.absolutePath).mtime,
       };
     })
-    .sort((left, right) => right.publishedAt.getTime() - left.publishedAt.getTime());
-}
-
-function extractTitle(tokens) {
-  const heading = tokens.find((token) => token.type === "heading" && token.depth === 1);
-  return heading ? cleanInlineText(heading.text ?? "") : null;
-}
-
-function extractDescription(tokens) {
-  const paragraph = tokens.find((token) => token.type === "paragraph");
-  const text = paragraph ? cleanInlineText(paragraph.text ?? "") : "";
-  return text || null;
-}
-
-function cleanInlineText(value) {
-  return value.replace(/`/g, "").replace(/\s+/g, " ").trim();
-}
-
-function humanizeFilename(filename) {
-  const basename = filename.replace(/\.md$/i, "");
-  if (basename.toLowerCase() === "website") {
-    return "Website Notes";
-  }
-
-  return `Release ${basename}`;
+    .sort((left, right) => right.publishedAt.getTime() - left.publishedAt.getTime())
+    .slice(0, 40);
 }
 
 export function GET({ site, url }) {
   const baseUrl = site ?? new URL(url.origin);
   const feedUrl = new URL("/rss.xml", baseUrl).toString();
   const siteUrl = new URL("/", baseUrl).toString();
-  const items = getReleaseEntries()
+  const items = getDocsFeedEntries(baseUrl)
     .map(
       (entry) => `  <item>
     <title>${escapeXml(entry.title)}</title>
-    <link>${escapeXml(entry.sourceUrl)}</link>
+    <link>${escapeXml(entry.url)}</link>
     <guid>${escapeXml(entry.guid)}</guid>
     <pubDate>${entry.publishedAt.toUTCString()}</pubDate>
     <description>${escapeXml(entry.description)}</description>
@@ -104,7 +49,7 @@ export function GET({ site, url }) {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
 <channel>
-  <title>causal-order releases</title>
+  <title>causal-order docs</title>
   <link>${escapeXml(siteUrl)}</link>
   <description>${escapeXml(defaultSiteDescription)}</description>
   <language>en</language>
