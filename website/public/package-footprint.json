@@ -3,17 +3,17 @@
   "version": "0.8.0",
   "fileCount": 69,
   "totals": {
-    "rawBytes": 130234,
-    "gzipBytes": 37444,
-    "brotliBytes": 31733,
-    "raw": "130.2 kB",
-    "gzip": "37.4 kB",
-    "brotli": "31.7 kB"
+    "rawBytes": 131200,
+    "gzipBytes": 37595,
+    "brotliBytes": 31838,
+    "raw": "131.2 kB",
+    "gzip": "37.6 kB",
+    "brotli": "31.8 kB"
   },
   "badge": {
     "schemaVersion": 1,
     "label": "publish size",
-    "message": "37.4 kB (gzip) | 31.7 kB (brotli)",
+    "message": "37.6 kB (gzip) | 31.8 kB (brotli)",
     "color": "blue"
   },
   "files": [
@@ -151,27 +151,27 @@
     },
     {
       "path": "dist/compare/deterministicCompare.d.ts",
-      "size": 497,
-      "gzip": 184,
-      "brotli": 158
+      "size": 855,
+      "gzip": 362,
+      "brotli": 281
     },
     {
       "path": "dist/compare/deterministicCompare.js",
-      "size": 2435,
-      "gzip": 538,
-      "brotli": 460
+      "size": 2793,
+      "gzip": 707,
+      "brotli": 588
     },
     {
       "path": "dist/compare/hlcCompare.d.ts",
-      "size": 441,
-      "gzip": 262,
-      "brotli": 194
+      "size": 428,
+      "gzip": 253,
+      "brotli": 184
     },
     {
       "path": "dist/compare/hlcCompare.js",
-      "size": 1044,
-      "gzip": 432,
-      "brotli": 347
+      "size": 1031,
+      "gzip": 424,
+      "brotli": 337
     },
     {
       "path": "dist/index.d.ts",
@@ -211,9 +211,9 @@
     },
     {
       "path": "dist/inspect/inspectOutputs.d.ts",
-      "size": 1673,
-      "gzip": 530,
-      "brotli": 467
+      "size": 1685,
+      "gzip": 532,
+      "brotli": 476
     },
     {
       "path": "dist/inspect/inspectOutputs.js",
@@ -259,9 +259,9 @@
     },
     {
       "path": "dist/order/internalOrderValidatedEvents.d.ts",
-      "size": 721,
-      "gzip": 381,
-      "brotli": 298
+      "size": 717,
+      "gzip": 374,
+      "brotli": 285
     },
     {
       "path": "dist/order/internalOrderValidatedEvents.js",
@@ -271,39 +271,39 @@
     },
     {
       "path": "dist/order/orderEvents.d.ts",
-      "size": 779,
-      "gzip": 380,
-      "brotli": 291
+      "size": 610,
+      "gzip": 322,
+      "brotli": 234
     },
     {
       "path": "dist/order/orderEvents.js",
-      "size": 14800,
-      "gzip": 3247,
-      "brotli": 2885
+      "size": 15687,
+      "gzip": 3319,
+      "brotli": 2955
     },
     {
       "path": "dist/order/orderEventStream.d.ts",
-      "size": 231,
-      "gzip": 170,
-      "brotli": 149
+      "size": 243,
+      "gzip": 168,
+      "brotli": 160
     },
     {
       "path": "dist/order/orderEventStream.js",
-      "size": 10101,
-      "gzip": 2315,
-      "brotli": 2041
+      "size": 9829,
+      "gzip": 2270,
+      "brotli": 1994
     },
     {
       "path": "dist/order/tieBreakers.d.ts",
-      "size": 522,
-      "gzip": 307,
-      "brotli": 245
+      "size": 187,
+      "gzip": 146,
+      "brotli": 118
     },
     {
       "path": "dist/order/tieBreakers.js",
-      "size": 522,
-      "gzip": 303,
-      "brotli": 240
+      "size": 139,
+      "gzip": 122,
+      "brotli": 103
     },
     {
       "path": "dist/order/watermarkStrategies.d.ts",
@@ -355,9 +355,9 @@
     },
     {
       "path": "dist/types.d.ts",
-      "size": 14499,
-      "gzip": 3702,
-      "brotli": 3214
+      "size": 14505,
+      "gzip": 3705,
+      "brotli": 3217
     },
     {
       "path": "dist/types.js",
@@ -421,15 +421,15 @@
     },
     {
       "path": "package.json",
-      "size": 5184,
-      "gzip": 1248,
+      "size": 5219,
+      "gzip": 1258,
       "brotli": 1102
     },
     {
       "path": "README.md",
-      "size": 21422,
-      "gzip": 6933,
-      "brotli": 5707
+      "size": 21909,
+      "gzip": 7121,
+      "brotli": 5869
     }
   ]
 }
