@@ -4,13 +4,15 @@
   "description": "An event integrity library for ordering and analyzing distributed events without false certainty.",
   "keywords": [
     "distributed-systems",
+    "distributed-events",
     "event-ordering",
-    "event-integrity",
+    "causal-ordering",
+    "event-replay",
+    "event-streams",
     "hybrid-logical-clock",
     "hlc",
-    "audit",
-    "concurrency",
-    "event-streams"
+    "lamport-clock",
+    "vector-clock"
   ],
   "author": "Gazali Ahmad",
   "license": "MIT",
@@ -21,7 +23,7 @@
   "bugs": {
     "url": "https://github.com/GazaliAhmad/causal-order/issues"
   },
-  "homepage": "https://github.com/GazaliAhmad/causal-order#readme",
+  "homepage": "https://causal-order.gazali.one",
   "engines": {
     "node": ">=20"
   },

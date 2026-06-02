@@ -7,6 +7,14 @@ import {
   getValidatedEventTime,
 } from "../internal/utils.js"
 
+/**
+ * Low-level deterministic tie-break primitive used by the higher-level
+ * `compareDeterministically()` helpers.
+ *
+ * Prefer `compareDeterministically()` for ordinary public fallback ordering.
+ * Use `applyTieBreaker()` when you specifically want the tie-break step on its
+ * own without the surrounding event-time and sequence comparison behavior.
+ */
 export function applyTieBreaker<T>(
   a: EventEnvelope<T>,
   b: EventEnvelope<T>,

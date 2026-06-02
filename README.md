@@ -215,6 +215,9 @@ As of `0.5.0`, the preferred names are:
 
 Older aliases may still exist for compatibility, but new code should prefer the primary names above.
 The root `causal-order` import may still keep compatibility aliases when that reduces migration pain, but focused entrypoints already emphasize the primary names rather than mixed canonical-and-compatibility naming.
+`compareClocks()` remains only as a deprecated root-level compatibility alias through `0.9.x` and is planned to disappear at `1.0.0`.
+`applyTieBreaker()` remains available as a lower-level helper when you specifically
+want the tie-break step on its own rather than the full deterministic fallback comparison.
 
 ## Raw Record Translation
 
@@ -319,6 +322,7 @@ If you need adjacent adapters, workflow glue, or domain policy on top of this su
 For large or unbounded event flows, use `orderEventStream()` instead of assuming everything belongs in one in-memory batch.
 
 That includes both ordinary day-to-day stream processing and delayed reconnect, offline sync, or recovery flows where late arrivals are part of normal operations.
+Each emitted `batch` is a `StreamOrderBatch` carrying the currently ready ordered events plus stream-specific metadata such as `watermark`, optional `correction`, and `isFinal`.
 
 ```ts
 import { orderEventStream } from "causal-order"

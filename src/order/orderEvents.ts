@@ -8,7 +8,10 @@ import type {
   ValidationResult,
   ValidatedEventEnvelope,
 } from "../types.js"
-import type { OrderValidatedEventsInternalOptions } from "./internalOrderValidatedEvents.js"
+import type {
+  EventValidationRecord,
+  OrderValidatedEventsInternalOptions,
+} from "./internalOrderValidatedEvents.js"
 import {
   applyTieBreaker,
 } from "../compare/deterministicCompare.js"
@@ -293,14 +296,17 @@ function buildOrderedMetadata<T>(
   }
 }
 
-/**
- * Orders already-validated events without re-running validation.
- *
- * The third `internal` parameter exists for current repo coordination and
- * advanced usage, but it should not yet be treated as stable long-term public
- * contract even after the published `0.5.0` API review.
- */
-export function orderValidatedEvents<T>(
+function createValidationRecordsForValidatedEvents<T>(
+  validEvents: ValidatedEventEnvelope<T>[],
+  validationOptions: { maxClockDriftMs?: bigint; includeWarnings?: boolean },
+): EventValidationRecord<T>[] {
+  return validEvents.map((event) => ({
+    event,
+    validation: validateEvent(event, validationOptions) as ValidationResult<ValidatedEventEnvelope<T>>,
+  }))
+}
+
+function orderValidatedEventsCore<T>(
   validEvents: ValidatedEventEnvelope<T>[],
   options?: OrderOptions<T>,
   internal?: OrderValidatedEventsInternalOptions<T>,
@@ -522,6 +528,41 @@ export function orderValidatedEvents<T>(
   }
 }
 
+/**
+ * Orders already-validated events through the public validated-event path.
+ *
+ * This public signature intentionally excludes the older repo-coordination
+ * `internal` bag so the package does not preserve implementation plumbing as
+ * long-term contract.
+ */
+export function orderValidatedEvents<T>(
+  validEvents: ValidatedEventEnvelope<T>[],
+  options?: OrderOptions<T>,
+): OrderResult<T> {
+  const validationOptions: { maxClockDriftMs?: bigint; includeWarnings?: boolean } = {
+    includeWarnings: false,
+  }
+  if (options?.maxClockDriftMs !== undefined) {
+    validationOptions.maxClockDriftMs = options.maxClockDriftMs
+  }
+
+  const detectAnomaliesEnabled = options?.detectAnomalies !== false
+  const internalOptions: OrderValidatedEventsInternalOptions<T> = {
+    sourceEvents: validEvents,
+    invalidEvents: 0,
+  }
+
+  if (detectAnomaliesEnabled) {
+    internalOptions.validations = createValidationRecordsForValidatedEvents(
+      validEvents,
+      validationOptions,
+    )
+    internalOptions.anomalies = []
+  }
+
+  return orderValidatedEventsCore(validEvents, options, internalOptions)
+}
+
 export function orderEvents<T>(
   events: EventEnvelope<T>[],
   options?: OrderOptions<T>,
@@ -576,5 +617,5 @@ export function orderEvents<T>(
     invalidEvents: events.length - validEvents.length,
   }
 
-  return orderValidatedEvents(validEvents, options, internalOptions)
+  return orderValidatedEventsCore(validEvents, options, internalOptions)
 }

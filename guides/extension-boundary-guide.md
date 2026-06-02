@@ -156,7 +156,7 @@ Use these docs together:
 * [Package Surface Overview](./package-surface-overview.md) for the first map of the exported package surface
 * [Policy Guidance](./policy-guidance.md) for strictness and late-arrival choices
 * [Supported Vs Unsupported Usage](./supported-vs-unsupported-usage.md) for the current contract boundary
-* [Decision Record: Core Boundaries `0.5.0`](./stability/decision-record-core-boundaries-0.5.0.md) for the deeper published boundary rationale
+* [Examples And Entrypoints](./examples-and-entrypoints.md) for the practical package-facing entrypoint map around that boundary
 
 If your next question is operational rather than architectural, continue with:
 

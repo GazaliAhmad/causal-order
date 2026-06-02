@@ -1285,17 +1285,17 @@ Focus:
 * final public-signature cleanup
 * final stream-surface naming cleanup where needed
 
+Already landed in `0.9.0-a`:
+
+* `compareClocks()` kept only as deprecated root-level compatibility surface through `0.9.x`, with removal planned at `1.0.0`
+* `compareWithTieBreaker()` removed from the public surface before `1.0.0`
+* `applyTieBreaker()` preserved as an intentional low-level public helper
+* `orderValidatedEvents()` narrowed to the public two-argument shape without the old `internal` bag
+* `StreamOrderBatch` adopted as the final stream-result type name
+
 Must decide:
 
-* whether remaining root-level compatibility aliases survive into `1.0.0`, move, or disappear:
-  * `compareClocks()`
-  * `compareWithTieBreaker()`
-* whether `applyTieBreaker()` is:
-  * an intentionally public low-level helper, or
-  * a pre-`1.0.0` cleanup candidate
-* whether `orderValidatedEvents()` keeps the current public shape or narrows before `1.0.0`:
-  * especially the current third `internal` coordination parameter
-* whether `OrderBatch` is the final preserve-worthy stream result name, or whether a more stream-specific name is needed before `1.0.0`
+* no remaining runtime-surface blocker in `0.9.0-a`; the only follow-through is carrying the planned `compareClocks()` removal into `1.0.0`
 
 Should decide:
 

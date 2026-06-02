@@ -3,8 +3,8 @@ import type {
   EventAnomaly,
   EventEnvelope,
   LateArrivalPolicy,
-  OrderBatch,
   StreamOrderOptions,
+  StreamOrderBatch,
   ValidationResult,
   ValidatedEventEnvelope,
   WatermarkFunction,
@@ -131,7 +131,7 @@ function mergePendingAnomalies<T>(
 export async function* orderEventStream<T>(
   source: AsyncIterable<EventEnvelope<T>>,
   options?: StreamOrderOptions<T>,
-): AsyncIterable<OrderBatch<T>> {
+): AsyncIterable<StreamOrderBatch<T>> {
   assertValidStreamOptions(options)
 
   const batchSize = options?.batchSize ?? 100
@@ -200,7 +200,7 @@ export async function* orderEventStream<T>(
     flushAll: boolean,
     isTerminal: boolean,
     correction?: CorrectionNotice,
-  ): OrderBatch<T> | undefined => {
+  ): StreamOrderBatch<T> | undefined => {
     const watermark = getActiveWatermark(
       maxObservedWatermarkSignal,
       maxLateArrivalMs,
@@ -208,10 +208,6 @@ export async function* orderEventStream<T>(
     lastFlushedWatermark = watermark
     promotePendingEntriesForWatermark(flushAll, watermark)
     const ready: ValidatedEventEnvelope<T>[] = []
-    const readyValidations: Array<{
-      event: ValidatedEventEnvelope<T>
-      validation: ValidationResult<ValidatedEventEnvelope<T>>
-    }> = []
 
     for (let index = 0; index < readyBuffer.length; index += 1) {
       const entry = readyBuffer[index]
@@ -220,10 +216,6 @@ export async function* orderEventStream<T>(
       }
 
       ready.push(entry.event)
-      readyValidations.push({
-        event: entry.event,
-        validation: entry.validation,
-      })
     }
 
     readyBuffer.length = 0
@@ -233,10 +225,7 @@ export async function* orderEventStream<T>(
     }
 
     const result = ready.length > 0
-      ? orderValidatedEvents(ready, options, {
-          sourceEvents: ready,
-          validations: readyValidations,
-        })
+      ? orderValidatedEvents(ready, options)
       : {
           ordered: [],
           anomalies: [],
@@ -244,7 +233,7 @@ export async function* orderEventStream<T>(
     const anomalies = mergePendingAnomalies(result.anomalies, pendingAnomalies)
     pendingAnomalies = []
 
-    const batch: OrderBatch<T> = {
+    const batch: StreamOrderBatch<T> = {
       events: result.ordered,
       anomalies,
       watermark,

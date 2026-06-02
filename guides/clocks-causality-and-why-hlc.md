@@ -24,6 +24,9 @@ Its practical stance is:
 
 That is why the library combines HLC with parent links, dependency links, and same-node sequence evidence instead of pretending one clock solves the whole problem.
 
+This is also one of the practical consequences of distributed-systems impossibility results:
+you do not get one perfect global timeline for free, so the library has to distinguish useful ordering from provable causality.
+
 ## Lamport Clocks
 
 Lamport clocks give you a logical ordering discipline:

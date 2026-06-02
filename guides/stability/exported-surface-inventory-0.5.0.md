@@ -186,22 +186,23 @@ That reads more like implementation plumbing than a long-term public contract.
 
 The default assumption should be that `internal` is too implementation-revealing for `1.0.0`.
 
-### `OrderBatch`
+### `StreamOrderBatch`
 
-`OrderBatch` works, but it is more generic than the rest of the stream surface.
-Because it is emitted by `orderEventStream()`, the current name invites a small ambiguity:
+`StreamOrderBatch` is the resolved stream-specific name for the emitted batch type.
+Before that rename, `OrderBatch` felt more generic than the rest of the stream surface.
+Because it is emitted by `orderEventStream()`, the older name invited a small ambiguity:
 
 * is this a stream-emission type?
 * or a general batch-ordering result type?
 
-The actual type includes streaming-only concepts such as:
+The underlying type includes streaming-only concepts such as:
 
 * `watermark`
 * `anomalyHorizon`
 * `correction`
 * `isFinal`
 
-That means `0.5.0` should decide whether `OrderBatch` is good enough to preserve or whether a more stream-specific name would be clearer before `1.0.0`.
+That question is now resolved in favor of the clearer stream-specific name before `1.0.0`.
 
 ### `strict`
 
@@ -275,7 +276,7 @@ The streaming surface feels honest, but some of its types are really policy-cont
 * `CorrectionNotice`
 * `StreamAnomalyHorizon`
 * `LateArrivalPolicy`
-* `OrderBatch`
+* `StreamOrderBatch`
 
 These should stay together as a reviewed cluster during `0.5.0`.
 The key question is not whether they exist.
@@ -288,7 +289,7 @@ The first chunk should therefore treat these as named review items:
 * `compareByHlc` versus `compareClocks`
 * `applyTieBreaker` versus `compareDeterministically` versus `compareWithTieBreaker`
 * `orderValidatedEvents` public signature, especially the `internal` parameter
-* `OrderBatch` naming
+* `StreamOrderBatch` naming
 * `strict` compatibility wording
 * `detectAnomalies` default behavior and naming posture
 * `allowUnknownOrder` wording relative to `strict`

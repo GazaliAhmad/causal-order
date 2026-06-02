@@ -1,11 +1,11 @@
 import type {
   CorrectionNotice,
   EventAnomaly,
-  OrderBatch,
   OrderResult,
   OrderedEvent,
   OrderStats,
   StreamAnomalyHorizon,
+  StreamOrderBatch,
 } from "../types.js"
 import { explainOrderedEvent } from "./explainOrderedEvent.js"
 import {
@@ -70,7 +70,7 @@ export function inspectOrderResult<T>(
 }
 
 export function inspectOrderBatch<T>(
-  batch: Readonly<OrderBatch<T>>,
+  batch: Readonly<StreamOrderBatch<T>>,
 ): OrderBatchInspection<T> {
   const ordered = inspectOrderedEvents(batch.events)
 

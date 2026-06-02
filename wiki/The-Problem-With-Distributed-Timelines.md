@@ -29,6 +29,16 @@ Examples:
 Those delays are not always tiny.
 In a real deployment, the central server can be down for `4` to `8` hours while individual nodes continue locally and only sync once central availability returns.
 
+## Why This Is Not Just Bad Tooling
+
+This is not only an implementation nuisance.
+It is also the practical consequence of distributed-systems impossibility limits.
+
+There is no free global observer that can always give every node one perfect, unquestionable timeline.
+Different parts of the system see different events at different times, through different clocks and different network paths.
+
+That is why libraries in this space end up discussing Lamport clocks, vector clocks, Hybrid Logical Clocks, and related limits on what ordering can honestly mean.
+
 ## The Real Design Question
 
 The problem is not whether these edge cases are real.

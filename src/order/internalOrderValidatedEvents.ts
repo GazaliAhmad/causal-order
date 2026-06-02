@@ -5,7 +5,7 @@ import type {
   ValidationResult,
 } from "../types.js"
 
-type EventValidationRecord<T> = {
+export type EventValidationRecord<T> = {
   event: EventEnvelope<T>
   validation: ValidationResult<ValidatedEventEnvelope<T>>
 }
