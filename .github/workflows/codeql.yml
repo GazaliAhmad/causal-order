@@ -1,0 +1,137 @@
+name: CodeQL
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/**"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "src/**"
+      - "test/**"
+      - "examples/**/*.mjs"
+      - "website/scripts/**/*.py"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/**"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "src/**"
+      - "test/**"
+      - "examples/**/*.mjs"
+      - "website/scripts/**/*.py"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      javascript_typescript: ${{ steps.manual.outputs.javascript_typescript || steps.filter.outputs.javascript_typescript }}
+      python: ${{ steps.manual.outputs.python || steps.filter.outputs.python }}
+      actions: ${{ steps.manual.outputs.actions || steps.filter.outputs.actions }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Mark all analyzers active for manual runs
+        id: manual
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          echo "javascript_typescript=true" >> "$GITHUB_OUTPUT"
+          echo "python=true" >> "$GITHUB_OUTPUT"
+          echo "actions=true" >> "$GITHUB_OUTPUT"
+
+      - name: Detect CodeQL-relevant changes
+        id: filter
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            javascript_typescript:
+              - '.github/workflows/codeql.yml'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'tsconfig.json'
+              - 'src/**'
+              - 'test/**'
+              - 'examples/**/*.mjs'
+            python:
+              - '.github/workflows/codeql.yml'
+              - 'website/scripts/**/*.py'
+            actions:
+              - '.github/workflows/**'
+
+  analyze-javascript-typescript:
+    needs: changes
+    if: ${{ needs.changes.outputs.javascript_typescript == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:javascript-typescript"
+
+  analyze-python:
+    needs: changes
+    if: ${{ needs.changes.outputs.python == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: python
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:python"
+
+  analyze-actions:
+    needs: changes
+    if: ${{ needs.changes.outputs.actions == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: actions
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:actions"
