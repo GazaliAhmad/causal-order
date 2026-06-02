@@ -1,6 +1,6 @@
 # What This Library Is
 
-`causal-order` is an event integrity library for distributed systems that cannot rely on a globally synchronized clock.
+`causal-order` is a deployable event-ordering runtime for distributed systems that cannot rely on a globally synchronized clock.
 
 It is designed for situations where events come from multiple services, devices, workers, regions, or replicas, and where ordinary wall-clock timestamps are not enough to tell a trustworthy story.
 The library's job is to help those systems stay operationally honest without requiring one perfect global time source.
@@ -54,4 +54,5 @@ In practice, that means the library focuses on a few specific jobs:
 That work is intentionally kept payload-agnostic and environment-free rather than growing into file parsing, CLI tooling, or transport adapters inside the core package.
 
 So this library is more than a nicer sort function.
-It is an event-integrity layer for pipelines that need to survive drift, replay, late sync, and partial causal evidence without falling back to fake global-clock certainty.
+It is a deployable ordering layer for pipelines that need to survive drift, replay, late sync, and partial causal evidence without falling back to fake global-clock certainty.
+The event-integrity outcome matters, but it is the result of the runtime doing its job, not a smaller replacement label for what the package has become.

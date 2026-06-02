@@ -304,7 +304,10 @@
   }
 
   .brand-text small {
-    display: none;
+    display: block;
+    font-size: 0.76rem;
+    line-height: 1.35;
+    white-space: nowrap;
   }
 
   .brand-meta {

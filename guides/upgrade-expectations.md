@@ -84,6 +84,14 @@ The expected direction is:
 
 If you are writing new code today, prefer the documented primary names now so the `1.0.0` transition is smaller later.
 
+Today, that specifically means:
+
+* `compareClocks()` survives only as deprecated root-level compatibility surface through `0.9.x`
+* focused imports and new code should already prefer `compareByHlc()`
+* `orderValidatedEvents()` now means the narrowed public validated-events-plus-options path rather than the older repo-coupled `internal` coordination shape
+
+So if you rely on older compatibility or advanced usage shapes, treat `0.9.x` as the time to move onto the documented primary path before `1.0.0`.
+
 ## What To Expect From Patch Releases
 
 Patch releases should usually feel narrow.

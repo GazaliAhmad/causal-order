@@ -71,9 +71,11 @@ Release and maintenance context:
 * [Implementation Guide `0.4.2`](./devex/implementation-guide-0.4.2.md)
 * [Release Notes `0.4.2`](../docs/releases/0.4.2.md)
 * [Release Notes `0.5.0`](../docs/releases/0.5.0.md)
+* [Release Notes `0.6.0`](../docs/releases/0.6.0.md)
 * [Release Notes `0.7.0`](../docs/releases/0.7.0.md)
 * [Release Notes `0.8.0`](../docs/releases/0.8.0.md)
-* [ROADMAP `0.8.0`](../ROADMAP.md)
+* [Release Notes `0.9.0`](../docs/releases/0.9.0.md)
+* [ROADMAP `0.9.x`](../ROADMAP.md)
 
 Published stability line:
 

@@ -12,7 +12,6 @@ on:
       - "src/**"
       - "test/**"
       - "examples/**/*.mjs"
-      - "website/scripts/**/*.py"
   pull_request:
     branches:
       - main
@@ -24,7 +23,6 @@ on:
       - "src/**"
       - "test/**"
       - "examples/**/*.mjs"
-      - "website/scripts/**/*.py"
   workflow_dispatch:
 
 permissions:
@@ -44,7 +42,6 @@ jobs:
       pull-requests: read
     outputs:
       javascript_typescript: ${{ steps.manual.outputs.javascript_typescript || steps.filter.outputs.javascript_typescript }}
-      python: ${{ steps.manual.outputs.python || steps.filter.outputs.python }}
       actions: ${{ steps.manual.outputs.actions || steps.filter.outputs.actions }}
 
     steps:
@@ -56,7 +53,6 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           echo "javascript_typescript=true" >> "$GITHUB_OUTPUT"
-          echo "python=true" >> "$GITHUB_OUTPUT"
           echo "actions=true" >> "$GITHUB_OUTPUT"
 
       - name: Detect CodeQL-relevant changes
@@ -73,9 +69,6 @@ jobs:
               - 'src/**'
               - 'test/**'
               - 'examples/**/*.mjs'
-            python:
-              - '.github/workflows/codeql.yml'
-              - 'website/scripts/**/*.py'
             actions:
               - '.github/workflows/**'
 
@@ -97,25 +90,6 @@ jobs:
         uses: github/codeql-action/analyze@v4
         with:
           category: "/language:javascript-typescript"
-
-  analyze-python:
-    needs: changes
-    if: ${{ needs.changes.outputs.python == 'true' }}
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
-        with:
-          languages: python
-
-      - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@v4
-        with:
-          category: "/language:python"
 
   analyze-actions:
     needs: changes

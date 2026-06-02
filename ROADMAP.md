@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap describes how `causal-order` should mature from the published `0.8.0` release into a stable `1.0.0` npm package.
+This roadmap describes how `causal-order` should mature from the published `0.9.0` release into a stable `1.0.0` npm package.
 
 The goal is not to rush publication.
 The goal is to make sure the semantics are trustworthy before the package becomes a long-term contract.
@@ -1259,182 +1259,41 @@ Exit criteria:
 * the team sees no major unresolved semantic or packaging question that should block `1.0.0`
 * the project is ready for stable adoption without needing a conceptual rewrite
 
-## `0.9.0` Chunked Stabilization Plan
+## `0.9.0` Published Final Stabilization Release
 
-The `0.9.0` line should stay narrow and deliberate.
-It is not the place to widen runtime scope, add new incident analog families, or
-introduce governance-heavy policy features that belong above the payload-agnostic core.
+`0.9.0` is now the published final stabilization release line before `1.0.0`.
 
-The purpose of this line is to turn the current "mostly decided" public surface into
-an actually preservable `1.0.0` contract.
+Its purpose was to turn the already-maturing public surface into a preservable
+long-term contract without widening runtime scope.
 
-Release shape:
+Published release shape:
 
 * `0.9.0-a` contract cleanup
 * `0.9.0-b` boundary freeze
 * `0.9.0-c` release lock
 
-### `0.9.0-a` Contract Cleanup
+Published outcomes:
 
-Goal:
-Remove the last API and naming ambiguity from the runtime-facing public surface.
+* runtime-facing contract cleanup:
+  * `compareClocks()` kept only as deprecated root-level compatibility surface through `0.9.x`
+  * `compareWithTieBreaker()` removed from the public surface
+  * `applyTieBreaker()` preserved as an intentional low-level public helper
+  * `orderValidatedEvents()` narrowed to the public validated-events-plus-options shape
+  * `StreamOrderBatch` adopted as the final stream-result type name
+* public boundary freeze:
+  * exported extension-policy interfaces preserved as intentional public boundary types
+  * `strict`, `detectAnomalies`, and `allowUnknownOrder` frozen around one consistent explanation
+  * docs tightened so the payload-agnostic core-versus-policy split is explicit instead of implied
+* release lock:
+  * README, guides, release notes, changelog, tests, package metadata, and generated API wording aligned around one `0.9.0` contract story
+  * runnable examples and package-facing imports aligned around the intended primary names and entrypoints
+  * public-surface tests strengthened to lock root-versus-subpath posture, alias posture, and preferred helper names
 
-Focus:
+Release result:
 
-* final helper-name and alias decisions
-* final public-signature cleanup
-* final stream-surface naming cleanup where needed
-
-Already landed in `0.9.0-a`:
-
-* `compareClocks()` kept only as deprecated root-level compatibility surface through `0.9.x`, with removal planned at `1.0.0`
-* `compareWithTieBreaker()` removed from the public surface before `1.0.0`
-* `applyTieBreaker()` preserved as an intentional low-level public helper
-* `orderValidatedEvents()` narrowed to the public two-argument shape without the old `internal` bag
-* `StreamOrderBatch` adopted as the final stream-result type name
-
-Must decide:
-
-* no remaining runtime-surface blocker in `0.9.0-a`; the only follow-through is carrying the planned `compareClocks()` removal into `1.0.0`
-
-Should decide:
-
-* whether any root-only compatibility alias needs stronger docs wording beyond JSDoc `@deprecated`
-* whether the deterministic helper layer needs any further simplification beyond:
-  * one clearly primary public helper
-  * one clearly classified low-level helper
-  * no ambiguous extra alias story
-* whether the current public type names around stream correction and finality read clearly enough for long-term preservation
-
-Nice to have:
-
-* small API-reference wording improvements that make the preferred helper path even more obvious to first-time readers
-* additional focused tests that prove root-import compatibility still behaves exactly as documented while subpaths stay tighter
-
-Definition of done:
-
-* every public helper is clearly classified as:
-  * primary
-  * compatibility-only
-  * deprecated
-  * or removed before `1.0.0`
-* no public runtime signature still carries "this may narrow later" ambiguity without an explicit release decision
-* the eventual `1.0.0` runtime API shape is visible from this chunk
-
-Not the point of `0.9.0-a`:
-
-* not new ordering semantics
-* not new stream policy behavior
-* not new domain-resolution surface
-
-### `0.9.0-b` Boundary Freeze
-
-Goal:
-Make the package boundary and stability claims explicit enough to preserve without overclaiming.
-
-Focus:
-
-* final compatibility wording for current runtime behavior
-* final scope-boundary wording for higher-layer policy concepts
-* final pre-`1.0.0` stance on any still-soft exported types
-
-Must decide:
-
-* whether the exported draft extension-policy interfaces are:
-  * intentionally preserved boundary surface, or
-  * explicitly provisional pre-`1.0.0` surface
-  * examples:
-    * `CausalContradictionPolicy`
-    * `ForkResolutionPolicy`
-    * `SemanticDedupePolicy`
-    * `PolicyVisibilityRecord`
-* whether the current wording for these behavior-shaping options is preserve-worthy as-is:
-  * `strict`
-  * `detectAnomalies`
-  * `allowUnknownOrder`
-* whether any docs still imply stronger core ownership than the implementation actually claims around:
-  * contradiction handling
-  * fork handling
-  * semantic dedupe
-  * operator-facing policy action
-
-Should decide:
-
-* whether any currently public "draft" type or policy shape should move behind more explicit caveat wording before `1.0.0`
-* whether the stream finality, correction, and watermark wording can be tightened further without changing runtime behavior
-* whether README, upgrade guidance, supported/unsupported usage, and extension-boundary guidance all tell the exact same root-versus-subpath and core-versus-policy story
-
-Nice to have:
-
-* clearer migration wording for users who currently depend on root imports or compatibility aliases
-* a slightly simpler public explanation of what the core owns versus what surrounding systems own
-
-Definition of done:
-
-* the package can state clearly:
-  * what is stable runtime contract
-  * what is compatibility surface
-  * what is boundary direction only
-  * what remains out of scope
-* no important public type is "draft by accident"
-* the docs do not overclaim beyond the implemented payload-agnostic core
-
-Not the point of `0.9.0-b`:
-
-* not implementing contradiction, fork, or semantic-dedupe policy runtime
-* not adding governance-oriented features
-* not widening the package into operational glue that belongs in later ecosystem work
-
-### `0.9.0-c` Release Lock
-
-Goal:
-Make the repository read like a deliberate, release-ready pre-`1.0.0` product surface.
-
-Focus:
-
-* align docs, examples, migration notes, tests, and package exports with the final `0.9.0` decisions
-* make the `1.0.0` path visible and low-ambiguity for adopters
-
-Must decide:
-
-* whether all public docs now reflect the final `0.9.0` compatibility decisions:
-  * `README.md`
-  * `CHANGELOG.md`
-  * release notes
-  * migration wording
-  * operator guidance
-* whether all runnable examples and package-facing imports now use the intended primary names and entrypoints
-* whether the current public-surface tests are strong enough to lock:
-  * root-versus-subpath behavior
-  * alias posture
-  * preferred helper names
-  * preserve-by-default option posture
-
-Should decide:
-
-* whether any remaining public-site wording or API descriptions still read like planning notes instead of stable package guidance
-* whether release packaging and export tests are explicit enough to catch accidental surface drift during the final pre-`1.0.0` line
-* whether the roadmap, release notes, and changelog describe the same `0.9.0` purpose without reopening scope
-
-Nice to have:
-
-* a cleaner final reviewer path for:
-  * evaluator
-  * maintainer
-  * operator
-* slightly tighter release-check wording around what exactly `0.9.0` is proving ahead of `1.0.0`
-
-Definition of done:
-
-* docs, examples, tests, and exports all agree on the intended public surface
-* the release line behaves like a final stabilization pass rather than another exploratory maturity milestone
-* `0.9.0` can serve as the practical handoff line immediately before `1.0.0`
-
-Recommended execution order:
-
-1. finish `0.9.0-a` first so API and naming decisions stop moving
-2. finish `0.9.0-b` second so boundary wording reflects real decisions instead of placeholders
-3. finish `0.9.0-c` last so release-surface alignment locks the chosen contract instead of a provisional one
+* `0.9.0` now reads like a shipped stabilization line rather than an exploratory planning milestone
+* the package says exactly what it means without reopening runtime scope
+* the remaining step after this point is the eventual `1.0.0` stable public release rather than more `0.9.0` cleanup
 
 ## `1.0.0` Stable Public Release
 
@@ -1456,130 +1315,6 @@ Definition of done:
 * breaking changes become exceptional
 * the conceptual documentation has graduated from repo wiki pages into a real website suitable for long-term public reference
 * the package is ready for real production evaluation
-
-## Post-`1.0`
-
-Possible directions after stability:
-
-* optional `day-boundary` integration for civil-time grouping
-* audit report helpers
-* incident timeline helpers
-* richer adapters
-* optional integration helpers for `Temporal` at the edges, not the core
-* performance tuning for large streaming workloads
-* richer operational tooling and workflow layers built on top of the core, if they strengthen the event-integrity story
-
-These should only happen if they strengthen the event integrity story.
-The package should not drift into becoming a database, queue, tracing platform, or generic distributed systems framework.
-
-## Tentative Ideas
-
-These are not assigned to a release line yet.
-They are here to capture potentially important directions without implying commitment, sequencing, or near-term scope.
-
-### Future Ecosystem Packages
-
-Once the core contract feels settled, one likely direction is to add ecosystem packages on top of the core runtime rather than folding those concerns into the core package itself.
-
-That could include:
-
-* `@causal-order/production`
-* `@causal-order/kafka`
-* `@causal-order/postgres`
-* `@causal-order/replay-tools`
-* `@causal-order/metrics`
-
-These should stay tentative until the core runtime is stable enough that downstream packages are not forced to absorb semantic or operational churn from the center of the project.
-
-### JSONL Companion CLI
-
-Another tentative direction is a separate-repository companion CLI focused on JSONL-style ingestion and inspection flows rather than adding that surface to the core package itself.
-
-The purpose of that CLI would be operational convenience:
-
-* read newline-delimited event dumps from disk
-* map raw JSONL records into the current event-envelope or `translateBatch()` flow
-* run ordering, anomaly detection, and confidence-aware inspection without requiring a custom script first
-* make replay-batch review, audit-style inspection, outage recovery analysis, and incident-timeline debugging easier for humans
-
-The important boundary is already decided:
-
-* the core package should remain free of CLI binaries
-* the core package should remain free of JSONL or other file-format adapters
-* if this exists, it should live in another repo or ecosystem package rather than being absorbed into `causal-order` itself
-
-The likely value of that companion would be:
-
-* turning JSONL event dumps into the current event-envelope or `translateBatch()` flow
-* making local inspection and replay-style evaluation easier without pushing file and terminal concerns into the core runtime
-* providing a more practical operator-facing surface for batch-oriented analysis work
-
-Over time, that companion could also become a glue layer around the core runtime:
-
-* ingestion glue from JSONL files into the package surface
-* workflow glue for replay review, anomaly inspection, and audit-style evaluation
-* operator-facing glue that connects raw event dumps to practical local analysis without changing the core package boundary
-
-The exact package name does not need to be fixed yet.
-What matters here is preserving the separation:
-
-* core runtime semantics stay in this repo
-* file-oriented and CLI-oriented JSONL workflows, if pursued, belong in a companion surface
-
-### Confidence-Aware Operational Glue
-
-Another tentative direction is to add confidence-aware operational glue on top of the core runtime rather than pushing it directly into the core package by default.
-
-This could include things such as:
-
-* confidence-grouped result helpers
-* sink-policy helpers that reject or warn on `fallback` or `unknown`
-* stricter operational wrappers for audit, replay, or projection workflows
-* confidence-aware metrics or reporting helpers
-
-The motivation is real:
-
-* the core library can preserve uncertainty correctly
-* downstream systems can still flatten that uncertainty away if they ignore confidence and anomaly semantics
-
-But the right implementation shape is still open.
-This may never belong in the core package itself.
-It may fit better as higher-level glue or ecosystem packages once the core runtime is stable enough to build around safely.
-
-### Causal Timestamp API
-
-One tentative direction is to design a smaller causal timestamp primitive that could sit beneath libraries like `causal-order`, or be used independently by runtimes, databases, storage engines, replication layers, and sync systems.
-
-The appeal of this idea is not "another timestamp format."
-The appeal would be a portable causal-time primitive that can be created, merged, compared, serialized, and interpreted honestly across environments that cannot rely on one globally synchronized clock.
-
-If explored, this should stay intentionally small.
-It should not turn into:
-
-* a database protocol
-* a tracing platform
-* a CRDT framework
-* a broad distributed-systems abstraction layer
-
-The most promising shape would likely focus on a narrow contract such as:
-
-* create or advance a causal timestamp
-* receive or merge a remote timestamp
-* compare two timestamps
-* serialize and parse them safely
-* explain whether a comparison represents causal proof, monotonic same-node progression, a weaker derived hint, or an honest inability to justify more
-
-Why this might matter:
-
-* many systems have wall-clock timestamps but no honest causal-time primitive
-* a portable causal timestamp surface could be useful outside this library
-* `causal-order` itself could eventually consume that primitive rather than being the only place the model lives
-
-This idea should remain tentative until there is enough clarity on whether it is:
-
-* a reusable low-level primitive
-* a separately publishable library
-* or simply an internal conceptual foundation for later work
 
 ## Success Criteria
 

@@ -737,9 +737,9 @@
         "<code>anomalies</code>: invalid, suspicious, or operationally important records.",
         "<code>stats</code>: counts for total, valid, invalid, ordered, and anomaly totals.",
         "<code>tieBreaker</code>: deterministic tie breaker such as <code>event_id</code> or <code>ingestion_order</code>.",
-        "<code>strict</code>: throw on invalid or unresolved conditions instead of returning a tolerant result.",
-        "<code>detectAnomalies</code>: include anomaly detection in the returned batch result.",
-        "<code>allowUnknownOrder</code>: permit unresolved ordering to remain explicit in non-strict mode.",
+        "<code>strict</code>: the main fail-fast switch for ordering and validation; translation fail-fast remains separately controlled through <code>translateBatch()</code> policy.",
+        "<code>detectAnomalies</code>: include emitted anomaly analysis in the returned batch result; turning it off reduces diagnostic output rather than upgrading confidence.",
+        "<code>allowUnknownOrder</code>: keep unresolved ordering explicit in non-strict mode; setting it to <code>false</code> strengthens severity posture rather than inventing stronger certainty.",
         "<code>maxClockDriftMs</code>: validation bound for future clock drift checks."
       ],
       "deprecated": null
@@ -1376,103 +1376,103 @@
         ]
       },
       {
-        "title": "Extension-policy draft types",
+        "title": "Extension-policy boundary types",
         "items": [
           {
             "name": "PolicyVisibilityKind",
             "label": "PolicyVisibilityKind",
-            "description": "Draft audit-output category for future extension-policy decisions.",
+            "description": "Audit-output category used at the core-to-policy boundary for higher-layer decisions.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },
           {
             "name": "PolicyVisibilityRecord",
             "label": "PolicyVisibilityRecord",
-            "description": "Draft operator-visible audit record describing what an extension policy did without mutating payloads silently.",
+            "description": "Operator-visible audit record describing what a higher-layer policy did without mutating payloads silently.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },
           {
             "name": "ExtensionPolicyAction",
             "label": "ExtensionPolicyAction",
-            "description": "Draft contradiction-policy action shared across payload-agnostic extension hooks.",
+            "description": "Payload-agnostic contradiction-policy action shared across boundary-level policy hooks.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },
           {
             "name": "CausalContradictionCandidate",
             "label": "CausalContradictionCandidate<T = unknown>",
-            "description": "Draft payload-agnostic contradiction candidate for future policy hooks.",
+            "description": "Payload-agnostic contradiction candidate surfaced at the core-to-policy boundary.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },
           {
             "name": "CausalContradictionPolicyResult",
             "label": "CausalContradictionPolicyResult",
-            "description": "Draft result shape for contradiction-policy evaluation with explicit operator visibility.",
+            "description": "Result shape for contradiction-policy evaluation with explicit operator visibility.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },
           {
             "name": "CausalContradictionPolicy",
             "label": "CausalContradictionPolicy<T = unknown, TContext = unknown>",
-            "description": "Draft policy interface for contradiction handling outside the core payload contract.",
+            "description": "Policy interface for contradiction handling outside the core payload contract.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },
           {
             "name": "EntityForkCandidate",
             "label": "EntityForkCandidate<T = unknown, TIdentity = unknown>",
-            "description": "Draft payload-agnostic entity-fork candidate supplied by higher-layer identity logic.",
+            "description": "Payload-agnostic entity-fork candidate supplied by higher-layer identity logic.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },
           {
             "name": "ForkResolutionAction",
             "label": "ForkResolutionAction",
-            "description": "Draft fork-policy action set that avoids implicit payload merging.",
+            "description": "Fork-policy action set that avoids implicit payload merging inside the core.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },
           {
             "name": "ForkResolutionPolicyResult",
             "label": "ForkResolutionPolicyResult",
-            "description": "Draft result shape for fork-resolution decisions with explicit visibility output.",
+            "description": "Result shape for fork-resolution decisions with explicit visibility output.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },
           {
             "name": "ForkResolutionPolicy",
             "label": "ForkResolutionPolicy<T = unknown, TIdentity = unknown, TContext = unknown>",
-            "description": "Draft policy interface for entity-fork handling outside the core payload contract.",
+            "description": "Policy interface for entity-fork handling outside the core payload contract.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },
           {
             "name": "SemanticDedupeCandidate",
             "label": "SemanticDedupeCandidate<T = unknown>",
-            "description": "Draft semantic-dedupe candidate for future policy hooks across different identifiers.",
+            "description": "Payload-agnostic semantic-dedupe candidate surfaced at the core-to-policy boundary across different identifiers.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },
           {
             "name": "SemanticDedupeAction",
             "label": "SemanticDedupeAction",
-            "description": "Draft dedupe-policy action set that preserves explicit operator-facing visibility.",
+            "description": "Dedupe-policy action set that preserves explicit operator-facing visibility.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },
           {
             "name": "SemanticDedupePolicyResult",
             "label": "SemanticDedupePolicyResult",
-            "description": "Draft result shape for semantic-dedupe decisions including retained and suppressed IDs.",
+            "description": "Result shape for semantic-dedupe decisions including retained and suppressed IDs.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },
           {
             "name": "SemanticDedupePolicy",
             "label": "SemanticDedupePolicy<T = unknown, TContext = unknown>",
-            "description": "Draft policy interface for semantic dedupe without forcing payload-aware merge logic into the core.",
+            "description": "Policy interface for semantic dedupe without forcing payload-aware merge logic into the core.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           }
