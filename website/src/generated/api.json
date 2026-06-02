@@ -174,7 +174,7 @@
             "since": "0.5.0",
             "replacementName": "compareByHlc",
             "replacementLabel": "compareByHlc()",
-            "message": "This compatibility alias remains exported for older code, but new code should prefer the explicit HLC-specific helper."
+            "message": "This deprecated root-only compatibility alias remains through 0.9.x for older code, but new code should prefer the explicit HLC-specific helper before it disappears at 1.0.0."
           },
           "sourcePath": "src/compare/hlcCompare.ts",
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/hlcCompare.ts"
@@ -358,20 +358,6 @@
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/tieBreakers.ts"
         },
         {
-          "name": "compareWithTieBreaker",
-          "kind": "function",
-          "label": "compareWithTieBreaker()",
-          "description": "Compares two events with the configured deterministic tie-breaker.",
-          "deprecated": {
-            "since": "0.5.0",
-            "replacementName": "compareDeterministically",
-            "replacementLabel": "compareDeterministically()",
-            "message": "This compatibility alias remains exported for older code, but new code should prefer the primary deterministic fallback helper."
-          },
-          "sourcePath": "src/order/tieBreakers.ts",
-          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/tieBreakers.ts"
-        },
-        {
           "name": "getTieBreaker",
           "kind": "function",
           "label": "getTieBreaker()",
@@ -511,7 +497,7 @@
         "since": "0.5.0",
         "replacementName": "compareByHlc",
         "replacementLabel": "compareByHlc()",
-        "message": "This compatibility alias remains exported for older code, but new code should prefer the explicit HLC-specific helper."
+        "message": "This deprecated root-only compatibility alias remains through 0.9.x for older code, but new code should prefer the explicit HLC-specific helper before it disappears at 1.0.0."
       }
     },
     "compareDeterministically": {
@@ -564,27 +550,6 @@
       "usage": null,
       "bullets": [],
       "deprecated": null
-    },
-    "compareWithTieBreaker": {
-      "title": "compareWithTieBreaker()",
-      "description": "Compares two events with the configured deterministic tie-breaker.",
-      "sourcePath": "src/order/tieBreakers.ts",
-      "kind": "function",
-      "signatures": [
-        "function compareWithTieBreaker<T>(\n  a: EventEnvelope<T>,\n  b: EventEnvelope<T>,\n  tieBreaker?: TieBreaker<T>,\n): number"
-      ],
-      "href": "/api/compare-with-tie-breaker/",
-      "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/tieBreakers.ts",
-      "primary": false,
-      "summary": null,
-      "usage": null,
-      "bullets": [],
-      "deprecated": {
-        "since": "0.5.0",
-        "replacementName": "compareDeterministically",
-        "replacementLabel": "compareDeterministically()",
-        "message": "This compatibility alias remains exported for older code, but new code should prefer the primary deterministic fallback helper."
-      }
     },
     "createHlcClock": {
       "title": "createHlcClock()",
@@ -720,7 +685,7 @@
       "sourcePath": "src/inspect/inspectOutputs.ts",
       "kind": "function",
       "signatures": [
-        "function inspectOrderBatch<T>(\n  batch: Readonly<OrderBatch<T>>,\n): OrderBatchInspection<T>"
+        "function inspectOrderBatch<T>(\n  batch: Readonly<StreamOrderBatch<T>>,\n): OrderBatchInspection<T>"
       ],
       "href": "/api/inspect-order-batch/",
       "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/inspect/inspectOutputs.ts",
@@ -785,7 +750,7 @@
       "sourcePath": "src/order/orderEventStream.ts",
       "kind": "function",
       "signatures": [
-        "async function* orderEventStream<T>(\n  source: AsyncIterable<EventEnvelope<T>>,\n  options?: StreamOrderOptions<T>,\n): AsyncIterable<OrderBatch<T>>"
+        "async function* orderEventStream<T>(\n  source: AsyncIterable<EventEnvelope<T>>,\n  options?: StreamOrderOptions<T>,\n): AsyncIterable<StreamOrderBatch<T>>"
       ],
       "href": "/api/order-event-stream/",
       "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/order/orderEventStream.ts",
@@ -1566,8 +1531,8 @@
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"
           },
           {
-            "name": "OrderBatch",
-            "label": "OrderBatch<T = unknown>",
+            "name": "StreamOrderBatch",
+            "label": "StreamOrderBatch<T = unknown>",
             "description": "Structured batch emitted by streaming ordering.",
             "sourcePath": "src/types.ts",
             "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/types.ts"

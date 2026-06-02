@@ -5,6 +5,7 @@ import { test } from "../helpers/harness.mjs"
 
 test("built package exposes the documented top-level runtime API", () => {
   const expectedExports = [
+    "applyTieBreaker",
     "compareByCausality",
     "compareByHlc",
     "compareDeterministically",

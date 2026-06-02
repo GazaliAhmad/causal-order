@@ -6,6 +6,7 @@ import {
   serializeHlc,
 } from "causal-order/clock"
 import {
+  applyTieBreaker,
   compareByCausality,
   compareByHlc,
   compareDeterministically,
@@ -46,6 +47,7 @@ test("package subpath exports expose focused runtime entrypoints", async () => {
     createHlcClock,
     parseHlc,
     serializeHlc,
+    applyTieBreaker,
     compareByCausality,
     compareByHlc,
     compareDeterministically,

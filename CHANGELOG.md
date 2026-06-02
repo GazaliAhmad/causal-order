@@ -3,6 +3,15 @@
 All notable changes to this project are summarized here.
 Detailed release write-ups live in `docs/releases/`.
 
+## [0.9.0] - Unreleased
+
+* This version is not published to npm.
+* Tightened the final pre-`1.0.0` runtime contract by removing `compareWithTieBreaker()` from the public surface while keeping `compareClocks()` only as deprecated root-level compatibility surface through `0.9.x`.
+* Classified `applyTieBreaker()` as intentional low-level public API and clarified that `compareDeterministically()` remains the primary user-facing deterministic fallback helper.
+* Narrowed `orderValidatedEvents()` to the public validated-events-plus-options shape and removed the old public `internal` coordination bag from the supported contract.
+* Hard-renamed the streaming result type from `OrderBatch` to `StreamOrderBatch` without preserving the older name as compatibility alias.
+* Updated the roadmap, repo-local stabilization notes, README wording, and generated API metadata so the `0.9.0-a` contract decisions read consistently across the package-facing release surface.
+
 ## [0.8.0]
 
 * Tightened the public adoption flow so evaluators can move from README to guides, examples, API docs, and release history without reconstructing the package story by hand.

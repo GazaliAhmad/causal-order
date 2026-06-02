@@ -327,7 +327,7 @@ const deprecatedPages = {
     replacementName: "compareByHlc",
     replacementLabel: "compareByHlc()",
     message:
-      "This compatibility alias remains exported for older code, but new code should prefer the explicit HLC-specific helper.",
+      "This deprecated root-only compatibility alias remains through 0.9.x for older code, but new code should prefer the explicit HLC-specific helper before it disappears at 1.0.0.",
   },
   compareWithTieBreaker: {
     since: "0.5.0",
@@ -445,7 +445,7 @@ const typeDescriptions = {
   WatermarkSignal: "Structured watermark progress signal returned by watermark helpers.",
   WatermarkFunction: "Function shape used to derive stream watermark progress.",
   StreamOrderOptions: "Options controlling streaming ordering, watermarking, and correction behavior.",
-  OrderBatch: "Structured batch emitted by streaming ordering.",
+  StreamOrderBatch: "Structured batch emitted by streaming ordering.",
 };
 
 const exportedModules = [...collectExportedModules("src/index.ts")]
@@ -587,7 +587,7 @@ const types = {
         typeItem("WatermarkSignal"),
         typeItem("WatermarkFunction", "WatermarkFunction<T>"),
         typeItem("StreamOrderOptions", "StreamOrderOptions<T>"),
-        typeItem("OrderBatch", "OrderBatch<T = unknown>"),
+        typeItem("StreamOrderBatch", "StreamOrderBatch<T = unknown>"),
       ],
     },
   ],

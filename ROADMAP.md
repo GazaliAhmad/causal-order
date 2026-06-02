@@ -1259,6 +1259,183 @@ Exit criteria:
 * the team sees no major unresolved semantic or packaging question that should block `1.0.0`
 * the project is ready for stable adoption without needing a conceptual rewrite
 
+## `0.9.0` Chunked Stabilization Plan
+
+The `0.9.0` line should stay narrow and deliberate.
+It is not the place to widen runtime scope, add new incident analog families, or
+introduce governance-heavy policy features that belong above the payload-agnostic core.
+
+The purpose of this line is to turn the current "mostly decided" public surface into
+an actually preservable `1.0.0` contract.
+
+Release shape:
+
+* `0.9.0-a` contract cleanup
+* `0.9.0-b` boundary freeze
+* `0.9.0-c` release lock
+
+### `0.9.0-a` Contract Cleanup
+
+Goal:
+Remove the last API and naming ambiguity from the runtime-facing public surface.
+
+Focus:
+
+* final helper-name and alias decisions
+* final public-signature cleanup
+* final stream-surface naming cleanup where needed
+
+Already landed in `0.9.0-a`:
+
+* `compareClocks()` kept only as deprecated root-level compatibility surface through `0.9.x`, with removal planned at `1.0.0`
+* `compareWithTieBreaker()` removed from the public surface before `1.0.0`
+* `applyTieBreaker()` preserved as an intentional low-level public helper
+* `orderValidatedEvents()` narrowed to the public two-argument shape without the old `internal` bag
+* `StreamOrderBatch` adopted as the final stream-result type name
+
+Must decide:
+
+* no remaining runtime-surface blocker in `0.9.0-a`; the only follow-through is carrying the planned `compareClocks()` removal into `1.0.0`
+
+Should decide:
+
+* whether any root-only compatibility alias needs stronger docs wording beyond JSDoc `@deprecated`
+* whether the deterministic helper layer needs any further simplification beyond:
+  * one clearly primary public helper
+  * one clearly classified low-level helper
+  * no ambiguous extra alias story
+* whether the current public type names around stream correction and finality read clearly enough for long-term preservation
+
+Nice to have:
+
+* small API-reference wording improvements that make the preferred helper path even more obvious to first-time readers
+* additional focused tests that prove root-import compatibility still behaves exactly as documented while subpaths stay tighter
+
+Definition of done:
+
+* every public helper is clearly classified as:
+  * primary
+  * compatibility-only
+  * deprecated
+  * or removed before `1.0.0`
+* no public runtime signature still carries "this may narrow later" ambiguity without an explicit release decision
+* the eventual `1.0.0` runtime API shape is visible from this chunk
+
+Not the point of `0.9.0-a`:
+
+* not new ordering semantics
+* not new stream policy behavior
+* not new domain-resolution surface
+
+### `0.9.0-b` Boundary Freeze
+
+Goal:
+Make the package boundary and stability claims explicit enough to preserve without overclaiming.
+
+Focus:
+
+* final compatibility wording for current runtime behavior
+* final scope-boundary wording for higher-layer policy concepts
+* final pre-`1.0.0` stance on any still-soft exported types
+
+Must decide:
+
+* whether the exported draft extension-policy interfaces are:
+  * intentionally preserved boundary surface, or
+  * explicitly provisional pre-`1.0.0` surface
+  * examples:
+    * `CausalContradictionPolicy`
+    * `ForkResolutionPolicy`
+    * `SemanticDedupePolicy`
+    * `PolicyVisibilityRecord`
+* whether the current wording for these behavior-shaping options is preserve-worthy as-is:
+  * `strict`
+  * `detectAnomalies`
+  * `allowUnknownOrder`
+* whether any docs still imply stronger core ownership than the implementation actually claims around:
+  * contradiction handling
+  * fork handling
+  * semantic dedupe
+  * operator-facing policy action
+
+Should decide:
+
+* whether any currently public "draft" type or policy shape should move behind more explicit caveat wording before `1.0.0`
+* whether the stream finality, correction, and watermark wording can be tightened further without changing runtime behavior
+* whether README, upgrade guidance, supported/unsupported usage, and extension-boundary guidance all tell the exact same root-versus-subpath and core-versus-policy story
+
+Nice to have:
+
+* clearer migration wording for users who currently depend on root imports or compatibility aliases
+* a slightly simpler public explanation of what the core owns versus what surrounding systems own
+
+Definition of done:
+
+* the package can state clearly:
+  * what is stable runtime contract
+  * what is compatibility surface
+  * what is boundary direction only
+  * what remains out of scope
+* no important public type is "draft by accident"
+* the docs do not overclaim beyond the implemented payload-agnostic core
+
+Not the point of `0.9.0-b`:
+
+* not implementing contradiction, fork, or semantic-dedupe policy runtime
+* not adding governance-oriented features
+* not widening the package into operational glue that belongs in later ecosystem work
+
+### `0.9.0-c` Release Lock
+
+Goal:
+Make the repository read like a deliberate, release-ready pre-`1.0.0` product surface.
+
+Focus:
+
+* align docs, examples, migration notes, tests, and package exports with the final `0.9.0` decisions
+* make the `1.0.0` path visible and low-ambiguity for adopters
+
+Must decide:
+
+* whether all public docs now reflect the final `0.9.0` compatibility decisions:
+  * `README.md`
+  * `CHANGELOG.md`
+  * release notes
+  * migration wording
+  * operator guidance
+* whether all runnable examples and package-facing imports now use the intended primary names and entrypoints
+* whether the current public-surface tests are strong enough to lock:
+  * root-versus-subpath behavior
+  * alias posture
+  * preferred helper names
+  * preserve-by-default option posture
+
+Should decide:
+
+* whether any remaining public-site wording or API descriptions still read like planning notes instead of stable package guidance
+* whether release packaging and export tests are explicit enough to catch accidental surface drift during the final pre-`1.0.0` line
+* whether the roadmap, release notes, and changelog describe the same `0.9.0` purpose without reopening scope
+
+Nice to have:
+
+* a cleaner final reviewer path for:
+  * evaluator
+  * maintainer
+  * operator
+* slightly tighter release-check wording around what exactly `0.9.0` is proving ahead of `1.0.0`
+
+Definition of done:
+
+* docs, examples, tests, and exports all agree on the intended public surface
+* the release line behaves like a final stabilization pass rather than another exploratory maturity milestone
+* `0.9.0` can serve as the practical handoff line immediately before `1.0.0`
+
+Recommended execution order:
+
+1. finish `0.9.0-a` first so API and naming decisions stop moving
+2. finish `0.9.0-b` second so boundary wording reflects real decisions instead of placeholders
+3. finish `0.9.0-c` last so release-surface alignment locks the chosen contract instead of a provisional one
+
 ## `1.0.0` Stable Public Release
 
 Goal:

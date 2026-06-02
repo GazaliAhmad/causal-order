@@ -39,6 +39,25 @@ async function assertExampleImportsStayPackageFacing() {
   }
 }
 
+function assertWebsiteGuidesDoNotLinkRepoOnlyGuides(websiteGuides) {
+  const repoOnlyGuideLinkPatterns = [
+    /https:\/\/github\.com\/GazaliAhmad\/causal-order\/blob\/main\/guides\/stability\//,
+    /https:\/\/github\.com\/GazaliAhmad\/causal-order\/blob\/main\/guides\/devex\//,
+    /https:\/\/github\.com\/GazaliAhmad\/causal-order\/blob\/main\/guides\/operations\/implementation-guide-/,
+  ]
+
+  for (const doc of websiteGuides) {
+    const html = doc.html ?? ""
+    for (const pattern of repoOnlyGuideLinkPatterns) {
+      assert.equal(
+        pattern.test(html),
+        false,
+        `website guide ${doc.relativePath} should not link to repo-only guide material matching ${pattern}`,
+      )
+    }
+  }
+}
+
 async function main() {
   const websiteDocs = await import(
     pathToFileURL(path.join(rootDir, "website/src/lib/docs.js")).href
@@ -141,7 +160,7 @@ async function main() {
 
   assertIncludes(extensionBoundaryGuide, "translateBatch()", "guides/extension-boundary-guide.md")
   assertIncludes(extensionBoundaryGuide, "CausalContradictionPolicy", "guides/extension-boundary-guide.md")
-  assertIncludes(extensionBoundaryGuide, "./stability/decision-record-core-boundaries-0.5.0.md", "guides/extension-boundary-guide.md")
+  assertIncludes(extensionBoundaryGuide, "./examples-and-entrypoints.md", "guides/extension-boundary-guide.md")
   assertIncludes(extensionBoundaryGuide, "./operations/incident-review-guide.md", "guides/extension-boundary-guide.md")
 
   assertIncludes(policyGuidance, "### `flag`", "guides/policy-guidance.md")
@@ -232,9 +251,12 @@ async function main() {
   assertIncludes(operatorMetricsGuide, "inspectOrderResult()", "guides/operations/operator-metrics-guide.md")
   assert.equal(websiteGuidePaths.has("operations/implementation-guide-0.6.0.md"), false, "website guides should exclude implementation guides")
   assert.equal(websiteGuidePaths.has("stability/implementation-guide-0.5.0.md"), false, "website guides should exclude stability implementation notes")
+  assert.equal(websiteGuidePaths.has("stability/0.9.0-checklist.md"), false, "website guides should exclude repo-local 0.9.0 checklist notes")
+  assert.equal(websiteGuidePaths.has("stability/0.9.0-a-status-pass.md"), false, "website guides should exclude repo-local 0.9.0-a status-pass notes")
   assert.equal(websiteGuidePaths.has("stability/decision-record-api-clarity-0.5.0.md"), false, "website guides should exclude decision records")
   assert.equal(websiteGuidePaths.has("stability/domain-semantic-design-notes-0.5.0.md"), false, "website guides should exclude design notes")
   assert.equal(websiteGuidePaths.has("devex/developer-experience-0.4.0.md"), false, "website guides should exclude developer-experience notes")
+  assertWebsiteGuidesDoNotLinkRepoOnlyGuides(websiteGuides)
 
   await assertExampleImportsStayPackageFacing()
 

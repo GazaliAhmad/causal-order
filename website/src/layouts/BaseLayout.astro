@@ -5,8 +5,8 @@ import "../styles/layout.css";
 import "../styles/ui.css";
 
 const {
-  title = "causal-order | Event integrity ordering for distributed systems",
-  description = "Learn how to order distributed events by justified causality instead of timestamp alone with guides, API reference, and conceptual docs for causal-order.",
+  title = "causal-order | Deployable event-ordering runtime for distributed systems",
+  description = "Learn how to deploy causal-order as an event-ordering runtime for distributed systems with guides, API reference, and conceptual docs.",
   imagePath = "https://causal-order.gazali.one/readme-banner.svg",
   noindex = false,
   pathname = Astro.url.pathname,
@@ -23,13 +23,39 @@ const imageUrl = siteOrigin && imagePath
 const robotsContent = noindex ? "noindex, nofollow" : "index, follow";
 const twitterCard = imageUrl ? "summary_large_image" : "summary";
 const imageAlt = "causal-order banner showing the library identity and event-ordering visual";
-const structuredData = JSON.stringify({
+const websiteStructuredData = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "causal-order",
   url: siteOrigin || undefined,
   description,
   inLanguage: "en",
+});
+const softwareStructuredData = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  name: "causal-order",
+  description: "A deployable event-ordering runtime for distributed systems.",
+  url: siteOrigin || undefined,
+  codeRepository: "https://github.com/GazaliAhmad/causal-order",
+  downloadUrl: "https://www.npmjs.com/package/causal-order",
+  programmingLanguage: "TypeScript",
+  runtimePlatform: "Node.js >=20",
+  license: "https://github.com/GazaliAhmad/causal-order/blob/main/LICENSE",
+  version: packageVersion,
+  codeSampleType: "library",
+  targetProduct: "Node.js",
+  keywords: [
+    "distributed event ordering",
+    "causal ordering",
+    "hybrid logical clocks",
+    "HLC",
+    "Lamport clocks",
+    "vector clocks",
+    "event replay",
+    "stream reconciliation",
+    "late-arriving events",
+  ],
 });
 
 const themeBootScript = `
@@ -175,7 +201,8 @@ const registerServiceWorkerScript = `
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180.png" />
     <link rel="mask-icon" href="/pwa-maskable.svg" color="#0f766e" />
     <link rel="alternate" type="application/rss+xml" title="causal-order releases" href="/rss.xml" />
-    <script type="application/ld+json" set:html={structuredData}></script>
+    <script type="application/ld+json" set:html={websiteStructuredData}></script>
+    <script type="application/ld+json" set:html={softwareStructuredData}></script>
     <script is:inline set:html={themeBootScript}></script>
   </head>
   <body>
@@ -221,7 +248,7 @@ const registerServiceWorkerScript = `
               </a>
             </div>
             <span class="brand-meta">
-              <small>event integrity for distributed systems</small>
+              <small>deployable event-ordering runtime</small>
             </span>
           </div>
         </div>

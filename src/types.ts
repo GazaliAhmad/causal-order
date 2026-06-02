@@ -514,7 +514,7 @@ export type StreamOrderOptions<T> = OrderOptions<T> & {
   watermark?: WatermarkFunction<T>
 }
 
-export type OrderBatch<T = unknown> = {
+export type StreamOrderBatch<T = unknown> = {
   events: OrderedEvent<T>[]
   anomalies: EventAnomaly<T>[]
   /**

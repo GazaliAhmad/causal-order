@@ -3,12 +3,12 @@ import assert from "node:assert/strict"
 import {
   compareByHlc,
   compareClocks,
-  compareDeterministically,
-  compareWithTieBreaker,
   orderEvents,
+  orderValidatedEvents,
 } from "../../dist/index.js"
 import { makeEvent } from "../helpers/events.mjs"
 import { test } from "../helpers/harness.mjs"
+import { validateEvent } from "../../dist/validate.js"
 
 test("compatibility HLC alias stays behaviorally aligned with compareByHlc", () => {
   const earlier = makeEvent({
@@ -30,22 +30,12 @@ test("compatibility HLC alias stays behaviorally aligned with compareByHlc", () 
   )
 })
 
-test("compatibility deterministic alias stays behaviorally aligned with compareDeterministically", () => {
-  const eventA = makeEvent({
-    id: "evt-a",
-    nodeId: "node-a",
-    physicalTimeMs: 1_000n,
-  })
-  const eventB = makeEvent({
-    id: "evt-b",
-    nodeId: "node-b",
-    physicalTimeMs: 1_000n,
-  })
+test("root surface keeps compareClocks compatibility while dropping compareWithTieBreaker", async () => {
+  const rootSurface = await import("../../dist/index.js")
 
-  assert.equal(
-    compareWithTieBreaker(eventA, eventB, "event_id"),
-    compareDeterministically(eventA, eventB, "event_id"),
-  )
+  assert.equal(typeof rootSurface.compareClocks, "function")
+  assert.equal(typeof rootSurface.compareDeterministically, "function")
+  assert.equal("compareWithTieBreaker" in rootSurface, false)
 })
 
 test("allowUnknownOrder false strengthens unresolved severity without changing emitted ordering", () => {
@@ -137,4 +127,45 @@ test("detectAnomalies false reduces emitted anomaly analysis without upgrading o
   )
   assert.ok(withAnomalies.anomalies.length > withoutAnomalies.anomalies.length)
   assert.ok(withoutAnomalies.ordered.every((entry) => entry.confidence === "unknown"))
+})
+
+test("orderValidatedEvents keeps anomaly visibility on by default without exposing the old internal bag", () => {
+  const eventA = makeEvent({
+    id: "evt-a",
+    nodeId: "node-a",
+    physicalTimeMs: 1_000n,
+  })
+  const eventB = makeEvent({
+    id: "evt-b",
+    nodeId: "node-b",
+    physicalTimeMs: 1_001n,
+  })
+
+  const validated = [eventA, eventB].map((event) => {
+    const validation = validateEvent(event, { includeWarnings: false })
+    assert.equal(validation.valid, true)
+    return validation.value
+  })
+
+  const withAnomalies = orderValidatedEvents(validated, {
+    detectAnomalies: true,
+  })
+  const withoutAnomalies = orderValidatedEvents(validated, {
+    detectAnomalies: false,
+  })
+
+  assert.equal(withAnomalies.stats.invalidEvents, 0)
+  assert.ok(withAnomalies.anomalies.length > withoutAnomalies.anomalies.length)
+  assert.deepEqual(
+    withoutAnomalies.ordered.map((entry) => ({
+      id: entry.event.id,
+      confidence: entry.confidence,
+      orderBasis: entry.orderBasis,
+    })),
+    withAnomalies.ordered.map((entry) => ({
+      id: entry.event.id,
+      confidence: entry.confidence,
+      orderBasis: entry.orderBasis,
+    })),
+  )
 })

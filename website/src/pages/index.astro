@@ -7,16 +7,17 @@ const featured = getFeaturedDocs();
 ---
 
 <BaseLayout
-  title="causal-order | Order distributed events by justified causality"
-  description="Understand and use causal-order for distributed event ordering with practical guides, API reference, and conceptual docs built around justified causality."
+  title="causal-order | Deployable runtime for distributed event ordering"
+  description="Understand and deploy causal-order as a confidence-aware runtime for distributed event ordering, replay, recovery, and streaming reconciliation."
 >
   <section class="hero">
     <div class="hero-copy">
-      <div class="hero-badge">Distributed systems docs</div>
-      <h1>Order by justified causality, not by timestamp alone.</h1>
+      <div class="hero-badge">Deployable distributed runtime</div>
+      <h1>A deployable event-ordering runtime for replay, recovery, and distributed event flows.</h1>
       <p>
-        <code>causal-order</code> is an event integrity library for distributed systems that still use
-        clocks, but cannot rely on one globally synchronized clock as the truth model.
+        <code>causal-order</code> is a deployable event-ordering runtime for distributed systems
+        that need bounded replay handling, reconnect-heavy stream reconciliation, explicit
+        late-arrival policy, and operator-visible output rather than timestamp-only ordering.
       </p>
 
       <div class="hero-install">
@@ -35,19 +36,19 @@ const featured = getFeaturedDocs();
       </div>
 
       <div class="hero-actions">
-        <a class="button button-primary" href="/guides/">Read the guides</a>
+        <a class="button button-primary" href="/guides/">Read deployment guides</a>
         <a class="button button-secondary" href="/wiki/">Explore the wiki</a>
       </div>
     </div>
 
     <div class="hero-panel">
       <div class="signal-card">
-        <span class="signal-label">Output contract</span>
+        <span class="signal-label">Runtime contract</span>
         <ul>
-          <li><code>proven</code> for explicit causal evidence</li>
-          <li><code>derived</code> for useful but weaker support</li>
-          <li><code>fallback</code> for deterministic safety output</li>
-          <li><code>unknown</code> when the system cannot justify more</li>
+          <li><code>orderEvents()</code> for bounded replay, recovery, and audit workloads</li>
+          <li><code>orderEventStream()</code> for continuous, delayed, and reconnect-heavy flows</li>
+          <li>explicit policy for late arrivals, uncertainty, and correction-capable output</li>
+          <li>inspection helpers for operator review, downstream writeback, and reconciliation</li>
         </ul>
       </div>
     </div>
@@ -56,10 +57,11 @@ const featured = getFeaturedDocs();
   <section class="path-strip">
     <article class="path-card panel">
       <span class="card-kicker">Evaluate quickly</span>
-      <h2>Decide whether this solves the problem you actually have.</h2>
+      <h2>Decide whether this belongs in a real production flow.</h2>
       <p>
         Start with fit, not implementation. Use the quick-start, supported-usage boundary, and
-        real examples before you wire it into a system.
+        real examples before you wire a runtime into a system that has to keep running under
+        replay, recovery, and stream pressure.
       </p>
       <ul class="home-links">
         <li><a href="/guides/quick-start-scenarios/">Quick Start Scenarios</a></li>
@@ -70,10 +72,10 @@ const featured = getFeaturedDocs();
 
     <article class="path-card panel">
       <span class="card-kicker">Build a first flow</span>
-      <h2>Translate, order, inspect, and choose policy deliberately.</h2>
+      <h2>Translate, order, and integrate the runtime deliberately.</h2>
       <p>
-        Once the fit is clear, move into package surface, policy, and the first runnable paths that
-        map cleanly onto a real deployment.
+        Once the fit is clear, move into package surface, policy, and runnable entrypoints that map
+        onto actual replay pipelines, recovery jobs, and long-lived stream handling.
       </p>
       <ul class="home-links">
         <li><a href="/guides/package-surface-overview/">Package Surface Overview</a></li>
@@ -84,11 +86,11 @@ const featured = getFeaturedDocs();
     </article>
 
     <article class="path-card panel">
-      <span class="card-kicker">Run and inspect</span>
-      <h2>Debug suspicious output with replay, reconciliation, and operator views.</h2>
+      <span class="card-kicker">Run in production</span>
+      <h2>Operate deployed ordering under replay, reconciliation, and late-arrival pressure.</h2>
       <p>
-        The package is strongest when you need to explain and review ordering claims, not just emit
-        them.
+        Inspection and operator views support that runtime posture by making deployed ordering
+        explainable, reviewable, and honest under real backlog, reconnect, and anomaly pressure.
       </p>
       <ul class="home-links">
         <li><a href="/guides/operations/replay-inspection-workflow/">Replay Inspection Workflow</a></li>
@@ -103,22 +105,22 @@ const featured = getFeaturedDocs();
   <section class="why-strip">
     <div>
       <span class="card-kicker">Why this exists</span>
-      <h2>Distributed timelines often look cleaner than they really are.</h2>
+      <h2>Production timelines often look cleaner than the system actually was.</h2>
     </div>
     <p>
-      Replayed events can look newer than originals. Offline devices sync late. Ingestion order
-      differs from creation order. <code>causal-order</code> helps surface those realities without
-      forcing them into fake certainty.
+      Replayed events can look newer than originals. Offline devices sync late. Ingestion order can
+      differ from creation order. <code>causal-order</code> is built for systems that still need a
+      deployable ordering runtime without turning those realities into false certainty.
     </p>
   </section>
 
   <section class="home-grid">
     <article class="home-card">
-      <span class="card-kicker">Practical layer</span>
+      <span class="card-kicker">Deployment layer</span>
       <h2><a href="/guides/">Guides</a></h2>
       <p>
-        Quick starts, policy choices, replay workflows, and operator follow-through for the current
-        package surface.
+        Deployment guides, policy choices, replay workflows, and operator follow-through for the
+        current runtime surface.
       </p>
       <ul class="home-links">
         {featured.guides.map((item) => (
@@ -146,10 +148,11 @@ const featured = getFeaturedDocs();
     <article class="home-card">
       <div class="split-card">
         <div>
-          <span class="card-kicker">Reference layer</span>
+          <span class="card-kicker">Runtime reference</span>
           <h2><a href="/api/">API</a></h2>
           <p>
-            Translation, ordering, inspection, and the exported type surface for the package.
+            The runtime entrypoints, inspection helpers, and exported types you build against in
+            bounded and streaming deployments.
           </p>
         </div>
 

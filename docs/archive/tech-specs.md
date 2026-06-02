@@ -260,7 +260,7 @@ export function orderEvents<T>(
 export async function* orderEventStream<T>(
   source: AsyncIterable<EventEnvelope<T>>,
   options?: StreamOrderOptions<T>
-): AsyncIterable<OrderBatch<T>>
+): AsyncIterable<StreamOrderBatch<T>>
 ```
 
 ## Error Handling Policy
@@ -514,7 +514,7 @@ export type LateArrivalPolicy =
 Output:
 
 ```ts
-export type OrderBatch<T> = {
+export type StreamOrderBatch<T> = {
   events: OrderedEvent<T>[]
   anomalies: EventAnomaly<T>[]
   watermark: bigint
