@@ -166,20 +166,6 @@
           "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/hlcCompare.ts"
         },
         {
-          "name": "compareClocks",
-          "kind": "function",
-          "label": "compareClocks()",
-          "description": "Compares two validated HLC timestamps directly.",
-          "deprecated": {
-            "since": "0.5.0",
-            "replacementName": "compareByHlc",
-            "replacementLabel": "compareByHlc()",
-            "message": "This deprecated root-only compatibility alias remains through 0.9.x for older code, but new code should prefer the explicit HLC-specific helper before it disappears at 1.0.0."
-          },
-          "sourcePath": "src/compare/hlcCompare.ts",
-          "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/hlcCompare.ts"
-        },
-        {
           "name": "compareByCausality",
           "kind": "function",
           "label": "compareByCausality()",
@@ -478,27 +464,6 @@
         "Possible results are <code>before</code>, <code>after</code>, <code>equal</code>, and <code>unknown</code> for invalid input."
       ],
       "deprecated": null
-    },
-    "compareClocks": {
-      "title": "compareClocks()",
-      "description": "Compares two validated HLC timestamps directly.",
-      "sourcePath": "src/compare/hlcCompare.ts",
-      "kind": "function",
-      "signatures": [
-        "function compareClocks(a: HlcTimestamp, b: HlcTimestamp): CausalOrdering"
-      ],
-      "href": "/api/compare-clocks/",
-      "sourceUrl": "https://github.com/GazaliAhmad/causal-order/blob/main/src/compare/hlcCompare.ts",
-      "primary": false,
-      "summary": null,
-      "usage": null,
-      "bullets": [],
-      "deprecated": {
-        "since": "0.5.0",
-        "replacementName": "compareByHlc",
-        "replacementLabel": "compareByHlc()",
-        "message": "This deprecated root-only compatibility alias remains through 0.9.x for older code, but new code should prefer the explicit HLC-specific helper before it disappears at 1.0.0."
-      }
     },
     "compareDeterministically": {
       "title": "compareDeterministically()",

@@ -3,6 +3,12 @@
 All notable changes to this project are summarized here.
 Detailed release write-ups live in `docs/releases/`.
 
+## [1.0.0]
+* Published the first stable public `causal-order` release.
+* Removed the last deprecated root-only compatibility alias by dropping `compareClocks()` and preserving `compareByHlc()` as the direct HLC helper.
+* Promoted the package-facing docs, compatibility policy, upgrade guidance, roadmap framing, generated API metadata, and package metadata to the shipped `1.0.0` stable contract story.
+* Clarified the package ecosystem in the README and package-facing docs, positioning `causal-order` as the core runtime and `@causal-order/dedupe` as a focused companion package.
+
 ## [0.9.0]
 * Tightened the final pre-`1.0.0` runtime contract by removing `compareWithTieBreaker()` from the public surface while keeping `compareClocks()` only as deprecated root-level compatibility surface through `0.9.x`.
 * Classified `applyTieBreaker()` as intentional low-level public API and clarified that `compareDeterministically()` remains the primary user-facing deterministic fallback helper.

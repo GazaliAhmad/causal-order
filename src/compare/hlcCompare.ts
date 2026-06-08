@@ -34,12 +34,3 @@ export function compareByHlc(a: HlcTimestamp, b: HlcTimestamp): CausalOrdering {
 
   return "equal"
 }
-
-/**
- * @deprecated Use `compareByHlc()` instead. This root-only compatibility alias
- * remains through `0.9.x` to reduce migration pain, but it is planned for
- * removal at `1.0.0`.
- */
-export function compareClocks(a: HlcTimestamp, b: HlcTimestamp): CausalOrdering {
-  return compareByHlc(a, b)
-}

@@ -1,9 +1,9 @@
 # Upgrade Expectations
 
-This guide explains what users should expect when upgrading `causal-order` before `1.0.0`.
+This guide explains what users should expect when upgrading `causal-order` now that the package has reached `1.0.0`.
 
-The package is still in `0.x`, so not every surface is equally frozen.
-But upgrades should still be explicit, documented, and understandable.
+The package is now on its stable line.
+That means the documented public surface should not drift casually, and any breaking change should be exceptional, explicit, and easy to understand.
 
 ## What The Project Tries To Preserve
 
@@ -22,7 +22,7 @@ If any of those change, you should expect release wording and matching docs upda
 
 ## What May Still Change More Freely
 
-Before `1.0.0`, these areas can still move more freely:
+These areas can still move more freely than the core public contract:
 
 * internal implementation structure
 * maintainer-only docs
@@ -66,31 +66,28 @@ If your workflow depends heavily on:
 
 then your upgrade review should be more deliberate than just "tests still pass."
 
-## EntryPoint Tightening Toward `1.0.0`
+## Stable EntryPoint Expectations
 
 The package already distinguishes between:
 
 * primary names that new code should prefer
 * compatibility aliases that still exist so older code does not break abruptly
 
-That distinction becomes more important as the project moves toward `1.0.0`.
-
-The expected direction is:
+The stable direction is now:
 
 * primary names stay stable and remain the documented first path
 * compatibility aliases stop looking equally canonical
 * focused subpaths already tighten around the primary public names instead of preserving every older alias forever
-* the root import may still keep compatibility aliases longer than the narrower subpaths
+* the root import and focused subpaths should tell the same primary API story
 
-If you are writing new code today, prefer the documented primary names now so the `1.0.0` transition is smaller later.
+If you are writing new code today, prefer the documented primary names directly.
 
 Today, that specifically means:
 
-* `compareClocks()` survives only as deprecated root-level compatibility surface through `0.9.x`
-* focused imports and new code should already prefer `compareByHlc()`
+* `compareByHlc()` is the supported direct HLC comparison helper
 * `orderValidatedEvents()` now means the narrowed public validated-events-plus-options path rather than the older repo-coupled `internal` coordination shape
 
-So if you rely on older compatibility or advanced usage shapes, treat `0.9.x` as the time to move onto the documented primary path before `1.0.0`.
+So if you still rely on older compatibility-era usage shapes, treat `1.0.0` as the line where the documented primary path became the only supported current path.
 
 ## What To Expect From Patch Releases
 
@@ -105,19 +102,18 @@ You should mainly expect:
 
 If a patch release affects public behavior in a meaningful way, the release wording should make that obvious.
 
-## What To Expect Before `1.0.0`
+## What To Expect From The Stable Line
 
-Pre-`1.0.0` does not mean "everything is unstable."
+Stable does not mean "nothing can ever change."
 It means:
 
-* some surfaces are already treated as preserved unless explicitly changed
-* some surfaces still have room to tighten or clarify
-* some compatibility aliases may still exist even though the documented primary names are already decided
-* the project wants explicit compatibility direction instead of accidental long-term promises
+* the documented public surface is treated as preserved unless a release explicitly says otherwise
+* internal organization, maintainer-only notes, and additive polish can still evolve
+* compatibility direction should be explicit rather than hidden inside incidental code churn
 
 So the right expectation is:
 
-* upgrades may still require attention
+* upgrades can still require attention
 * surprise should be avoided
 * silent contract drift is the thing the project is trying hardest not to do
 
@@ -130,7 +126,7 @@ If your environment needs minimal change risk:
 * validate against your real replay, stream, or anomaly-handling workflow
 * prefer documented primary entrypoints and names over older compatibility aliases
 
-That approach fits the current maturity level better than assuming every `0.x` release behaves like a post-`1.0` maintenance line.
+That approach remains the safest way to evaluate changes against a real workload even on a stable line.
 
 ## Practical Rule
 
@@ -138,4 +134,4 @@ Use this rule when upgrading:
 
 > trust the current documented surface, read the release wording when that surface changes, and do not rely on undocumented behavior just because it happened to work once.
 
-That is the safest way to benefit from the package while it is still moving toward `1.0.0`.
+That is the safest way to benefit from the package while keeping upgrade risk explicit and manageable.

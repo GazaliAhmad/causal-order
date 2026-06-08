@@ -1,6 +1,6 @@
 {
   "name": "causal-order",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "description": "A deployable event-ordering runtime for distributed replay, recovery, and stream reconciliation without false certainty.",
   "keywords": [
     "distributed-systems",

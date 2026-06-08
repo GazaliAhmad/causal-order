@@ -22,6 +22,18 @@ That means the main public surface revolves around three jobs:
 * ordering
 * inspection
 
+## Package Ecosystem
+
+`causal-order` is the core runtime in the broader package ecosystem.
+
+Companion packages can extend the runtime with focused operational capabilities without widening the payload-agnostic core package itself.
+
+Current package-facing example:
+
+* [`@causal-order/dedupe`](https://www.npmjs.com/package/@causal-order/dedupe): duplicate-event filtering before causal ordering
+
+That means the main package should stay narrow and honest about ordering, while adjacent packages can handle workflow-specific preparation around that runtime.
+
 ## Ingress Layer
 
 ### `translateBatch()`

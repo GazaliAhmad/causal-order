@@ -34,8 +34,8 @@ test("built package exposes the documented top-level runtime API", () => {
   }
 })
 
-test("built package keeps the final 0.9.x root compatibility and advanced helper posture", () => {
-  assert.equal(typeof causalOrder.compareClocks, "function")
+test("built package keeps the 1.0.0 stable helper posture", () => {
+  assert.equal("compareClocks" in causalOrder, false)
   assert.equal(typeof causalOrder.orderValidatedEvents, "function")
   assert.equal(typeof causalOrder.applyTieBreaker, "function")
   assert.equal(typeof causalOrder.compareDeterministically, "function")

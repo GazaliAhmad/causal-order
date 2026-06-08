@@ -3,7 +3,7 @@
 This guide explains how to carry `causal-order` forward without relying on undocumented project memory.
 
 The goal is not to turn every maintenance step into ceremony.
-The goal is to keep the package stable, honest, and easy to evaluate while it moves from `0.x` toward `1.0.0`.
+The goal is to keep the package stable, honest, and easy to evaluate now that `1.0.0` is the public baseline.
 
 ## What Must Stay Stable
 
@@ -118,7 +118,7 @@ Before changing CI:
 
 For release-line work:
 
-* use a focused branch such as `release/0.7.0`
+* use a focused branch such as `release/1.0.1`
 * keep the branch scope narrow
 * merge small follow-through PRs instead of batching unrelated work
 * sync with `main` before continuing if part of the branch lands early

@@ -47,7 +47,6 @@ const exportDescriptions = {
   parseHlc: "Parses a serialized HLC string into its structured parts.",
   serializeHlc: "Serializes an HLC value into the canonical string form.",
   compareByHlc: "Compares two events by their HLC values only.",
-  compareClocks: "Compares two validated HLC timestamps directly.",
   compareByCausality: "Performs pairwise causal comparison without inventing evidence.",
   compareValidatedByCausality: "Performs pairwise causal comparison on already validated events.",
   applyTieBreaker: "Applies the active deterministic tie-breaker when stronger ordering is absent.",
@@ -320,15 +319,7 @@ for await (const batch of orderEventStream(source(), {
     ],
   },
 };
-const deprecatedPages = {
-  compareClocks: {
-    since: "0.5.0",
-    replacementName: "compareByHlc",
-    replacementLabel: "compareByHlc()",
-    message:
-      "This deprecated root-only compatibility alias remains through 0.9.x for older code, but new code should prefer the explicit HLC-specific helper before it disappears at 1.0.0.",
-  },
-};
+const deprecatedPages = {};
 const typeDescriptions = {
   NodeId: "Branded node identifier used to separate same-node and cross-node reasoning.",
   EventId: "Branded event identifier used for duplicate and reference checks.",
@@ -1001,7 +992,6 @@ function functionSlug(name) {
     validateClock: "validate-clock",
     compareByCausality: "compare-by-causality",
     compareByHlc: "compare-by-hlc",
-    compareClocks: "compare-clocks",
   };
 
   return slugOverrides[name] ?? name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();

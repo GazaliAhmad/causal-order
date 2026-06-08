@@ -94,6 +94,19 @@ import { translateBatch } from "causal-order/translate"
 import { createHlcClock } from "causal-order/clock"
 ```
 
+## Package Ecosystem
+
+`causal-order` is the core runtime in the causal-order package ecosystem.
+
+Additional packages extend the runtime with focused operational capabilities.
+
+| Package                | Purpose                                          |
+| ---------------------- | ------------------------------------------------ |
+| `causal-order`         | Core causal event ordering runtime               |
+| `@causal-order/dedupe` | Duplicate-event filtering before causal ordering |
+
+See: [https://www.npmjs.com/package/@causal-order/dedupe](https://www.npmjs.com/package/@causal-order/dedupe)
+
 ## Runtime Policy
 
 Current runtime posture:
@@ -218,9 +231,8 @@ As of `0.5.0`, the preferred names are:
 * `compareByHlc()` for direct HLC comparison
 * `compareDeterministically()` for deterministic fallback comparison
 
-Older aliases may still exist for compatibility, but new code should prefer the primary names above.
-The root `causal-order` import may still keep compatibility aliases when that reduces migration pain, but focused entrypoints already emphasize the primary names rather than mixed canonical-and-compatibility naming.
-`compareClocks()` remains only as a deprecated root-level compatibility alias through `0.9.x` and is planned to disappear at `1.0.0`.
+The stable surface now keeps the primary names only.
+Focused entrypoints and the root `causal-order` import both emphasize the same current API story instead of mixing canonical names with transitional aliases.
 `applyTieBreaker()` remains available as a lower-level helper when you specifically
 want the tie-break step on its own rather than the full deterministic fallback comparison.
 
@@ -308,7 +320,7 @@ console.log(translationSummary)
 console.log(inspection)
 ```
 
-The `0.9.0` helper layer is intentionally narrow:
+The `1.0.0` helper layer is intentionally narrow:
 
 * `summarizeEventAnomalies()`
 * `summarizeTranslationAnomalies()`
@@ -445,7 +457,7 @@ They use the public `causal-order` package surface so copied example code still 
 
 ## Status
 
-`0.9.0` is the current published `causal-order` release.
+`1.0.0` is the current published `causal-order` release.
 
 Current package posture:
 
@@ -463,13 +475,13 @@ Confidence ladder:
 * `Manual 250k Confidence` is the heavier on-demand batch and stream validation path
 * `Manual AWS Incident Confidence` is the outage-shape streaming confidence run with GC-observed summary artifacts
 
-`0.9.0` finalizes:
+`1.0.0` finalizes:
 
-* the last pre-`1.0.0` contract cleanup across helper posture, alias posture, narrowed public signatures, and stream-result naming
-* the public boundary freeze for extension-policy interfaces and the final wording for `strict`, `detectAnomalies`, and `allowUnknownOrder`
-* the package-facing docs and website alignment around `causal-order` as a deployable event-ordering runtime
+* the first stable public contract for the bounded batch, streaming, translation, validation, and inspection surfaces
+* the last planned helper-alias cleanup by removing `compareClocks()` after the `0.9.x` deprecation line
+* the stable package-facing docs and website alignment around `causal-order` as a deployable event-ordering runtime
 
-For the `0.9.0` package-facing release surface, see:
+For the `1.0.0` package-facing release surface, see:
 
 * [Extension Boundary Guide](https://causal-order.gazali.one/guides/extension-boundary-guide/)
 * [Policy Guidance](https://causal-order.gazali.one/guides/policy-guidance/)
