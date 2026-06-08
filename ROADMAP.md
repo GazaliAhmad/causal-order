@@ -1,9 +1,9 @@
 # Roadmap
 
-This roadmap describes how `causal-order` should mature from the published `0.9.0` release into a stable `1.0.0` npm package.
+This roadmap now records how `causal-order` reached `1.0.0` and where the stable line should mature next.
 
-The goal is not to rush publication.
-The goal is to make sure the semantics are trustworthy before the package becomes a long-term contract.
+The goal is not to widen scope for its own sake.
+The goal is to keep the stable contract trustworthy while future work stays explicit and honest.
 
 ## Principles
 
@@ -1315,6 +1315,12 @@ Definition of done:
 * breaking changes become exceptional
 * the conceptual documentation has graduated from repo wiki pages into a real website suitable for long-term public reference
 * the package is ready for real production evaluation
+
+Shipped result:
+
+* `1.0.0` is now the current published stable release
+* `compareClocks()` has been removed after the `0.9.x` deprecation line, leaving `compareByHlc()` as the direct HLC helper
+* the package-facing docs, compatibility guidance, upgrade guidance, roadmap framing, and generated API surface now all describe the stable line directly instead of speaking from pre-release posture
 
 ## Success Criteria
 

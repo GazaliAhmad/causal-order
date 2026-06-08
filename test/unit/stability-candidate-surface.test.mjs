@@ -2,7 +2,6 @@ import assert from "node:assert/strict"
 
 import {
   compareByHlc,
-  compareClocks,
   orderEvents,
   orderValidatedEvents,
 } from "../../dist/index.js"
@@ -10,31 +9,12 @@ import { makeEvent } from "../helpers/events.mjs"
 import { test } from "../helpers/harness.mjs"
 import { validateEvent } from "../../dist/validate.js"
 
-test("compatibility HLC alias stays behaviorally aligned with compareByHlc", () => {
-  const earlier = makeEvent({
-    id: "evt-1",
-    nodeId: "node-a",
-    physicalTimeMs: 1_000n,
-    logicalCounter: 0,
-  })
-  const later = makeEvent({
-    id: "evt-2",
-    nodeId: "node-b",
-    physicalTimeMs: 1_005n,
-    logicalCounter: 1,
-  })
-
-  assert.equal(
-    compareClocks(earlier.clock, later.clock),
-    compareByHlc(earlier.clock, later.clock),
-  )
-})
-
-test("root surface keeps compareClocks compatibility while dropping compareWithTieBreaker", async () => {
+test("root surface keeps the stable primary comparison helpers only", async () => {
   const rootSurface = await import("../../dist/index.js")
 
-  assert.equal(typeof rootSurface.compareClocks, "function")
+  assert.equal(typeof rootSurface.compareByHlc, "function")
   assert.equal(typeof rootSurface.compareDeterministically, "function")
+  assert.equal("compareClocks" in rootSurface, false)
   assert.equal("compareWithTieBreaker" in rootSurface, false)
 })
 

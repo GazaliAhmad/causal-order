@@ -1,19 +1,19 @@
 {
   "package": "causal-order",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "fileCount": 69,
   "totals": {
-    "rawBytes": 131809,
-    "gzipBytes": 37733,
-    "brotliBytes": 31955,
-    "raw": "131.8 kB",
-    "gzip": "37.7 kB",
-    "brotli": "32.0 kB"
+    "rawBytes": 131596,
+    "gzipBytes": 37560,
+    "brotliBytes": 31844,
+    "raw": "131.6 kB",
+    "gzip": "37.6 kB",
+    "brotli": "31.8 kB"
   },
   "badge": {
     "schemaVersion": 1,
     "label": "publish size",
-    "message": "37.7 kB (gzip) | 32.0 kB (brotli)",
+    "message": "37.6 kB (gzip) | 31.8 kB (brotli)",
     "color": "blue"
   },
   "files": [
@@ -163,15 +163,15 @@
     },
     {
       "path": "dist/compare/hlcCompare.d.ts",
-      "size": 428,
-      "gzip": 253,
-      "brotli": 184
+      "size": 153,
+      "gzip": 132,
+      "brotli": 100
     },
     {
       "path": "dist/compare/hlcCompare.js",
-      "size": 1031,
-      "gzip": 424,
-      "brotli": 337
+      "size": 774,
+      "gzip": 294,
+      "brotli": 240
     },
     {
       "path": "dist/index.d.ts",
@@ -422,14 +422,14 @@
     {
       "path": "package.json",
       "size": 5243,
-      "gzip": 1266,
-      "brotli": 1112
+      "gzip": 1267,
+      "brotli": 1124
     },
     {
       "path": "README.md",
-      "size": 22331,
-      "gzip": 7220,
-      "brotli": 5952
+      "size": 22650,
+      "gzip": 7297,
+      "brotli": 6010
     }
   ]
 }
