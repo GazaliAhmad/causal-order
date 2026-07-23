@@ -41,5 +41,8 @@ jobs:
       - name: Verify release
         run: npm run release:check
 
+      - name: Verify published package stack
+        run: npm run release:stack:check
+
       - name: Publish package
         run: npm publish --provenance

@@ -4,183 +4,276 @@ import { getFeaturedDocs } from "../lib/docs.js";
 import "../styles/home.css";
 
 const featured = getFeaturedDocs();
+
+const runtimePackages = [
+  {
+    name: "@causal-order/transport",
+    id: "runtime-transport",
+    version: "0.2.0",
+    role: "Ingress",
+    summary: "Normalizes WebSocket and JSON node traffic into the shared event contract.",
+    npm: "https://www.npmjs.com/package/@causal-order/transport",
+  },
+  {
+    name: "@causal-order/monitor",
+    id: "runtime-monitor",
+    version: "0.6.0",
+    role: "Optional resilience",
+    summary: "Adds health-aware buffering, replay, and operator monitoring where delivery is fragile.",
+    npm: "https://www.npmjs.com/package/@causal-order/monitor",
+    optional: true,
+  },
+  {
+    name: "@causal-order/dedupe",
+    id: "runtime-dedupe",
+    version: "1.2.0",
+    role: "Identity",
+    summary: "Filters duplicate event identities before they reach the ordering boundary.",
+    npm: "https://www.npmjs.com/package/@causal-order/dedupe",
+  },
+  {
+    name: "causal-order",
+    id: "runtime-core",
+    version: "1.0.1",
+    role: "Ordering",
+    summary: "Orders accepted events without turning partial evidence into false certainty.",
+    npm: "https://www.npmjs.com/package/causal-order",
+  },
+];
+
+const ecosystemStructuredData = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "causal-order ecosystem packages",
+  itemListElement: [
+    ...runtimePackages.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: `${item.name} v${item.version}`,
+      url: item.npm,
+    })),
+    {
+      "@type": "ListItem",
+      position: 5,
+      name: "@causal-order/testing v0.3.1",
+      url: "https://www.npmjs.com/package/@causal-order/testing",
+    },
+  ],
+});
 ---
 
 <BaseLayout
-  title="causal-order | Deployable runtime for distributed event ordering"
-  description="Understand and deploy causal-order as a confidence-aware runtime for distributed event ordering, replay, recovery, and streaming reconciliation."
+  title="causal-order | Distributed event integrity ecosystem"
+  description="A five-package ecosystem for transport, recovery, duplicate filtering, causal ordering, and systems-level validation in distributed event flows."
 >
+  <script type="application/ld+json" set:html={ecosystemStructuredData}></script>
+
   <section class="hero">
     <div class="hero-copy">
-      <div class="hero-badge">Deployable distributed runtime</div>
-      <h1>A deployable event-ordering runtime for replay, recovery, and distributed event flows.</h1>
-      <p>
-        <code>causal-order</code> is a deployable event-ordering runtime for distributed systems
-        that need bounded replay handling, reconnect-heavy stream reconciliation, explicit
-        late-arrival policy, and operator-visible output rather than timestamp-only ordering.
+      <div class="hero-badge">Five packages · one explicit contract</div>
+      <h1>Distributed event delivery without false certainty.</h1>
+      <p class="hero-lede">
+        The <code>causal-order</code> ecosystem separates transport, recovery, identity,
+        ordering, and qualification so each responsibility stays visible and replaceable.
       </p>
-
-      <div class="hero-install">
-        <div class="install-kicker">Published on npm</div>
-        <div class="install-command">
-          <code>npm install causal-order</code>
-          <a
-            class="install-link"
-            href="https://www.npmjs.com/package/causal-order"
-            target="_blank"
-            rel="noreferrer"
-          >
-            View package
-          </a>
-        </div>
-      </div>
 
       <div class="hero-actions">
-        <a class="button button-primary" href="/guides/">Read deployment guides</a>
-        <a class="button button-secondary" href="/wiki/">Explore the wiki</a>
+        <a class="button button-primary" href="#ecosystem">Explore the ecosystem</a>
+        <a class="button button-secondary" href="/guides/quick-start-scenarios/">Start with core</a>
+      </div>
+
+      <div class="platform-line" aria-label="Published platform status">
+        <span><strong>Published stack</strong></span>
+        <span>Node.js ≥22.13.0</span>
+        <span>Validated on Node.js 22 and 24</span>
       </div>
     </div>
 
-    <div class="hero-panel">
-      <div class="signal-card">
-        <span class="signal-label">Runtime contract</span>
-        <ul>
-          <li><code>orderEvents()</code> for bounded replay, recovery, and audit workloads</li>
-          <li><code>orderEventStream()</code> for continuous, delayed, and reconnect-heavy flows</li>
-          <li>explicit policy for late arrivals, uncertainty, and correction-capable output</li>
-          <li>inspection helpers for operator review, downstream writeback, and reconciliation</li>
-        </ul>
+    <aside class="stack-status" aria-label="Published ecosystem versions">
+      <span class="card-kicker">Published package versions</span>
+      <ol>
+        {runtimePackages.map((item) => (
+          <li>
+            <a href="#ecosystem">
+              <span>{item.name}</span>
+              <strong>v{item.version}</strong>
+            </a>
+          </li>
+        ))}
+        <li class="testing-status">
+          <a href="#ecosystem">
+            <span>@causal-order/testing</span>
+            <strong>v0.3.1</strong>
+          </a>
+        </li>
+      </ol>
+    </aside>
+  </section>
+
+  <section class="ecosystem-section" id="ecosystem">
+    <div class="section-heading">
+      <div>
+        <span class="card-kicker">Runtime path</span>
+        <h2>One owner for each operational responsibility.</h2>
       </div>
+      <p>
+        Compose only the layers the deployment needs. The event contract is the seam between
+        packages; no package quietly absorbs another package’s job.
+      </p>
     </div>
-  </section>
 
-  <section class="path-strip">
-    <article class="path-card panel">
-      <span class="card-kicker">Evaluate quickly</span>
-      <h2>Decide whether this belongs in a real production flow.</h2>
-      <p>
-        Start with fit, not implementation. Use the quick-start, supported-usage boundary, and
-        real examples before you wire a runtime into a system that has to keep running under
-        replay, recovery, and stream pressure.
-      </p>
-      <ul class="home-links">
-        <li><a href="/guides/quick-start-scenarios/">Quick Start Scenarios</a></li>
-        <li><a href="/guides/supported-vs-unsupported-usage/">Supported Vs Unsupported Usage</a></li>
-        <li><a href="/guides/examples-and-entrypoints/">Examples And Entrypoints</a></li>
-      </ul>
-    </article>
-
-    <article class="path-card panel">
-      <span class="card-kicker">Build a first flow</span>
-      <h2>Translate, order, and integrate the runtime deliberately.</h2>
-      <p>
-        Once the fit is clear, move into package surface, policy, and runnable entrypoints that map
-        onto actual replay pipelines, recovery jobs, and long-lived stream handling.
-      </p>
-      <ul class="home-links">
-        <li><a href="/guides/package-surface-overview/">Package Surface Overview</a></li>
-        <li><a href="/guides/extension-boundary-guide/">Extension Boundary Guide</a></li>
-        <li><a href="/guides/policy-guidance/">Policy Guidance</a></li>
-        <li><a href="/examples/">Examples Index</a></li>
-      </ul>
-    </article>
-
-    <article class="path-card panel">
-      <span class="card-kicker">Run in production</span>
-      <h2>Operate deployed ordering under replay, reconciliation, and late-arrival pressure.</h2>
-      <p>
-        Inspection and operator views support that runtime posture by making deployed ordering
-        explainable, reviewable, and honest under real backlog, reconnect, and anomaly pressure.
-      </p>
-      <ul class="home-links">
-        <li><a href="/guides/operations/replay-inspection-workflow/">Replay Inspection Workflow</a></li>
-        <li><a href="/guides/operations/streaming-reconciliation-workflow/">Streaming Reconciliation Workflow</a></li>
-        <li><a href="/guides/operations/incident-review-guide/">Incident Review Guide</a></li>
-        <li><a href="/guides/operations/anomaly-interpretation-guide/">Anomaly Interpretation Guide</a></li>
-        <li><a href="/guides/operations/operator-metrics-guide/">Operator Metrics Guide</a></li>
-      </ul>
-    </article>
-  </section>
-
-  <section class="why-strip">
-    <div>
-      <span class="card-kicker">Why this exists</span>
-      <h2>Production timelines often look cleaner than the system actually was.</h2>
+    <div class="runtime-flow">
+      {runtimePackages.map((item, index) => (
+        <>
+          <article id={item.id} class:list={["package-card", item.optional && "package-card-optional"]}>
+            <div class="package-card-topline">
+              <span>{item.role}</span>
+              {item.optional && <span class="optional-tag">optional</span>}
+            </div>
+            <h3><a class="package-card-link" href={item.npm} target="_blank" rel="noreferrer">{item.name}</a></h3>
+            <span class="package-version">v{item.version}</span>
+            <p>{item.summary}</p>
+          </article>
+          {index < runtimePackages.length - 1 && <span class="flow-arrow" aria-hidden="true">→</span>}
+        </>
+      ))}
     </div>
-    <p>
-      Replayed events can look newer than originals. Offline devices sync late. Ingestion order can
-      differ from creation order. <code>causal-order</code> is built for systems that still need a
-      deployable ordering runtime without turning those realities into false certainty.
-    </p>
+
+    <article class="testing-layer" id="runtime-testing">
+      <div>
+        <span class="card-kicker">Qualification layer</span>
+        <h3>
+          <a class="testing-layer-link" href="https://www.npmjs.com/package/@causal-order/testing" target="_blank" rel="noreferrer">
+            @causal-order/testing <span>v0.3.1</span>
+          </a>
+        </h3>
+      </div>
+      <p>
+        Runs workloads, injects faults, captures artifacts, and returns verdicts across the
+        installed system. Testing surrounds the stack; it is not another delivery stage.
+      </p>
+    </article>
   </section>
 
-  <section class="why-strip">
-    <div>
-      <span class="card-kicker">Package ecosystem</span>
-      <h2>The runtime is designed to stay narrow, with companion packages around it.</h2>
+  <section class="install-section">
+    <div class="section-heading section-heading-compact">
+      <div>
+        <span class="card-kicker">Compose the stack</span>
+        <h2>Install the path your system actually runs.</h2>
+      </div>
+      <p>Monitor is optional. Testing belongs in qualification, not the production delivery path.</p>
     </div>
-    <p>
-      <code>causal-order</code> is the core event-ordering runtime in the package ecosystem.
-      Companion packages such as
-      <a href="https://www.npmjs.com/package/@causal-order/dedupe" target="_blank" rel="noreferrer">
-        <code>@causal-order/dedupe</code>
-      </a>
-      can add focused workflow capabilities like duplicate-event filtering before causal ordering
-      without turning the core runtime into an all-in-one platform.
-    </p>
-  </section>
 
-  <section class="home-grid">
-    <article class="home-card">
-      <span class="card-kicker">Deployment layer</span>
-      <h2><a href="/guides/">Guides</a></h2>
-      <p>
-        Deployment guides, policy choices, replay workflows, and operator follow-through for the
-        current runtime surface.
-      </p>
-      <ul class="home-links">
-        {featured.guides.map((item) => (
-          <li><a href={item.href}>{item.title}</a></li>
-        ))}
-      </ul>
-    </article>
-
-    <article class="home-card">
-      <span class="card-kicker">Conceptual layer</span>
-      <h2><a href="/wiki/">Wiki</a></h2>
-      <p>
-        Mental models, terminology, and deeper explanations for concurrency, uncertainty, and
-        honest ordering claims.
-      </p>
-      <ul class="home-links">
-        {featured.wiki.map((item) => (
-          <li><a href={item.href}>{item.title}</a></li>
-        ))}
-      </ul>
-    </article>
-  </section>
-
-  <section class="api-strip">
-    <article class="home-card">
-      <div class="split-card">
-        <div>
-          <span class="card-kicker">Runtime reference</span>
-          <h2><a href="/api/">API</a></h2>
-          <p>
-            The runtime entrypoints, inspection helpers, and exported types you build against in
-            bounded and streaming deployments.
-          </p>
+    <div class="install-grid">
+      <article class="install-card">
+        <span>Monitor-aware path</span>
+        <div class="install-command-row">
+          <code>npm install @causal-order/transport @causal-order/monitor @causal-order/dedupe causal-order</code>
+          <button type="button" class="copy-command" data-copy-command>Copy</button>
         </div>
+      </article>
+      <article class="install-card">
+        <span>Direct path</span>
+        <div class="install-command-row">
+          <code>npm install @causal-order/transport @causal-order/dedupe causal-order</code>
+          <button type="button" class="copy-command" data-copy-command>Copy</button>
+        </div>
+      </article>
+      <article class="install-card install-card-testing">
+        <span>System qualification</span>
+        <div class="install-command-row">
+          <code>npm install --save-dev @causal-order/testing</code>
+          <button type="button" class="copy-command" data-copy-command>Copy</button>
+        </div>
+      </article>
+    </div>
+  </section>
 
-        <ul class="home-links home-links-compact">
-          <li><a href="/api/translate-batch/">translateBatch()</a></li>
-          <li><a href="/api/order-events/">orderEvents()</a></li>
-          <li><a href="/api/order-event-stream/">orderEventStream()</a></li>
-          <li><a href="/api/inspect-order-result/">inspectOrderResult()</a></li>
-          <li><a href="/api/validate-event/">validateEvent()</a></li>
-          <li><a href="/api/types/">Types</a></li>
-        </ul>
-      </div>
+  <section class="ownership-grid">
+    <article class="ownership-card">
+      <span class="card-kicker">Narrow by design</span>
+      <h2>Packages remain independently useful.</h2>
+      <p>
+        Adopt a single layer or the full runtime path. The ecosystem does not require one large
+        framework or hide transport and recovery policy inside ordering.
+      </p>
+    </article>
+    <article class="ownership-card">
+      <span class="card-kicker">Evidence over appearance</span>
+      <h2>Ordering claims remain bounded.</h2>
+      <p>
+        Replay, reconnects, late arrivals, and partial clocks are surfaced as operational facts—not
+        polished into a timeline that looks more certain than the evidence allows.
+      </p>
+    </article>
+    <article class="ownership-card">
+      <span class="card-kicker">System qualification</span>
+      <h2>The composed path gets tested.</h2>
+      <p>
+        Faults and workloads exercise package boundaries together, producing artifacts and verdicts
+        that can be reviewed before the stack is trusted in production.
+      </p>
     </article>
   </section>
+
+  <section class="core-docs-section">
+    <div class="core-docs-copy">
+      <span class="card-kicker">Core documentation</span>
+      <h2>This site is also the reference for <code>causal-order</code> v1.0.1.</h2>
+      <p>
+        Use the guides for deployment decisions, the wiki for the reasoning model, and the API
+        reference for the core ordering runtime’s exported surface.
+      </p>
+      <a class="button button-secondary" href="/api/">Open the core API</a>
+    </div>
+
+    <div class="home-grid">
+      <article class="home-card">
+        <span class="card-kicker">Deployment layer</span>
+        <h3><a href="/guides/">Guides</a></h3>
+        <ul class="home-links">
+          {featured.guides.map((item) => (
+            <li><a href={item.href}>{item.title}</a></li>
+          ))}
+        </ul>
+      </article>
+
+      <article class="home-card">
+        <span class="card-kicker">Conceptual layer</span>
+        <h3><a href="/wiki/">Wiki</a></h3>
+        <ul class="home-links">
+          {featured.wiki.map((item) => (
+            <li><a href={item.href}>{item.title}</a></li>
+          ))}
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <script>
+    const copyButtons = document.querySelectorAll<HTMLButtonElement>("[data-copy-command]");
+
+    for (const button of copyButtons) {
+      button.addEventListener("click", async () => {
+        const command = button.parentElement?.querySelector("code")?.textContent?.trim();
+
+        if (!command) return;
+
+        try {
+          await navigator.clipboard.writeText(command);
+          button.textContent = "Copied";
+          button.classList.add("is-copied");
+          window.setTimeout(() => {
+            button.textContent = "Copy";
+            button.classList.remove("is-copied");
+          }, 1600);
+        } catch {
+          button.textContent = "Copy failed";
+          window.setTimeout(() => {
+            button.textContent = "Copy";
+          }, 1600);
+        }
+      });
+    }
+  </script>
 </BaseLayout>

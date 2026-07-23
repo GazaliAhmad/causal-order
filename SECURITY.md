@@ -2,15 +2,14 @@
 
 ## Supported Versions
 
-Security fixes are provided on a best-effort basis for the current development line and the latest published `0.3.x` release.
+Security fixes are provided for the published `1.0.x` stable line.
 
 | Version | Supported |
 | --- | --- |
-| `main` / unreleased work | best effort |
-| latest `0.3.x` | yes |
+| latest `1.0.x` | yes |
 | older `0.x` lines | no |
 
-Because `causal-order` is still in the `0.x` phase, security and hardening work may land in the latest release line without backporting to older tags.
+The supported runtime floor is Node.js `>=22.13.0`. Node.js `18` and `20` are not supported by `v1.0.1`.
 
 ## Reporting a Vulnerability
 
