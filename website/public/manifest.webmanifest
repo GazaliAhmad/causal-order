@@ -1,7 +1,7 @@
 {
   "name": "causal-order",
   "short_name": "causal-order",
-  "description": "Event integrity for distributed systems that cannot treat timestamp order alone as the truth model.",
+  "description": "A package ecosystem for transport, recovery, duplicate filtering, causal ordering, and systems-level validation.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

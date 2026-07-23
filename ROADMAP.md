@@ -1,6 +1,8 @@
 # Roadmap
 
-This roadmap now records how `causal-order` reached `1.0.0` and where the stable line should mature next.
+Published package version: `v1.0.1`
+
+This roadmap records how `causal-order` established the stable `1.0` contract and preserved it through `1.0.1`.
 
 The goal is not to widen scope for its own sake.
 The goal is to keep the stable contract trustworthy while future work stays explicit and honest.
@@ -63,11 +65,12 @@ For new features, the default design test should be:
 
 ## Platform Baseline
 
-Current intended platform posture:
+Current platform posture for published `v1.0.1`:
 
-* active repository development targets Node.js `24`
-* published package support begins at Node.js `20+`
-* Node.js `18` remains in CI for best-effort regression detection, not as a formal long-term support contract
+* published package support begins at Node.js `22.13.0`
+* CI validates Node.js `22` and `24`
+* active repository development and performance work targets Node.js `24`
+* Node.js `18` and `20` remain part of earlier release history but are not supported by `v1.0.1`
 * ESM only
 * core time representation stays primitive: `bigint` epoch milliseconds
 * no `Temporal` requirement in the core package
@@ -105,7 +108,7 @@ For truly large or unbounded workloads, the roadmap should prefer batching, part
 
 ## `1.0` Release Checklist
 
-Before `causal-order` should be considered ready for `1.0.0`, these should all feel true:
+The shipped `1.0.0` release established the following stable-line conditions:
 
 * the top-level API names and exported result types feel stable enough to support long-term
 * confidence semantics for `proven`, `derived`, `fallback`, and `unknown` are crisp and no longer expected to change materially
@@ -118,20 +121,20 @@ Before `causal-order` should be considered ready for `1.0.0`, these should all f
 * anomaly and error messages are useful enough to support real debugging and audit work
 * the project is ready to preserve the semantics as a public contract, not just the function names
 
-Current status snapshot:
+Completed status snapshot:
 
 | Checklist Item | Status | Notes |
 | --- | --- | --- |
-| Top-level API names and exported result types feel stable enough to support long-term | Mostly | The published `0.5.0` and `0.6.0` surfaces are now narrow, explicit, directly export-tested, and backed by explicit API-clarity, default-behavior, core-boundary, and operational follow-through notes, but the project is still intentionally reserving room for pre-`1.0` contract cleanup. |
-| Confidence semantics are crisp and no longer expected to change materially | Partial | The `proven` / `derived` / `fallback` / `unknown` model is coherent and well-tested, but the roadmap still treats semantic freeze as a later milestone rather than as already complete. |
-| `orderBasis`, `causalEvidence`, anomaly types, and strict-mode behavior feel intentional rather than exploratory | Mostly | The current runtime surface is much more deliberate across ordering, validation, translation anomalies, and strict-mode behavior, including machine-readable diagnostics, policy controls, and deterministic translation anomaly ordering, though some remaining `1.0` contract-shaping work still exists around broader semantics and naming. |
-| The difference between `orderEvents()` and `orderEventStream()` is clear in both code and docs | Mostly | The batch, stream, and raw-record ingress split is now much clearer across the README, guides, examples, tests, and website API reference, though the stream boundary can still be taught more simply before `1.0`. |
-| The README describes the real shipped package, not a still-evolving intended shape | Mostly | The README now reflects the published `0.5.0` and `0.6.0` package surface, including `translateBatch()`, the current diagnostic contract, current Node support, the runnable package-facing examples, the released stability notes, the operational inspection layer, and the real batch-versus-stream posture, even though the wider docs set still has room to settle further. |
-| Examples clearly show why this library is safer than naive timestamp sorting | Partial | The repo has good scenario coverage for replay corruption, offline sync, false audit timelines, drift, and streaming recovery, but those examples can still be made more central and easier to discover for first-time evaluators. |
-| Performance guidance is honest about routine workloads, heavier batch workloads, and when streaming is the better model | Mostly | The current guidance is explicit about routine `10k` and `100k` guardrails, stronger `150k` hardening bands, and operational `250k` batch and stream validation runs without pretending every heavier path belongs in the default guard loop. |
-| Large-batch behavior has been benchmarked and pressure-tested enough that major surprises are unlikely in realistic use | Mostly | The repo now has meaningful `100k` guardrails, `150k` hardening coverage, and operational `250k` batch and stream runs, though more repeated history would still make the `1.0` confidence story stronger. |
-| Anomaly and error messages are useful enough to support real debugging and audit work | Mostly | Machine-readable anomaly coverage is substantially stronger after the published `0.4.1` diagnostics follow-through, though operator-facing wording and broader message polish still remain improvement areas rather than a fully finished `1.0` contract. |
-| The project is ready to preserve the semantics as a public contract, not just the function names | Not Yet | This is the real `1.0` threshold, and the project does not appear to be claiming that yet. |
+| Top-level API names and exported result types feel stable enough to support long-term | Complete | The `1.0.0` export and declaration surface is now the compatibility baseline for the stable line. |
+| Confidence semantics are crisp and no longer expected to change materially | Complete | `proven`, `derived`, `fallback`, and `unknown` have stable documented meanings and focused coverage. |
+| `orderBasis`, `causalEvidence`, anomaly types, and strict-mode behavior feel intentional rather than exploratory | Complete | The shipped semantic surface is explicit, machine-readable, and compatibility-protected. |
+| The difference between `orderEvents()` and `orderEventStream()` is clear in both code and docs | Complete | Batch, stream, and raw-record translation have distinct documented entrypoints and examples. |
+| The README describes the real shipped package, not a still-evolving intended shape | Complete | Package-facing documentation describes the stable runtime and its ecosystem boundary directly. |
+| Examples clearly show why this library is safer than naive timestamp sorting | Complete | Replay, drift, offline-sync, false-audit, and recovery scenarios exercise causal evidence and uncertainty. |
+| Performance guidance is honest about routine workloads, heavier batch workloads, and when streaming is the better model | Complete | Routine guards and heavier confidence profiles are separated and documented. |
+| Large-batch behavior has been benchmarked and pressure-tested enough that major surprises are unlikely in realistic use | Complete | The stable release was qualified with batch, stream, constrained-heap, and incident-shaped evidence. |
+| Anomaly and error messages are useful enough to support real debugging and audit work | Complete | Stable structured diagnostics support inspection and operational workflows. |
+| The project is ready to preserve the semantics as a public contract, not just the function names | Complete | `1.0.0` made the semantic contract stable; `1.0.1` verifies it against the current published package stack. |
 
 ## Release Phases
 
@@ -759,18 +762,19 @@ The practical direction from here is:
 * keep the current heavier `250k` batch and stream runs available as real validation surfaces
 * decide separately whether any future CI or release workflow should promote more of those heavier runs into a stricter default gate
 
-The current next-step CI posture is now represented directly in the repo through a non-blocking GitHub Actions post-merge validation workflow that:
+Historical `0.3.x` CI posture was represented directly in the repo through a non-blocking GitHub Actions post-merge validation workflow that:
 
 * runs on merges into `main`
-* runs `150k` batch and `150k` stream validation across Node.js `20` and `24`
+* ran `150k` batch and `150k` stream validation across Node.js `20` and `24`
 * treats that matrix as merge-to-`main` confidence work rather than as a requirement for pull requests, docs-only updates, or website-only updates
 * skips the heavier validation when the change only touches documentation or website surfaces
 
-That idea fits the current platform posture well:
+That historical matrix is superseded by the `v1.0.1` stack baseline:
 
-* Node.js `20` remains the supported runtime floor
+* Node.js `22.13.0` is the supported runtime floor
+* Node.js `22` and `24` are the active CI lines
 * Node.js `24` remains the active development and performance target
-* Node.js `18` remains available for future expansion if the heavier confidence matrix is later widened
+* Node.js `18` and `20` are no longer supported
 
 ## `0.4.0` Developer Experience
 
@@ -1318,7 +1322,7 @@ Definition of done:
 
 Shipped result:
 
-* `1.0.0` is now the current published stable release
+* `1.0.0` established the first published stable release and remains the stable-contract baseline preserved by `1.0.1`
 * `compareClocks()` has been removed after the `0.9.x` deprecation line, leaving `compareByHlc()` as the direct HLC helper
 * the package-facing docs, compatibility guidance, upgrade guidance, roadmap framing, and generated API surface now all describe the stable line directly instead of speaking from pre-release posture
 

@@ -40,9 +40,11 @@ These can still move more freely, as long as the release wording stays honest:
 
 Current package support:
 
-* published npm package support: Node.js `>=20`
-* active repository development target: Node.js `24`
-* Node.js `18` CI coverage is regression-oriented validation, not the main support contract
+* published npm package support: Node.js `>=22.13.0`
+* supported CI lines: Node.js `22` and `24`
+* active repository development and performance target: Node.js `24`
+
+Node.js `18` and `20` were supported or exercised by earlier release lines. That history remains in the relevant release notes and Roadmap entries, but those runtimes are not supported by `v1.0.1`.
 
 If this policy changes, update:
 

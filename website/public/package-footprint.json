@@ -1,19 +1,19 @@
 {
   "package": "causal-order",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "fileCount": 69,
   "totals": {
-    "rawBytes": 131596,
-    "gzipBytes": 37560,
-    "brotliBytes": 31844,
-    "raw": "131.6 kB",
-    "gzip": "37.6 kB",
-    "brotli": "31.8 kB"
+    "rawBytes": 116379,
+    "gzipBytes": 33072,
+    "brotliBytes": 28131,
+    "raw": "116.4 kB",
+    "gzip": "33.1 kB",
+    "brotli": "28.1 kB"
   },
   "badge": {
     "schemaVersion": 1,
     "label": "publish size",
-    "message": "37.6 kB (gzip) | 31.8 kB (brotli)",
+    "message": "33.1 kB (gzip) | 28.1 kB (brotli)",
     "color": "blue"
   },
   "files": [
@@ -421,15 +421,15 @@
     },
     {
       "path": "package.json",
-      "size": 5243,
-      "gzip": 1267,
-      "brotli": 1124
+      "size": 5322,
+      "gzip": 1293,
+      "brotli": 1151
     },
     {
       "path": "README.md",
-      "size": 22650,
-      "gzip": 7297,
-      "brotli": 6010
+      "size": 7354,
+      "gzip": 2783,
+      "brotli": 2270
     }
   ]
 }

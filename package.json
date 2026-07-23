@@ -1,6 +1,6 @@
 {
   "name": "causal-order",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A deployable event-ordering runtime for distributed replay, recovery, and stream reconciliation without false certainty.",
   "keywords": [
     "distributed-systems",
@@ -25,7 +25,7 @@
   },
   "homepage": "https://causal-order.gazali.one",
   "engines": {
-    "node": ">=20"
+    "node": ">=22.13.0"
   },
   "sideEffects": false,
   "type": "module",
@@ -99,6 +99,7 @@
     "site:build": "npm --prefix website run build",
     "site:preview": "npm --prefix website run preview",
     "release:check": "npm run check && npm test && npm run badge:footprint && npm run docs:sync:check && npm run bench:check",
+    "release:stack:check": "node scripts/packed-stack-release-check.mjs",
     "demo": "npm run build && node examples/smoke-demo.mjs",
     "examples": "npm run build && npm run examples:check",
     "bench": "npm run build && node perf/run.mjs --profile baseline-100k-shuffled",

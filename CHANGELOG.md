@@ -3,6 +3,13 @@
 All notable changes to this project are summarized here.
 Detailed release write-ups live in `docs/releases/`.
 
+## [1.0.1]
+* Added a packed-artifact release gate that verifies the exact core package with transport `0.2.0`, monitor `0.6.0`, dedupe `1.2.0`, and testing `0.3.1`, including healthy flow, buffering and replay, dedupe bypass, retry recovery, and a failing negative control.
+* Documented all five ecosystem packages, the four-stage runtime path, the optional monitor boundary, and testing's separate qualification role.
+* Corrected the Roadmap's historical `1.0` checklist so it agrees with the shipped stable release without changing runtime semantics.
+* Raised the package and stack runtime floor to Node.js `>=22.13.0`, with Node.js `22` and `24` as the supported CI lines.
+* Details: `docs/releases/1.0.1.md`
+
 ## [1.0.0]
 * Published the first stable public `causal-order` release.
 * Removed the last deprecated root-only compatibility alias by dropping `compareClocks()` and preserving `compareByHlc()` as the direct HLC helper.
@@ -41,7 +48,7 @@ Detailed release write-ups live in `docs/releases/`.
 * Polished docs-site navigation and layout consistency across guides, wiki, and API pages, including clearer sidebar grouping, consistent right-side TOC behavior, and better examples and entrypoint discovery.
 * Added CI support so docs-sync checks install website dependencies before importing website-backed docs helpers.
 
-## [0.6.1] - Unreleased
+## [0.6.1] - Not published
 
 * This version is not published to npm.
 * Automated the README publish-size badge from the actual published package contents and refreshed it during release-check and prepack flows.
@@ -60,7 +67,7 @@ Detailed release write-ups live in `docs/releases/`.
 * Added the first operator metrics guide covering watermark progress, late-arrival frequency, anomaly-rate monitoring, and correction-rate monitoring.
 * Added `0.6.0` release notes and aligned the README, guides index, and wiki entry points around the landed operational-tooling surface.
 
-## [0.5.1] - Unreleased
+## [0.5.1] - Not published
 
 * This version is not published to npm.
 * Polished post-`0.5.0` release artifacts and clarified that the exported-surface inventory is historical audit context, not an active release gate.

@@ -24,15 +24,22 @@ That means the main public surface revolves around three jobs:
 
 ## Package Ecosystem
 
-`causal-order` is the core runtime in the broader package ecosystem.
+`causal-order` is the ordering runtime at the end of the package ecosystem's delivery path:
 
-Companion packages can extend the runtime with focused operational capabilities without widening the payload-agnostic core package itself.
+```text
+@causal-order/transport -> [@causal-order/monitor] -> @causal-order/dedupe -> causal-order
+```
 
-Current package-facing example:
+The runtime packages have focused ownership:
 
-* [`@causal-order/dedupe`](https://www.npmjs.com/package/@causal-order/dedupe): duplicate-event filtering before causal ordering
+* [`@causal-order/transport`](https://www.npmjs.com/package/@causal-order/transport) owns transport and delivery adaptation.
+* [`@causal-order/monitor`](https://www.npmjs.com/package/@causal-order/monitor) is optional and owns health-aware routing, bounded buffering, and replay.
+* [`@causal-order/dedupe`](https://www.npmjs.com/package/@causal-order/dedupe) filters duplicate events before causal ordering.
+* [`causal-order`](https://www.npmjs.com/package/causal-order) owns causal ordering, uncertainty, and anomaly output.
 
-That means the main package should stay narrow and honest about ordering, while adjacent packages can handle workflow-specific preparation around that runtime.
+[`@causal-order/testing`](https://www.npmjs.com/package/@causal-order/testing) sits outside the runtime path. It supplies workloads, fault injection, orchestration, artifacts, and verdicts for qualifying the installed stack; it is not a delivery stage.
+
+That separation keeps the ordering package narrow while adjacent packages retain their own operational responsibilities.
 
 ## Ingress Layer
 

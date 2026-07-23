@@ -5,8 +5,8 @@ import "../styles/layout.css";
 import "../styles/ui.css";
 
 const {
-  title = "causal-order | Deployable event-ordering runtime for distributed systems",
-  description = "Learn how to deploy causal-order as an event-ordering runtime for distributed systems with guides, API reference, and conceptual docs.",
+  title = "causal-order | Distributed event integrity ecosystem",
+  description = "Explore the causal-order ecosystem for transport, recovery, duplicate filtering, ordering, and systems-level validation in distributed event flows.",
   imagePath = "https://causal-order.gazali.one/readme-banner.svg",
   noindex = false,
   pathname = Astro.url.pathname,
@@ -22,11 +22,11 @@ const imageUrl = siteOrigin && imagePath
   : "";
 const robotsContent = noindex ? "noindex, nofollow" : "index, follow";
 const twitterCard = imageUrl ? "summary_large_image" : "summary";
-const imageAlt = "causal-order banner showing the library identity and event-ordering visual";
+const imageAlt = "causal-order ecosystem banner showing distributed event flow and ordering";
 const websiteStructuredData = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "causal-order",
+  name: "causal-order ecosystem",
   url: siteOrigin || undefined,
   description,
   inLanguage: "en",
@@ -40,7 +40,7 @@ const softwareStructuredData = JSON.stringify({
   codeRepository: "https://github.com/GazaliAhmad/causal-order",
   downloadUrl: "https://www.npmjs.com/package/causal-order",
   programmingLanguage: "TypeScript",
-  runtimePlatform: "Node.js >=20",
+  runtimePlatform: "Node.js >=22.13.0",
   license: "https://github.com/GazaliAhmad/causal-order/blob/main/LICENSE",
   version: packageVersion,
   codeSampleType: "library",
@@ -248,12 +248,13 @@ const registerServiceWorkerScript = `
               </a>
             </div>
             <span class="brand-meta">
-              <small>deployable event-ordering runtime</small>
+              <small>distributed event integrity ecosystem</small>
             </span>
           </div>
         </div>
 
         <nav class="top-nav" aria-label="Main">
+          <a href="/#ecosystem">Ecosystem</a>
           <a href="/guides/">Guides</a>
           <a href="/wiki/">Wiki</a>
           <a href="/api/">API</a>

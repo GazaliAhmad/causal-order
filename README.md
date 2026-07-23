@@ -1,124 +1,49 @@
 # causal-order
 
-<table border="0" cellpadding="0" cellspacing="0" style="border:none; border-collapse:collapse; margin-bottom:10px;">
-  <tr style="border:none;">
-    <td style="border:none; padding-right:8px;"><a href="https://github.com/GazaliAhmad/causal-order/actions"><img src="https://img.shields.io/github/actions/workflow/status/GazaliAhmad/causal-order/ci.yml?branch=main&style=flat-square&label=CI&color=blue&badgev=20260529" alt="CI Status"></a></td>
-    <td style="border:none; padding-right:8px;"><a href="https://github.com/GazaliAhmad/causal-order"><img src="https://img.shields.io/badge/Dependencies-0%20%2F%20Zero-black?style=flat-square" alt="Zero Dependencies Unified"></a></td>
-    <td style="border:none; padding-right:8px;"><a href="https://www.npmjs.com/package/causal-order"><img src="./website/public/package-footprint-badge.svg" alt="Package Footprint"></a></td>
-    <td style="border:none; padding-right:8px;"><a href="https://github.com/GazaliAhmad/causal-order"><img src="https://img.shields.io/badge/Node.js-v24%20LTS%20Ready-green?style=flat-square" alt="Node Runtime"></a></td>
-    <td style="border:none; padding:0;"><a href="https://github.com/GazaliAhmad/causal-order"><img src="https://img.shields.io/badge/150k%20Stress%20Profile-Passed%20%E2%9C%93-orange?style=flat-square" alt="Stress Profile"></a></td>
-  </tr>
-</table>
+Order distributed events without pretending timestamps prove more than they do. `causal-order` combines explicit causal evidence, same-node sequence, hybrid logical clocks, deterministic fallback, and structured anomalies into a deployable ordering runtime.
 
-![causal-order banner](https://causal-order.gazali.one/readme-banner.svg)
+Published package version: `v1.0.1`
 
-A deployable event-ordering runtime for distributed systems that still use clocks, but cannot rely on one globally synchronized clock as the truth model.
+## Stack Position
 
-`causal-order` helps developers design and run event processing, replay, and recovery flows without assuming the system has one perfect global time source. It does not replace clocks or timestamps; it provides a deployable ordering layer when timestamp order alone is not enough to explain what happened or keep event integrity honest.
+```text
+@causal-order/transport -> [@causal-order/monitor] -> @causal-order/dedupe -> causal-order
+```
 
-Website: [https://causal-order.gazali.one](https://causal-order.gazali.one)
+`causal-order` owns ordering, confidence, causal evidence, and anomaly output at the end of the delivery path. Monitor is optional and owns health-aware buffering and replay. `@causal-order/testing` sits outside the path as qualification infrastructure, not a fifth runtime stage.
 
-It helps you:
-
-* order what can be ordered
-* preserve concurrency only when it can be justified honestly
-* flag what is suspicious
-* keep the difference between proof, inference, fallback, and unknown
-
-## Why This Exists
-
-Distributed systems often produce misleading timelines:
-
-* clocks drift across regions
-* replayed events can look newer than original events
-* offline devices sync late
-* ingestion order differs from creation order
-* some events are truly concurrent
-
-`causal-order` exists to make that uncertainty visible instead of hiding it.
-
-## Mental Model
-
-`causal-order` is built around a simple rule:
-
-> Be easy to use at the surface, but hard to misuse into false certainty.
-
-In practice, that means:
-
-* not every event set should be forced into one total order
-* explicit causal evidence outranks clock appearance
-* cross-node events without supported causal evidence should usually remain `unknown`
-* shared `traceId` or `partition` metadata does not, by itself, imply causality
-* streaming finality is operational, not causal truth
-
-Supported causal evidence today is intentionally narrow:
-
-* `parentEventId`
-* `dependencyEventIds`
-* same-node monotonic `sequence`
-
-This library is not trying to eliminate clocks.
-It is trying to stop treating wall-clock agreement as the truth model for a distributed system.
-
-## What You Get
-
-Given a set of distributed events, the library returns:
-
-* `ordered`: events with `orderIndex`, `orderBasis`, and `confidence`
-* `anomalies`: invalid, suspicious, or operationally important records
-* `stats`: summary counts for the batch
-
-Confidence is explicit:
-
-* `proven`: explicit causal evidence exists
-* `derived`: order was inferred from useful but weaker metadata
-* `fallback`: deterministic ordering was imposed for stability
-* `unknown`: the library cannot honestly justify the claim
-
-## Install
+## Install and Requirements
 
 ```bash
 npm install causal-order
 ```
 
-ESM only.
+- Node.js `>=22.13.0`
+- ESM-only output
+- no runtime dependencies
 
-Focused imports are also available when you want a narrower public entrypoint:
+The repository and published stack are validated on Node.js `22` and `24`. The `22.13.0` floor aligns core with monitor's built-in `node:sqlite` requirement. See the [`1.0.1` release notes](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/1.0.1.md) for the exact qualified companion versions.
 
-```ts
-import { orderEvents } from "causal-order/order"
-import { orderEvents as batchOrderEvents } from "causal-order/batch"
-import { orderEventStream } from "causal-order/stream"
-import { createProcessingTimeWatermark } from "causal-order/watermarks"
-import { translateBatch } from "causal-order/translate"
-import { createHlcClock } from "causal-order/clock"
-```
+## When to Use It
 
-## Package Ecosystem
+Use `causal-order` when:
 
-`causal-order` is the core runtime in the causal-order package ecosystem.
+- events arrive from several services, devices, or regions
+- timestamps alone cannot establish causal truth
+- replay, reconnect, or late arrival can disturb arrival order
+- operators need an explanation for ordering decisions
+- invalid or uncertain metadata must remain visible
 
-Additional packages extend the runtime with focused operational capabilities.
+### When Not to Use It
 
-| Package                | Purpose                                          |
-| ---------------------- | ------------------------------------------------ |
-| `causal-order`         | Core causal event ordering runtime               |
-| `@causal-order/dedupe` | Duplicate-event filtering before causal ordering |
+This package is not:
 
-See: [https://www.npmjs.com/package/@causal-order/dedupe](https://www.npmjs.com/package/@causal-order/dedupe)
+- a distributed queue, transport, or persistence layer
+- a semantic dedupe or domain-conflict resolver
+- a replacement for consensus ordering already established by Raft, Paxos, or an equivalent authority
+- necessary when a plain timestamp sort is genuinely sufficient
 
-## Runtime Policy
-
-Current runtime posture:
-
-* published package support starts at `Node.js >=20`
-* active development and performance validation target `Node.js 24`
-* CI still exercises `Node.js 18`, `20`, and `24` to catch regressions around the supported floor
-* the package is ESM only
-
-For the fuller compatibility and support boundary, see [COMPATIBILITY.md](https://github.com/GazaliAhmad/causal-order/blob/main/COMPATIBILITY.md).
-
-## Quick Example
+## Quick Start
 
 ```ts
 import { orderEvents } from "causal-order"
@@ -148,118 +73,46 @@ const events = [
   },
 ]
 
-const result = orderEvents(events, {
-  strict: false,
-  detectAnomalies: true,
-})
+const result = orderEvents(events)
 
 console.log(result.ordered)
 console.log(result.anomalies)
 ```
 
-Example output shape:
+Each ordered entry explains its position with `orderBasis`, `confidence`, and any `causalEvidence`. The runtime does not silently upgrade a clock-derived or fallback order into proven causality.
 
-```ts
-[
-  {
-    event: events[0],
-    orderIndex: 0n,
-    orderBasis: "sequence",
-    confidence: "derived",
-  },
-  {
-    event: events[1],
-    orderIndex: 1n,
-    orderBasis: "causal",
-    confidence: "proven",
-    causalEvidence: [{ type: "parent_event", parentEventId: "evt-1" }],
-  },
-]
+## Core Behavior
+
+Ordering evidence is applied in this direction:
+
+```text
+explicit dependencies -> same-node sequence -> HLC -> deterministic fallback
 ```
 
-The important part is not just the order.
-It is the explanation of why that order exists and how trustworthy it is.
+Confidence remains visible:
 
-## Default Option Posture
+- `proven`: supported by explicit causal or same-node evidence
+- `derived`: inferred from valid ordering metadata such as HLC or initial sequence placement
+- `fallback`: stable placement without a stronger causal claim
+- `unknown`: the relationship remains unresolved
 
-The default batch-ordering posture is designed to keep uncertainty visible instead of flattening it away:
+The default batch posture is warning-visible:
 
 ```ts
-const result = orderEvents(events, {
+orderEvents(events, {
   strict: false,
   detectAnomalies: true,
 })
 ```
 
-The main options to understand are:
-
-* think of the option boundary this way:
-  * `strict` controls fail-fast behavior for ordering and validation
-  * `allowUnknownOrder` controls whether unresolved placement stays explicit in non-strict output
-  * `detectAnomalies` controls how much diagnostic analysis is emitted with the result
-* `strict: false`
-  keeps the run warning-visible by default so invalid or unresolved cases can surface as structured anomalies instead of stopping the whole batch immediately
-  translation fail-fast behavior is configured separately through `translateBatch()` policy rather than through this same option
-* `allowUnknownOrder`
-  defaults to an uncertainty-visible posture where unresolved placement can still be emitted with warning-level visibility in non-strict mode
-* `detectAnomalies: true`
-  keeps anomaly reporting on by default because the package treats anomaly visibility as part of the ordinary answer, not as a debugging extra
-
-Two boundary rules matter here:
-
-* setting `allowUnknownOrder: false` strengthens severity posture for unresolved output, but it does not invent stronger certainty or silently rewrite the ordering result
-* setting `detectAnomalies: false` reduces emitted diagnostic output, but it does not make the result truer, cleaner, or more causally justified
-
-If you are unsure, start with warning-visible defaults and tighten later once the surrounding workflow is actually prepared to reject uncertain input.
-
-## Pairwise Helpers
-
-When you need a direct helper rather than a full ordering pass, prefer the primary pairwise methods:
-
-```ts
-import { compareByHlc, compareDeterministically } from "causal-order"
-
-const hlcRelation = compareByHlc(eventA.clock, eventB.clock)
-const fallbackOrder = compareDeterministically(eventA, eventB, "event_id")
-
-console.log(hlcRelation)
-console.log(fallbackOrder)
-```
-
-As of `0.5.0`, the preferred names are:
-
-* `compareByHlc()` for direct HLC comparison
-* `compareDeterministically()` for deterministic fallback comparison
-
-The stable surface now keeps the primary names only.
-Focused entrypoints and the root `causal-order` import both emphasize the same current API story instead of mixing canonical names with transitional aliases.
-`applyTieBreaker()` remains available as a lower-level helper when you specifically
-want the tie-break step on its own rather than the full deterministic fallback comparison.
+`strict` controls fail-fast behavior. `detectAnomalies` controls diagnostic output. `allowUnknownOrder` controls unresolved-order severity; it does not invent stronger certainty.
 
 ## Raw Record Translation
 
-When your data is not already in the library's event-envelope shape, use `translateBatch()` first and then pass the translated records into `orderEvents()`.
+Use `translateBatch()` when source records do not already match the event envelope:
 
 ```ts
 import { orderEvents, translateBatch } from "causal-order"
-
-const records = [
-  {
-    eventId: "evt-1",
-    source: "orders-api",
-    occurredAt: "1714971840123",
-    sequence: 1n,
-    body: { type: "order.created" },
-  },
-  {
-    eventId: "evt-2",
-    source: "payments-worker",
-    occurredAt: 1714971840125,
-    sequence: 1n,
-    parent: "evt-1",
-    body: { type: "payment.captured" },
-  },
-]
 
 const translated = translateBatch(records, {
   getEventId: (record) => record.eventId,
@@ -270,238 +123,76 @@ const translated = translateBatch(records, {
   getPayload: (record) => record.body,
 })
 
-console.log(translated.anomalies)
-
-const ordered = orderEvents(translated.translated, {
-  strict: false,
-  detectAnomalies: true,
-})
-
-console.log(ordered.ordered)
+const result = orderEvents(translated.translated)
 ```
 
-What matters most:
+Translation separates accepted events from structured anomalies. The [policy guide](https://causal-order.gazali.one/guides/policy-guidance/) covers coercion and failure behavior.
 
-* required mappers: `getEventId`, `getNodeId`, `getPhysicalTime`
-* accepted timestamp inputs: `bigint`, safe integer `number`, or canonical integer `string`
-* rejected timestamp inputs include `Date`, ISO timestamp strings, decimals, exponent notation, and unsafe integers
-* translated results split accepted records from structured translation anomalies
+## Streaming
 
-Keep pre-translation shaping narrow. Pass original source records into `translateBatch()` whenever possible and let it own coercion, rejection, and anomaly reporting.
-
-If you need the deeper ingress-policy details, see:
-
-* API: [translateBatch()](https://causal-order.gazali.one/api/translate-batch/)
-* Guide: [Policy Guidance](https://causal-order.gazali.one/guides/policy-guidance/)
-
-## Operational Inspection Helpers
-
-For operational review, replay audits, or emitted-batch inspection, the current release includes a small additive helper layer on top of the core runtime output:
+Use `orderEventStream()` for large or unbounded flows:
 
 ```ts
-import {
-  inspectOrderResult,
-  orderEvents,
-  summarizeTranslationAnomalies,
-  translateBatch,
-} from "causal-order"
-
-const translated = translateBatch(records, config)
-const translationSummary = summarizeTranslationAnomalies(translated.anomalies)
-
-const ordered = orderEvents(translated.translated, {
-  strict: false,
-  detectAnomalies: true,
-})
-
-const inspection = inspectOrderResult(ordered)
-
-console.log(translationSummary)
-console.log(inspection)
-```
-
-The `1.0.0` helper layer is intentionally narrow:
-
-* `summarizeEventAnomalies()`
-* `summarizeTranslationAnomalies()`
-* `explainOrderedEvent()`
-* `inspectOrderResult()`
-* `inspectOrderBatch()`
-
-These helpers summarize or explain existing package output. They do not hide anomalies, rewrite ordered state, or invent stronger causal claims than the runtime already supports.
-
-If you need adjacent adapters, workflow glue, or domain policy on top of this surface, see:
-
-* [Extension Boundary Guide](https://causal-order.gazali.one/guides/extension-boundary-guide/)
-
-## Streaming Overview
-
-For large or unbounded event flows, use `orderEventStream()` instead of assuming everything belongs in one in-memory batch.
-
-That includes both ordinary day-to-day stream processing and delayed reconnect, offline sync, or recovery flows where late arrivals are part of normal operations.
-Each emitted `batch` is a `StreamOrderBatch` carrying the currently ready ordered events plus stream-specific metadata such as `watermark`, optional `correction`, and `isFinal`.
-
-```ts
-import { orderEventStream } from "causal-order"
+import { orderEventStream } from "causal-order/stream"
 
 for await (const batch of orderEventStream(source(), {
   batchSize: 100,
   maxLateArrivalMs: 30_000n,
   lateArrivalPolicy: "flag",
-  strict: false,
 })) {
-  console.log(batch.events)
-  console.log(batch.anomalies)
-  console.log(batch.watermark, batch.isFinal)
+  console.log(batch.events, batch.anomalies)
 }
 ```
 
-Keep this mental model in mind:
+Watermarks control operational readiness, not causal truth. Late arrivals use explicit `flag`, `drop`, `emit_correction`, or `fail` policy.
 
-* the watermark controls operational readiness, not causal truth
-* late events are handled by explicit policy rather than being silently hidden
-* non-final output may need later reconciliation, especially in reconnect-heavy flows
+## Inspection
 
-For the full stream contract, see:
+Inspection helpers summarize existing output without rewriting it:
 
-* [Streaming Recovery And Resync](https://causal-order.gazali.one/guides/streaming-recovery-resync/)
-* [Streaming Finality](https://causal-order.gazali.one/wiki/streaming-finality/)
+```ts
+import {
+  explainOrderedEvent,
+  inspectOrderBatch,
+  inspectOrderResult,
+  summarizeEventAnomalies,
+  summarizeTranslationAnomalies,
+} from "causal-order/inspect"
+```
 
-## When To Use It
+## Package Exports
 
-`causal-order` is primarily for deployable operational event processing in distributed systems that cannot rely on one perfect global clock.
-It is meant to be deployable as the event-ordering engine in that workflow, not as a complete end-to-end event platform by itself.
-One of its main applications is straightforward deployment as the ordering layer for distributed event workflows that still need honest causal ordering at runtime.
+| Export | Purpose |
+| --- | --- |
+| `causal-order` | primary ordering, translation, validation, and inspection surface |
+| `causal-order/batch` | batch ordering |
+| `causal-order/stream` | streaming ordering |
+| `causal-order/translate` | raw-record translation |
+| `causal-order/clock` | HLC creation and serialization |
+| `causal-order/compare` | causal, HLC, and deterministic comparison |
+| `causal-order/validate` | event and clock validation |
+| `causal-order/anomalies` | anomaly detection |
+| `causal-order/inspect` | output explanation and summaries |
+| `causal-order/watermarks` | stream watermark helpers |
+| `causal-order/types` | public TypeScript contracts |
 
-That includes:
+## Documentation
 
-* continuous stream processing with explicit late-arrival and reconciliation behavior
-* delayed reconnect and recovery workflows
-* offline sync inspection
-* replay analysis
+- [Website and API reference](https://causal-order.gazali.one)
+- [Quick-start scenarios](https://causal-order.gazali.one/guides/quick-start-scenarios/)
+- [Package surface overview](https://causal-order.gazali.one/guides/package-surface-overview/)
+- [Supported and unsupported usage](https://causal-order.gazali.one/guides/supported-vs-unsupported-usage/)
+- [Policy guidance](https://causal-order.gazali.one/guides/policy-guidance/)
+- [Extension boundary](https://causal-order.gazali.one/guides/extension-boundary-guide/)
+- [Replay inspection workflow](https://causal-order.gazali.one/guides/operations/replay-inspection-workflow/)
+- [Streaming reconciliation workflow](https://causal-order.gazali.one/guides/operations/streaming-reconciliation-workflow/)
+- [Examples](https://github.com/GazaliAhmad/causal-order/tree/main/examples)
+- [`1.0.1` release notes](https://github.com/GazaliAhmad/causal-order/blob/main/docs/releases/1.0.1.md)
+- [Changelog](https://github.com/GazaliAhmad/causal-order/blob/main/CHANGELOG.md)
 
-Other strong use cases include:
-
-* multi-region debugging
-* audit timeline reconstruction
-* late-arrival stream handling
-* distributed incident analysis
-
-It is especially useful when:
-
-* events come from multiple services, devices, or regions
-* timestamps are not enough on their own
-* ordering claims need explanation
-* concurrency matters
-* suspicious metadata should not be silently normalized
-
-It is less useful when:
-
-* you already have authoritative causal ordering elsewhere
-* your data has already been normalized into the exact ordering truth you trust by a consensus layer such as Raft or Paxos
-* you only need a plain timestamp sort
-
-If a consensus system has already settled the ordering question cleanly for the stream you care about, `causal-order` is usually not the interesting part of the stack anymore.
-The library is strongest when ordering truth is still messy, partial, cross-boundary, or worth explaining.
-
-## Get Started
-
-Evaluate the package:
-
-* start with [What This Library Is](https://causal-order.gazali.one/wiki/what-this-library-is/)
-* read [Quick Start Scenarios](https://causal-order.gazali.one/guides/quick-start-scenarios/)
-* check [Supported Vs Unsupported Usage](https://causal-order.gazali.one/guides/supported-vs-unsupported-usage/)
-* scan [Examples And Entrypoints](https://causal-order.gazali.one/guides/examples-and-entrypoints/)
-
-Build a first flow:
-
-* start with [Package Surface Overview](https://causal-order.gazali.one/guides/package-surface-overview/)
-* use [Policy Guidance](https://causal-order.gazali.one/guides/policy-guidance/) to choose strictness and late-arrival behavior
-* keep [Upgrade Expectations](https://causal-order.gazali.one/guides/upgrade-expectations/) nearby if you are adopting it into a maintained system
-* use [Mental Model](https://causal-order.gazali.one/guides/mental-model/) and [Clocks, Causality, And Why HLC](https://causal-order.gazali.one/guides/clocks-causality-and-why-hlc/) when you need deeper design context
-
-Operate or debug a deployed workflow:
-
-* use [Replay Inspection Workflow](https://causal-order.gazali.one/guides/operations/replay-inspection-workflow/)
-* use [Streaming Reconciliation Workflow](https://causal-order.gazali.one/guides/operations/streaming-reconciliation-workflow/)
-* use [Incident Review Guide](https://causal-order.gazali.one/guides/operations/incident-review-guide/)
-* use [Anomaly Interpretation Guide](https://causal-order.gazali.one/guides/operations/anomaly-interpretation-guide/)
-* use [Operator Metrics Guide](https://causal-order.gazali.one/guides/operations/operator-metrics-guide/)
-* use [Streaming Recovery And Resync](https://causal-order.gazali.one/guides/streaming-recovery-resync/) and [Streaming Finality](https://causal-order.gazali.one/wiki/streaming-finality/) for stream-specific behavior
-
-Study failure patterns and workloads:
-
-* [Case Studies](https://causal-order.gazali.one/guides/case-studies/)
-* [Replay Corruption](https://causal-order.gazali.one/guides/replay-corruption/)
-* [Multi-Region Drift](https://causal-order.gazali.one/guides/multi-region-drift/)
-* [False Audit Timelines](https://causal-order.gazali.one/guides/false-audit-timeline/)
-* [Offline Sync Anomalies](https://causal-order.gazali.one/guides/offline-sync-anomalies/)
-* [Causal Inversion](https://causal-order.gazali.one/guides/causal-inversion/)
-* [AWS-Inspired DynamoDB Outage Exercise](https://causal-order.gazali.one/guides/aws-inspired-dynamodb-outage/)
-* [Stress Hardening](https://causal-order.gazali.one/guides/stress-hardening/)
-* [After-Hours Batch Processing](https://causal-order.gazali.one/guides/after-hours-batch-processing/)
-* [Realistic Workloads](https://causal-order.gazali.one/wiki/realistic-workloads/)
-
-Runnable examples:
-
-* [Examples Index](https://causal-order.gazali.one/examples/)
-* [Minimal Ingress Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/ingress-minimal.mjs)
-* [Ingress Replay Pipeline Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/ingress-replay-pipeline.mjs)
-* [Local Durable Buffer Replay Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/local-durable-buffer-replay.mjs)
-* [False Audit Timeline Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/false-audit-timeline.mjs)
-* [Offline Sync Anomalies Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/offline-sync-anomalies.mjs)
-* [Streaming Recovery And Resync Example](https://github.com/GazaliAhmad/causal-order/blob/main/examples/streaming-recovery-resync.mjs)
-
-The runnable examples are written from the package consumer point of view.
-They use the public `causal-order` package surface so copied example code still looks like the right starting point in a real project.
-
-## Status
-
-`1.0.0` is the current published `causal-order` release.
-
-Current package posture:
-
-* `causal-order` is ready to use as a deployable event-ordering runtime today when you want confidence-aware ordering, anomaly visibility, and explicit causal justification in a real workflow
-* deployment is a first-class application of the package, not only a forensic or post-incident use case
-* bounded batch recovery, replay, reconciliation, and audit-style workloads are the clearest production-credible starting point in the current contract
-* streaming is also part of the public contract, with the current hardening and runtime-stability guides defining how to deploy it with explicit lateness, correction, and reconciliation posture
-* the repo already includes heavier deployment-facing evidence, including named `250k` batch and stream validation profiles and a documented `1,000,000`-event AWS-inspired streaming outage exercise
-* raw-record translation into the event envelope and its machine-readable failure contract are now part of the package surface rather than repo-local work
-
-Confidence ladder:
-
-* `CI` covers everyday correctness, docs sync, and package-facing examples
-* `Post-Merge 150k Confidence` is the routine stronger automated confidence run
-* `Manual 250k Confidence` is the heavier on-demand batch and stream validation path
-* `Manual AWS Incident Confidence` is the outage-shape streaming confidence run with GC-observed summary artifacts
-
-`1.0.0` finalizes:
-
-* the first stable public contract for the bounded batch, streaming, translation, validation, and inspection surfaces
-* the last planned helper-alias cleanup by removing `compareClocks()` after the `0.9.x` deprecation line
-* the stable package-facing docs and website alignment around `causal-order` as a deployable event-ordering runtime
-
-For the `1.0.0` package-facing release surface, see:
-
-* [Extension Boundary Guide](https://causal-order.gazali.one/guides/extension-boundary-guide/)
-* [Policy Guidance](https://causal-order.gazali.one/guides/policy-guidance/)
-* [Replay Inspection Workflow](https://causal-order.gazali.one/guides/operations/replay-inspection-workflow/)
-* [Streaming Reconciliation Workflow](https://causal-order.gazali.one/guides/operations/streaming-reconciliation-workflow/)
-* [Incident Review Guide](https://causal-order.gazali.one/guides/operations/incident-review-guide/)
-* [Anomaly Interpretation Guide](https://causal-order.gazali.one/guides/operations/anomaly-interpretation-guide/)
-* [Operator Metrics Guide](https://causal-order.gazali.one/guides/operations/operator-metrics-guide/)
-* [Stress Hardening](https://causal-order.gazali.one/guides/stress-hardening/)
-* [AWS-Inspired DynamoDB Outage Exercise](https://causal-order.gazali.one/guides/aws-inspired-dynamodb-outage/)
+Detailed concepts, operational workflows, case studies, and release history stay in `guides/`, `wiki/`, and `docs/releases/` rather than being repeated here.
 
 ## Repository Development
-
-If you are working in the repository itself, start with:
-
-* [CONTRIBUTING.md](https://github.com/GazaliAhmad/causal-order/blob/main/CONTRIBUTING.md)
-* [MAINTENANCE.md](https://github.com/GazaliAhmad/causal-order/blob/main/MAINTENANCE.md)
-* [RELEASE_PROCESS.md](https://github.com/GazaliAhmad/causal-order/blob/main/RELEASE_PROCESS.md)
-
-The most useful local gates are:
 
 ```bash
 npm run check
@@ -509,14 +200,12 @@ npm test
 npm run release:check
 ```
 
+See [CONTRIBUTING.md](https://github.com/GazaliAhmad/causal-order/blob/main/CONTRIBUTING.md), [MAINTENANCE.md](https://github.com/GazaliAhmad/causal-order/blob/main/MAINTENANCE.md), and [RELEASE_PROCESS.md](https://github.com/GazaliAhmad/causal-order/blob/main/RELEASE_PROCESS.md).
+
 ## License
 
-MIT. See [LICENSE](https://github.com/GazaliAhmad/causal-order/blob/main/LICENSE).
+[MIT](https://github.com/GazaliAhmad/causal-order/blob/main/LICENSE)
 
 ## Security
 
-See [SECURITY.md](https://github.com/GazaliAhmad/causal-order/blob/main/SECURITY.md) for supported versions and private vulnerability reporting guidance.
-
-## Contributing
-
-See [CONTRIBUTING.md](https://github.com/GazaliAhmad/causal-order/blob/main/CONTRIBUTING.md) for repository workflow, verification expectations, and documentation update guidance.
+See [SECURITY.md](https://github.com/GazaliAhmad/causal-order/blob/main/SECURITY.md) for supported versions and private vulnerability reporting.

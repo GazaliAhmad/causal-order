@@ -47,9 +47,9 @@ The repository is split into a few clear areas:
 
 ## Local Setup
 
-Use Node.js `24` for repository development work.
+Use Node.js `22.13.0` or newer for repository development work. Node.js `24` is the preferred local development line.
 
-The published npm package officially supports Node.js `>=20`.
+The published npm package officially supports Node.js `>=22.13.0`.
 
 ```bash
 npm install
@@ -75,10 +75,10 @@ npm run site:preview
 
 Current runtime policy for repository work:
 
-* use Node.js `24` for local repository work
-* the published package officially supports Node.js `>=20`
-* CI runs against Node.js `18`, `20`, and `24`
-* Node.js `18` coverage is best-effort regression validation, not a formal support contract
+* use Node.js `22.13.0` or newer for local repository work
+* prefer Node.js `24` for active development and performance work
+* the published package officially supports Node.js `>=22.13.0`
+* CI runs against Node.js `22` and `24`
 
 ## Contribution Style
 
